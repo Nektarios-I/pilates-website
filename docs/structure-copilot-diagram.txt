@@ -1,0 +1,38 @@
+pilates-studio-website/
+├── .github/
+│   ├── copilot-instructions.md
+│   └── prompts/
+├── .vscode/
+│   ├── extensions.json
+│   └── settings.json
+├── docs/
+├── public/
+│   ├── images/
+│   ├── icons/
+│   └── og/
+├── src/
+│   ├── app/
+│   │   ├── (marketing)/
+│   │   ├── classes/
+│   │   ├── pricing/
+│   │   ├── instructors/
+│   │   ├── contact/
+│   │   ├── faq/
+│   │   └── blog/
+│   ├── components/
+│   │   ├── ui/
+│   │   ├── layout/
+│   │   └── sections/
+│   ├── features/
+│   │   ├── booking/
+│   │   ├── classes/
+│   │   ├── instructors/
+│   │   ├── pricing/
+│   │   └── testimonials/
+│   ├── lib/
+│   ├── config/
+│   ├── hooks/
+│   ├── styles/
+│   └── test/
+├── e2e/
+└── .env.example

@@ -1,0 +1,17 @@
+project-root/
+├── AGENTS.md
+├── .codex/
+│   ├── config.toml
+│   ├── prompts/
+│   │   ├── codex-plan-foundation.md
+│   │   ├── codex-scaffold-foundation.md
+│   │   ├── codex-setup-testing.md
+│   │   ├── codex-implement-homepage-shell.md
+│   │   └── codex-review-change.md
+│   └── playbooks/
+│       ├── planning-playbook.md
+│       ├── implementation-playbook.md
+│       ├── testing-playbook.md
+│       └── review-playbook.md
+└── docs/
+    └── (reuse existing docs)

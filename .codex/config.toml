@@ -1,0 +1,18 @@
+project_root_markers = [".git"]
+
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+default_permissions = ":workspace"
+
+model_reasoning_effort = "high"
+model_verbosity = "low"
+model_reasoning_summary = "none"
+
+[sandbox_workspace_write]
+network_access = false
+
+[analytics]
+enabled = false
+
+[feedback]
+enabled = false

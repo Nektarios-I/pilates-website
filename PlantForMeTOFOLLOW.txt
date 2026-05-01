@@ -1,0 +1,39 @@
+Create the GitHub repo.
+
+Initialize Next.js with App Router, TypeScript, Tailwind, and src/.
+
+Commit the raw scaffold.
+
+Create docs/ files manually.
+
+Create .github/copilot-instructions.md manually.
+
+Create .github/prompts/*.prompt.md files.
+
+Create .vscode/settings.json and .vscode/extensions.json.
+
+Define the final folder structure.
+
+Install testing and formatting dependencies.
+
+Ask Copilot for a plan only, not code.
+
+Review and correct the plan manually.
+
+Ask Copilot to scaffold the project structure.
+
+Run lint, typecheck, and tests.
+
+Fix structural issues manually.
+
+Ask Copilot to implement homepage shell plus tests.
+
+Add Playwright smoke test for homepage and navigation.
+
+Connect GitHub repo to Vercel.
+
+Enable preview deployments.
+
+Add GitHub Actions for lint, test, build, and e2e.
+
+Only after that, begin page-by-page implementation.
