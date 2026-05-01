@@ -1,0 +1,9 @@
+Plan prompt — ask Codex to inspect the repo and define the next milestone precisely.
+
+Implementation prompt — ask Codex to implement only that milestone.
+
+Review prompt — ask Codex to review what it just changed and call out drift, duplication, or weak spots.
+
+Fix prompt — if needed, ask Codex to clean the issues it found.
+
+Next-step prompt — ask Codex to propose the next milestone and exact prompt for it.

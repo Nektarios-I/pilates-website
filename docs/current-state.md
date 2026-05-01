@@ -6,17 +6,18 @@ This file tells the coding agent the exact current stage of the repository so it
 
 ## Current situation
 
-The repository has been prepared primarily at the documentation and agent-guidance level.
+Milestone 1 foundation scaffold is complete and has been reviewed for small cleanup issues.
 
-The following kinds of files should already exist or be in progress:
+The repository currently includes:
 
 - repo guidance files for Copilot and Codex
 - planning and architecture documentation
 - testing strategy documentation
 - prompt and playbook files for agent workflows
+- App Router marketing route placeholders
+- shared layout components, UI primitives, site/navigation config, metadata helpers, robots, and sitemap
 
-However, the actual application scaffold may still be incomplete or missing.
-The agent must inspect the real repository contents and report the actual state instead of assuming that the Next.js project has already been initialized.
+The agent must still inspect the real repository contents before each task instead of assuming undocumented files, scripts, packages, or content exist.
 
 ## Intended stack
 
@@ -31,16 +32,14 @@ The intended stack for the project is:
 
 ## Current priority
 
-The immediate priority is not final implementation.
+The immediate priority is the testing foundation milestone.
 
-The immediate priority is:
+The next task should:
 
-1. inspect the repository,
-2. understand exactly what exists,
-3. identify missing foundation pieces,
-4. confirm the intended environment and toolchain,
-5. ask clarifying questions,
-6. propose the cleanest next task.
+1. install and configure Vitest with React Testing Library,
+2. install and configure Playwright,
+3. add the first scaffold-level smoke tests,
+4. keep homepage implementation deferred until after the testing baseline exists.
 
 ## Important rule
 
@@ -48,13 +47,13 @@ Do not assume package versions, libraries, scripts, or config files unless they 
 If a file is missing, say it is missing.
 If a version cannot be detected, say it cannot be detected.
 
-## Expected first outcome
+## Expected next outcome
 
-The first useful result from the agent is a repository audit and structured plan, not immediate code generation.
+The next useful result from the agent is a small, verified testing foundation that exercises the existing scaffold without implementing Milestone 2 homepage content.
 
 ## Additional locked decisions
 
-- Studio name is **corehouse Pilates Studio**.
+- Studio name is **Corehouse Pilates Studio**.
 - Unit/integration testing will use **Vitest + React Testing Library**.
 - End-to-end testing will use **Playwright**.
 - Milestone 1 is **foundation scaffold only**.

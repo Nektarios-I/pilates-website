@@ -16,9 +16,9 @@ It should always allow a developer to quickly understand:
 
 ## Project identity
 
-- Project: Pilates Studio Website
+- Project: Corehouse Pilates Studio Website
 - Type: Marketing website for a professional Pilates studio
-- Status: Setup / planning phase
+- Status: Milestone 1 foundation scaffold reviewed and ready for testing foundation
 
 ---
 
@@ -27,17 +27,15 @@ It should always allow a developer to quickly understand:
 - Next.js App Router
 - TypeScript
 - Tailwind CSS
-- React Testing Library
+- Vitest + React Testing Library
 - Playwright
 - Vercel as initial deployment target
-
-Update this section if the actual implemented stack changes.
 
 ---
 
 ## Current stage
 
-<!-- Example: Documentation prepared, repository audit pending -->
+Milestone 1 foundation scaffold is complete and has had a cleanup review. The project now has the public route structure, shared layout shell, metadata/indexing foundation, and config structure without final homepage sections or test tooling.
 
 ---
 
@@ -47,32 +45,28 @@ Update this section if the actual implemented stack changes.
 - Product and architecture docs prepared
 - Copilot guidance files prepared
 - Codex guidance files prepared
-
-Update this list continuously.
+- Structured logging system prepared
+- Site map prepared for Milestone 1 public routes
+- Milestone 1 foundation scaffold completed
+- Milestone 1 scaffold cleanup review completed
 
 ---
 
 ## Key active priorities
 
-1. Audit actual repository state
-2. Confirm environment/tooling setup
-3. Scaffold project foundation
-4. Set up testing baseline
-5. Implement homepage shell
-6. Continue page-by-page implementation
+1. Set up testing baseline with Vitest, React Testing Library, and Playwright
+2. Implement homepage shell
+3. Continue page-by-page implementation
 
 ---
 
 ## Open questions
 
-- Final client branding?
-- Final color direction?
-- Final navigation structure?
+- Final visual identity and color direction?
+- Final navigation style?
 - Booking integration details?
 - CMS needed or not?
 - Real content availability?
-
-Replace these with actual open questions as the project evolves.
 
 ---
 
@@ -87,24 +81,25 @@ Replace these with actual open questions as the project evolves.
 
 ## Decisions made
 
-Record short decision summaries here and point to the decision log when needed.
-
 - App Router + TypeScript intended
 - Mobile-first approach required
 - Modular UI architecture required
-- Testing should be built in early
+- Vitest + React Testing Library locked for unit/integration tests
+- Playwright locked for E2E tests
+- Milestone 1 is foundation scaffold only
+- Structured markdown logs are required for meaningful project work
 
 ---
 
 ## Next recommended action
 
-<!-- Update after each major step -->
+Start the testing foundation milestone with Vitest, React Testing Library, and Playwright.
 
 ---
 
 ## Last updated
 
-<!-- YYYY-MM-DD HH:MM -->s
+2026-05-01 17:27Z
 
 ## Logging system
 

@@ -16,146 +16,132 @@ Do not turn it into a generic project wiki.
 
 ---
 
-## How to use this file
-
-For each major task:
-
-1. Copy this structure.
-2. Fill in the current task details.
-3. Keep the steps small and checkable.
-4. Update status as work completes.
-5. Use it alongside Codex threads and task prompts.
-
-Recommended status values:
-
-- planned
-- in_progress
-- blocked
-- done
-
----
-
 ## Current task
 
 ### Title
 
-<!-- Example: Scaffold initial App Router marketing foundation -->
+Milestone 1 foundation scaffold review and cleanup
 
 ### Goal
 
-<!-- What should exist or be true when this task is complete? -->
+Review the completed Milestone 1 scaffold, clean up small documentation or metadata drift, and leave the repository ready for the testing foundation milestone.
 
 ### Why this matters
 
-<!-- Why this task is worth doing now -->
+Milestone 2 should start from a coherent foundation, with route structure, metadata, naming, tracking docs, and logs aligned before test tooling is introduced.
 
 ### Scope
 
-<!-- What is included -->
+- Check `.env.example` for duplicate or conflicting public config lines.
+- Check project tracking docs for leftover scaffold-plan template text or stale status.
+- Check Corehouse Pilates Studio naming consistency.
+- Check route/layout consistency after removing the default scaffold page.
+- Check metadata/config consistency across the app shell, sitemap, robots, and placeholders.
+- Keep logging and changelog updates concise and proportionate.
 
 ### Out of scope
 
-<!-- What is intentionally excluded -->
+- Installing test packages.
+- Adding test configuration.
+- Implementing homepage sections.
+- Adding final studio copy, pricing, schedules, booking, CMS, analytics, or integrations.
 
 ---
 
 ## Required context
 
-List the files and docs that must be read before implementation.
-
 - `AGENTS.md`
 - `README.md`
+- `PLANS.md`
+- `CHANGELOG.md`
 - `.github/copilot-instructions.md`
+- `.codex/playbooks/review-playbook.md`
+- `docs/current-state.md`
 - `docs/product-requirements.md`
 - `docs/site-map.md`
 - `docs/architecture.md`
 - `docs/testing-strategy.md`
-
-Add any task-specific files below:
-
-- <!-- file path -->
+- `docs/ui-architecture.md`
+- `docs/responsive-strategy.md`
+- `docs/engineering-principles.md`
+- `docs/project-ledger.md`
+- `docs/decision-log.md`
+- `docs/content-model.md`
+- `docs/ux-notes.md`
+- `docs/logging-strategy.md`
+- `logs/README.md`
+- Milestone 1 scaffold files under `src/app`, `src/components`, `src/config`, and `src/lib`
+- Milestone 1 implementation log
 
 ---
 
 ## Constraints
 
-- Follow documented architecture.
-- Keep route files thin.
-- Prefer server components by default.
-- Use semantic HTML.
-- Avoid unnecessary dependencies.
-- Add or update tests when behavior changes.
-- Keep the solution small, clean, and reviewable.
-
-Add any task-specific constraints below:
-
-- <!-- constraint -->
+- Keep changes small and reviewable.
+- Preserve Milestone 1 scope.
+- Do not introduce new dependencies, scripts, test tooling, or feature implementation.
+- Prefer documentation cleanup over new decisions unless existing docs conflict.
+- Keep placeholder copy explicit and avoid unconfirmed business facts.
 
 ---
 
 ## Proposed file changes
 
-List files to create or modify.
+### Modify
+
+- `PLANS.md`
+- `CHANGELOG.md`
+- `docs/current-state.md`
+- `docs/project-ledger.md`
+- `src/app/(marketing)/blog/[slug]/page.tsx`
 
 ### Create
 
-- <!-- path -->
-
-### Modify
-
-- <!-- path -->
+- one review log under `logs/review/`
 
 ### Avoid touching
 
-- <!-- path -->
+- package dependencies and lockfile
+- test configuration and scripts
+- homepage content sections
+- booking/CMS/API/integration files
 
 ---
 
 ## Implementation sequence
 
-Break the work into small ordered steps.
-
-1. [planned] <!-- step -->
-2. [planned] <!-- step -->
-3. [planned] <!-- step -->
-4. [planned] <!-- step -->
+1. [done] Read required docs and inspect the Milestone 1 scaffold.
+2. [done] Identify cleanup issues in docs, naming, route layout, and metadata.
+3. [done] Apply small scoped cleanup fixes and add a review log.
+4. [done] Run `npm run lint`.
+5. [done] Run `npm run build`.
+6. [done] Review the final diff for scope creep.
 
 ---
 
 ## Verification plan
 
-List the exact checks to run.
-
-- [ ] `npm run lint`
-- [ ] `npm run test`
-- [ ] `npm run test:e2e`
-- [ ] `npm run build`
-
-Add any task-specific verification below:
-
-- [ ] <!-- command -->
-
-If a command is currently blocked, note why in the status section.
+- [x] `npm run lint`
+- [x] `npm run build` passed from `C:\Users\User\Desktop\pilateswebsite`; the mixed-case path still triggers the known Next.js Windows prerender invariant.
+- [ ] `npm run test` remains intentionally unavailable until Milestone 2.
+- [ ] `npm run test:e2e` remains intentionally unavailable until Milestone 2.
 
 ---
 
 ## Risks / review points
 
-List what could go wrong or what needs special review.
-
-- <!-- risk -->
-- <!-- review point -->
+- Do not turn cleanup into homepage implementation.
+- Do not install or configure testing packages before Milestone 2.
+- Keep documentation aligned without rewriting the project history.
+- Treat broader encoding cleanup in older docs as a separate task unless it blocks this review.
 
 ---
 
 ## Status log
 
-Use short timestamped notes.
-
-- YYYY-MM-DD HH:MM — planned — initial plan created
-- YYYY-MM-DD HH:MM — in_progress — implementation started
-- YYYY-MM-DD HH:MM — blocked — waiting on missing package / config
-- YYYY-MM-DD HH:MM — done — task completed and verified
+- 2026-05-01 17:21Z - in_progress - Milestone 1 review and cleanup pass started.
+- 2026-05-01 17:25Z - done - Lint passed; build passed from the lowercase workspace path and reproduced the known mixed-case path issue.
+- 2026-05-01 17:27Z - done - Final diff reviewed for Milestone 1 scope.
 
 ---
 
@@ -163,19 +149,8 @@ Use short timestamped notes.
 
 The task is complete when all of the following are true:
 
-- the requested behavior or structure exists
-- the implementation matches the documented architecture
-- relevant tests were added or updated
-- relevant checks passed or blockers were explicitly documented
-- the diff is clean and reviewable
-
-## Logging linkage
-
-For every major task tracked in this plan, create a corresponding log entry in `logs/` when:
-
-- planning is completed,
-- implementation materially changes files,
-- testing or review produces meaningful results,
-- or blockers significantly change the next steps.
-
-The log filename should follow the naming convention defined in `docs/logging-strategy.md`.
+- concrete cleanup issues are fixed or explicitly marked out of scope
+- Milestone 1 scope remains intact
+- a concise review log exists under `logs/review/`
+- lint and build pass or blockers are documented
+- the next milestone recommendation is clear
