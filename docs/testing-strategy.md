@@ -16,7 +16,6 @@ Build confidence in the website through fast feedback, stable automated tests, a
 ## Testing stack
 
 - React Testing Library for component and integration tests
-- Jest or Vitest for test runner setup
 - Playwright for end-to-end tests
 
 ## Locked testing decisions
