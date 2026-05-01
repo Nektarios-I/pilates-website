@@ -132,3 +132,20 @@ Link to other docs when needed.
 - Related files:
   - `docs/project-ledger.md`
   - `docs/current-state.md`
+
+### DEC-0008 — Use a structured repository logging system
+
+- Date: 2026-05-01
+- Status: accepted
+- Context:
+  The project uses AI-assisted workflows and needs durable, human-readable traceability across planning, implementation, testing, review, and deployment.
+- Decision:
+  Use a structured `logs/` directory with categorized markdown logs and a consistent filename convention.
+- Why:
+  The project should remain auditable and understandable over time.
+- Consequences:
+  Meaningful Codex, Copilot, manual, and CI actions should create concise markdown logs.
+- Related files:
+  - `docs/logging-strategy.md`
+  - `logs/README.md`
+  - `CHANGELOG.md`

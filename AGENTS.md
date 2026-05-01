@@ -36,6 +36,11 @@ Before making non-trivial changes, read these files:
 - `docs/site-map.md`
 - `docs/architecture.md`
 - `docs/testing-strategy.md`
+- `docs/ui-architecture.md`
+- `docs/responsive-strategy.md`
+- `docs/engineering-principles.md`
+- `docs/project-ledger.md`
+- `docs/decision-log.md`
 
 If any of those files conflict with your assumptions, follow the repository docs and do not invent alternatives silently.
 
@@ -216,3 +221,16 @@ At the end of non-trivial tasks, report:
 5. any remaining follow-up work
 
 Keep the summary concise and concrete.
+
+## Logging requirements
+
+For any non-trivial planning, implementation, testing, review, bug-fix, or deployment task:
+
+- create or update a matching markdown log entry under `logs/`,
+- follow `docs/logging-strategy.md`,
+- use the required naming convention,
+- keep the log concise and factual,
+- include verification status and next recommended action.
+
+Do not create logs for trivial autocomplete or tiny wording-only edits.
+Prefer one meaningful log per coherent task.

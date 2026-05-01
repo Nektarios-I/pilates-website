@@ -168,3 +168,14 @@ The task is complete when all of the following are true:
 - relevant tests were added or updated
 - relevant checks passed or blockers were explicitly documented
 - the diff is clean and reviewable
+
+## Logging linkage
+
+For every major task tracked in this plan, create a corresponding log entry in `logs/` when:
+
+- planning is completed,
+- implementation materially changes files,
+- testing or review produces meaningful results,
+- or blockers significantly change the next steps.
+
+The log filename should follow the naming convention defined in `docs/logging-strategy.md`.

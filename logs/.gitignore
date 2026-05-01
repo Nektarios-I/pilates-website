@@ -1,0 +1,12 @@
+# Keep human-readable markdown logs
+!README.md
+!**/*.md
+!**/.gitkeep
+
+# Ignore raw or temporary outputs
+**/*.log
+**/*.tmp
+**/*.raw
+**/*.out
+**/*.trace
+**/*.cache

@@ -105,3 +105,9 @@ Record short decision summaries here and point to the decision log when needed.
 ## Last updated
 
 <!-- YYYY-MM-DD HH:MM -->s
+
+## Logging system
+
+The project uses a structured logging system under `logs/` for planning, implementation, testing, bug, deployment, review, and session records.
+
+Curated notable changes should also be reflected in `CHANGELOG.md`.

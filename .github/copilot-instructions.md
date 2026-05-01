@@ -106,3 +106,15 @@ When asked to implement something:
 4. Implement the smallest clean version first.
 5. Add or update tests.
 6. Keep the result production-oriented and easy to maintain.
+
+## Logging policy
+
+For non-trivial Copilot-assisted work:
+
+- follow `docs/logging-strategy.md`,
+- create a matching markdown log in `logs/` when the task materially changes code, tests, structure, or plans,
+- use the required filename format,
+- summarize what was done, what files changed, what was verified, and what should happen next.
+
+Do not generate noisy raw logs.
+Prefer concise, durable markdown summaries.
