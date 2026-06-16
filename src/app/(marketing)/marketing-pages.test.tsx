@@ -14,7 +14,7 @@ const marketingPages = [
   {
     name: "home",
     Page: HomePage,
-    heading: "Corehouse Pilates Studio",
+    heading: "A calm starting point for Pilates studio information",
     metadata: homeMetadata,
     expectedTitle: "Home",
   },
@@ -69,7 +69,7 @@ const marketingPages = [
   },
 ] as const;
 
-describe("marketing route placeholders", () => {
+describe("marketing routes", () => {
   it.each(marketingPages)(
     "renders the $name page placeholder with a page heading",
     ({ Page, heading }) => {

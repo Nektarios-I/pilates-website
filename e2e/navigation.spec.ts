@@ -4,8 +4,15 @@ test("loads the homepage and navigates through primary routes", async ({ page })
   await page.goto("/");
 
   await expect(
-    page.getByRole("heading", { level: 1, name: "Corehouse Pilates Studio" }),
+    page.getByRole("heading", {
+      level: 1,
+      name: "A calm starting point for Pilates studio information",
+    }),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Contact the studio" }).first()).toHaveAttribute(
+    "href",
+    "/contact",
+  );
 
   const primaryNavigation = page.getByRole("navigation", { name: "Primary navigation" });
 

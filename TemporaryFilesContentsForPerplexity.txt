@@ -1,0 +1,2836 @@
+Below I will give you the contents of each file, analyze them exactly and then give me the exact instruciton needs for the refinemenst based on the acutal contents.
+brand-direction:
+# Brand Direction — Corehouse Pilates Studio
+
+
+This document presents 2–3 plausible aesthetic directions for the Pilates studio website, each aligned with the studio's positioning as premium, trustworthy, and focused on precision and wellness.
+
+
+**Purpose**: Choose one direction as the foundation for design tokens and visual system implementation.
+
+
+**Constraints**: Avoid generic SaaS aesthetics, purple gradients, template-like three-column grids, and placeholder imagery. Prefer restrained color, strong typography, clear hierarchy, and authentic content.
+
+
+---
+
+
+## Direction 1: Refined Minimalist
+
+
+### Mood
+
+
+- **Keywords**: Serene, sophisticated, authoritative, understated luxury
+- **Tone**: Calm yet confident; speaks to precision and control
+- **Impression**: High-end wellness studio with mastery of craft; minimal distraction, maximum focus
+- **Best for**: Studios targeting professionals, serious practitioners, and those seeking premium refinement
+
+
+### Typography
+
+
+- **Headings**: Clean sans-serif, geometric (e.g., Inter, Grotesk, or similar)
+  - Large, spacious, minimal weight variation (regular/bold)
+  - Generous leading for calm, open feel
+  - Example: H1 in 48–56px with 1.1–1.2 line-height
+- **Body**: Same sans-serif or slightly warmer companion (e.g., Figtree, Graphik)
+  - 16–18px for comfortable reading
+  - High contrast with ample letter-spacing
+- **Accent**: Possibly a subtle serif for hero taglines or testimonials (optional, used sparingly)
+
+
+### Color Direction
+
+
+- **Primary palette**:
+  - Off-white/cream base (`#fafaf8` or similar) — clean, not pure white
+  - Deep charcoal/near-black (`#1a1a1a`) — for text and strong elements
+  - Subtle warm accent (taupe, warm gray, or soft sage `#8b8680` or `#7a9b8e`) — for secondary CTAs, accents, borders
+- **Secondary**:
+  - Pale cream for surfaces (`#f5f3f0`)
+  - Soft shadow/divider in warm gray (`#ebe8e3`)
+- **Accent** (if needed):
+  - Minimal use of warm terracotta (`#c9856f`) or soft bronze (`#a89968`) — for key CTAs only
+- **Overall**: 85% cool/warm neutrals; 15% accent. Low saturation; high contrast for legibility
+
+
+### Imagery Direction
+
+
+- **Photography style**: Clean, well-lit studio spaces; close-ups of movement and posture; natural light
+- **Subjects**: Diverse age ranges and body types; authentic practitioners in mid-movement; focus on precision and control
+- **Color in photos**: Natural, muted tones; avoid oversaturated colors or heavy post-processing
+- **Illustration** (if used): Minimalist line art; anatomical diagrams of form; simple geometric abstraction of movement
+- **Avoid**: Generic stock photos, models in perfect lighting, overly stylized or heavily filtered imagery
+
+
+### Spacing and Layout
+
+
+- **Density**: Very open and spacious; generous margins and padding
+- **Grid**: 6–12 column grid; favor 2–3 column layouts for content
+- **Section spacing**: Sections separated by 80–120px vertical space
+- **Container max-width**: 1000–1100px (narrower than typical to maintain focus)
+- **Emphasis via whitespace**: Content hierarchy built on spacing as much as visual weight
+
+
+### Motion and Interaction
+
+
+- **Transitions**: Slow, gentle; 300–500ms ease-in-out for link hovers and state changes
+- **Microinteractions**: Minimal; subtle scale or opacity change on hover
+- **Scroll**: No fixed parallax or heavy animation; smooth scroll behavior
+- **Load states**: Fade-in rather than slide-in; respect prefers-reduced-motion
+
+
+### Why This Direction Fits Pilates
+
+
+- Pilates is about **precision, control, and intentionality** — minimalism mirrors this philosophy
+- The studio appeals to **professionals and practitioners** who value substance over flash
+- **Calm environment** supports the wellness positioning
+- **Clear hierarchy** reflects the structured, methodical nature of the practice
+- **Spaciousness** echoes the feeling of a well-organized, uncluttered studio
+
+
+### What to Avoid
+
+
+- ❌ Heavy texture or busy patterns
+- ❌ Warm earth tones only (risks looking aged/vintage)
+- ❌ Colorful accent palette (diminishes focus)
+- ❌ Playful or casual tone in copy or imagery
+- ❌ Animation or motion that draws attention away from content
+- ❌ Oversized hero sections or cinematic feel
+- ❌ Multiple competing CTAs or visual anchors
+
+
+### Reference Sites to Study
+
+
+Study these manually for inspiration; do not copy directly:
+
+
+1. **Reformer Pilates Studio (international)**: Look for how they balance professionalism with warmth; note their use of negative space and restrained color.
+2. **Luxury wellness brands (e.g., premium yoga/wellness)**: Note clean typography, spacious layouts, and subtle use of earth tones.
+3. **High-end personal training or coaching sites**: Study how they convey expertise and trust through calm, confident design.
+
+
+---
+
+
+## Direction 2: Warm Elegance
+
+
+### Mood
+
+
+- **Keywords**: Welcoming, warm, sophisticated, grounded, approachable
+- **Tone**: Professional and expert, but not cold; inviting without being casual
+- **Impression**: Upscale wellness community where precision meets warmth; you are cared for
+- **Best for**: Studios targeting a broader audience; practitioners who value both expertise and personal connection
+
+
+### Typography
+
+
+- **Headings**: Serif typeface (e.g., Crimson Text, Lora, Volkhov, or similar)
+  - 40–52px for H1; elegant, readable
+  - Slightly higher serif weight than body for distinction
+  - Conveys timelessness and sophistication
+- **Body**: Warm sans-serif (e.g., Figtree, Poppins, or humanist sans)
+  - 16–18px; friendly but not playful
+  - Slightly rounded character shapes add warmth
+- **Accent**: A secondary serif in smaller size for pull-quotes or testimonials (optional)
+
+
+### Color Direction
+
+
+- **Primary palette**:
+  - Warm white/ivory base (`#fffaf5` or `#fef9f3`) — off-white with warmth
+  - Deep warm brown or charcoal (`#2a2420` or `#3d3a35`) — text; warm rather than cool-black
+  - Warm accent (soft terracotta, warm sage, or warm taupe `#c9a878`, `#8b9d89`, `#a89080`) — secondary CTAs, borders, subtle background tints
+- **Secondary**:
+  - Light cream or warm off-white for surfaces (`#f8f4f0`)
+  - Warm divider/shadow (`#e8e2da`)
+  - Soft warm accent for hover states (`#daa968` or `#b8a083`)
+- **Overall**: 80% warm neutrals; 20% warm accents. Gentle saturation; readable but not harsh
+
+
+### Imagery Direction
+
+
+- **Photography style**: Warm, natural lighting (golden hour when possible); candid, relatable moments; focus on connection and form
+- **Subjects**: Diverse practitioners; authentic smiles; close-ups of good form; instructors guiding students
+- **Color in photos**: Warm light; natural skin tones; earthy, organic feel
+- **Illustration** (if used): Watercolor or soft line art; organic, flowing lines that suggest movement; botanical or natural elements as accents
+- **Avoid**: Cold, harsh lighting; overly polished or distant imagery; clinical feel
+
+
+### Spacing and Layout
+
+
+- **Density**: Open and spacious, but slightly more intentional rhythm than Refined Minimalist
+- **Grid**: 8–12 column grid; allows for 3-column layouts with warmth
+- **Section spacing**: Sections separated by 60–100px vertical space
+- **Container max-width**: 1100–1200px
+- **Emphasis**: Hierarchy through color, weight, and spacing; slightly more layering than minimalist approach
+
+
+### Motion and Interaction
+
+
+- **Transitions**: Smooth, moderate pace; 250–400ms ease-in-out
+- **Microinteractions**: Gentle color shift or soft scale on hover; warmer accent color appears
+- **Scroll**: Smooth scroll; minimal parallax; subtle color transitions as sections enter view (optional, light touch)
+- **Load states**: Fade-in with slight color warmth; soft, welcoming feel
+
+
+### Why This Direction Fits Pilates
+
+
+- **Warm tone** suggests the personal, human side of the practice — connection with instructor and community
+- **Elegance + warmth** conveys that the studio is both professional and welcoming
+- **Serif typography** adds timelessness and craftsmanship, reflecting decades of Pilates tradition
+- **Organic imagery and illustration** connects to the body-centered nature of the practice
+- **Slightly richer color** allows for visual interest without chaos
+
+
+### What to Avoid
+
+
+- ❌ Overly warm or saturated tones (risks looking dated/rustic)
+- ❌ Heavy serifs or very ornate typefaces
+- ❌ Too many accent colors or competing visual elements
+- ❌ Generic wellness clichés (candles, flowers, spa imagery)
+- ❌ Copy that feels flowery or overly emotional
+- ❌ Distracting animations or video backgrounds
+- ❌ Layouts that feel cluttered despite warmth
+
+
+### Reference Sites to Study
+
+
+Study these manually for inspiration; do not copy directly:
+
+
+1. **Upscale independent fitness/wellness studios**: Note how they balance warmth with authority; observe serif/sans pairings.
+2. **Premium small-batch wellness brands**: Study how they use warm color and imagery to convey care without being commercial.
+3. **Artisanal or craft-focused professional services**: Notice how they convey tradition and expertise through typography and restrained, warm color.
+
+
+---
+
+
+## Direction 3: Strong Modern
+
+
+### Mood
+
+
+- **Keywords**: Contemporary, empowering, confident, dynamic, grounded
+- **Tone**: Progressive and professional; emphasizes strength and transformation
+- **Impression**: Modern studio that understands both the science and the power of the practice; you are building strength
+- **Best for**: Studios with younger practitioners or those seeking to emphasize the dynamic, transformative aspects of Pilates
+
+
+### Typography
+
+
+- **Headings**: Bold, contemporary sans-serif (e.g., Inter Bold, Source Sans Pro Bold, Dm Sans)
+  - 44–56px; clean, direct, powerful
+  - Slightly tighter letter-spacing for strength
+  - Uppercase or mixed-case; both can work
+- **Body**: Modern humanist sans (e.g., Figtree, Calibre, or similar)
+  - 16–18px; open and readable
+  - Friendly but purposeful
+- **Accent**: Possibly a contrasting weight or subtle mono-width font for CTAs or labels
+
+
+### Color Direction
+
+
+- **Primary palette**:
+  - Off-white/warm white base (`#faf9f7`)
+  - Strong charcoal or dark navy (`#1f1f1f` or `#1a2332`) — for text; projects confidence
+  - Modern accent (warm clay, warm sage, or modern bronze `#d4956d`, `#758b78`, `#a39079`) — secondary CTAs, accents, highlights
+- **Secondary**:
+  - Clean light background (`#f5f4f2`)
+  - Warm gray divider (`#e8e5e0`)
+  - Slightly bolder accent for active states (`#c9825c` or `#69765d`)
+- **Overall**: 75% neutrals; 25% accent. Moderate saturation; confident without being loud
+
+
+### Imagery Direction
+
+
+- **Photography style**: Sharp, clean, well-lit; active movement captured mid-form; confidence and strength visible
+- **Subjects**: Diverse practitioners; focused expressions; strong postures; dynamic mid-movement shots; transformation narratives
+- **Color in photos**: Bright, clear lighting; good skin-tone rendering; perhaps subtle warm filter for warmth
+- **Illustration** (if used): Geometric, dynamic line art; arrows or directional elements suggesting motion; abstract representations of strength and balance
+- **Avoid**: Overly soft or dreamy imagery; still, posed-looking photos; clinical or clinical anatomical focus only
+
+
+### Spacing and Layout
+
+
+- **Density**: Purposeful spacing; not overly open, but clearly organized
+- **Grid**: 12 column grid; allows for varied layouts (2, 3, 4 column) while maintaining rhythm
+- **Section spacing**: Sections separated by 60–90px vertical space
+- **Container max-width**: 1200–1280px (slightly wider; suggests modern web confidence)
+- **Emphasis**: Clear hierarchy through color, weight, and directional flow; slightly more dynamic arrangement of elements
+
+
+### Motion and Interaction
+
+
+- **Transitions**: Crisp, purposeful; 200–350ms ease-in-out or ease-out for responsiveness
+- **Microinteractions**: More noticeable hover effects; color shift to accent color; possible subtle scale
+- **Scroll**: Smooth scroll; optional, light use of directional indicators (arrows, underlines appearing on scroll)
+- **Load states**: Fade-in with slight upward motion (respectful, not jarring); conveys momentum
+
+
+### Why This Direction Fits Pilates
+
+
+- **Contemporary aesthetic** positions the studio as progressive and forward-thinking
+- **Strong color and typography** align with the empowering, transformative nature of the practice
+- **Dynamic layouts** suggest movement and energy without compromising the calming effect of Pilates
+- **Modern imagery** attracts practitioners seeking both tradition and innovation
+- **Confidence in design** reflects confidence in method and results
+
+
+### What to Avoid
+
+
+- ❌ Overly trendy design or colors that will feel dated soon
+- ❌ All-caps headlines or design that shouts
+- ❌ Heavy animation or effects that distract from content
+- ❌ Overly geometric or abstract imagery that loses human connection
+- ❌ Neon or very high-saturation accent colors
+- ❌ Copy that sounds like aggressive fitness marketing
+- ❌ Layouts that sacrifice clarity for visual novelty
+
+
+### Reference Sites to Study
+
+
+Study these manually for inspiration; do not copy directly:
+
+
+1. **Contemporary independent fitness studios**: Note how they balance modernity with accessibility; observe their use of accent color and typography.
+2. **Progressive wellness or health tech brands**: Study how they convey expertise and innovation simultaneously.
+3. **Modern luxury brands** (non-fitness): Notice how they use bold typography and confident color choices without feeling chaotic.
+
+
+---
+
+
+## Comparison Table
+
+
+| Aspect | Refined Minimalist | Warm Elegance | Strong Modern |
+|--------|-------------------|---------------|---------------|
+| **Primary mood** | Serene, sophisticated | Welcoming, warm | Confident, dynamic |
+| **Headings** | Clean sans-serif | Serif (warm) | Bold sans-serif |
+| **Primary accent** | Subtle warm/sage | Warm terracotta/sage | Modern clay/sage |
+| **Imagery tone** | Clean, precise | Warm, connected | Sharp, active |
+| **Best for** | Premium, serious practitioners | Broad appeal, community focus | Progressive, transformation-focused |
+| **Visual weight** | Light, open | Balanced, warm | Strong, purposeful |
+| **Risk if overdone** | Can feel cold or austere | Can feel dated or overly floral | Can feel trendy or aggressive |
+
+
+---
+
+
+## Decision Framework
+
+
+Use these questions to choose the right direction:
+
+
+1. **Who is the primary audience?**
+   - Serious, premium-focused practitioners → Refined Minimalist
+   - Mixed audience; community important → Warm Elegance
+   - Younger practitioners or transformation-focused → Strong Modern
+
+
+2. **What is the studio's positioning?**
+   - Premium, exclusive, refined → Refined Minimalist
+   - Accessible luxury, welcoming community → Warm Elegance
+   - Modern, progressive, results-oriented → Strong Modern
+
+
+3. **What feeling should people have visiting the site?**
+   - Calm, focused, quiet confidence → Refined Minimalist
+   - Warmth, connection, professional care → Warm Elegance
+   - Energy, empowerment, dynamic strength → Strong Modern
+
+
+4. **What visual treatment feels most authentic to the studio's actual culture and teaching style?**
+
+
+---
+
+
+## Next Steps
+
+
+1. **Review all three directions** with the studio owner/leadership.
+2. **Choose one primary direction** as the foundation for design tokens.
+3. **Create `docs/design-tokens.md`** (Task 5) using the chosen direction as reference.
+4. **Build the design test page** (Task 7) to validate typography, color, spacing, and components.
+
+
+---
+
+
+## Notes
+
+
+- These directions are intentionally different to highlight distinct brand positioning choices.
+- None is "wrong"—each is appropriate for a Pilates studio; the choice depends on the studio's actual audience, values, and teaching style.
+- The chosen direction will guide typography selections, color palette, imagery sourcing, spacing system, and component design throughout Milestone 2 and beyond.
+- If the studio's actual brand voice or mission statement suggests a blend (e.g., warmth + modernity), the chosen direction can be adjusted by blending elements from two directions.
+design-test-page-spec.md:
+# Design Test Page Specification
+
+
+This document specifies the exact structure and content of the design test page (sandbox). The page should be a private or clearly non-production route that displays all design tokens and component patterns for visual validation before full implementation.
+
+
+**Purpose**: Validate typography, color, spacing, and component design without business messaging or production content.
+
+
+**Route**: Suggested `/design` (admin-only or clearly marked as non-production)
+
+
+**Status**: Design decisions completed in `docs/design-tokens.md`. Implementation should not require new design choices.
+
+
+---
+
+
+## Page Structure
+
+
+The design test page consists of sections organized vertically. Each section demonstrates a category of tokens and patterns. No business copy, navigation, or marketing messaging; this is a design audit page only.
+
+
+### Section: Header / Title
+
+
+```
+Design System Showcase
+Corehouse Pilates Studio
+
+
+[Subtitle: This page displays all design tokens and patterns. Not for production.]
+```
+
+
+**Typography**: h1 (text-h1 token), subtitle in text-body-sm
+
+
+---
+
+
+### Section 1: Typography Specimen
+
+
+Display all typographic styles in a dedicated section.
+
+
+#### Subsection: Headings
+
+
+```
+H1 Heading — 52px, weight 600, line-height 1.1
+H2 Heading — 44px, weight 600, line-height 1.15
+H3 Heading — 32px, weight 600, line-height 1.2
+H4 Heading — 24px, weight 600, line-height 1.25
+H5 Heading — 20px, weight 600, line-height 1.3
+H6 Heading — 18px, weight 600, line-height 1.35
+```
+
+
+Each heading rendered in actual token size. Include copy showing letter-spacing and any variants.
+
+
+#### Subsection: Body Text
+
+
+```
+Body Large — 18px, weight 400, line-height 1.6
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+
+Body Medium — 16px, weight 400, line-height 1.6
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+
+
+Body Small — 14px, weight 400, line-height 1.5
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+```
+
+
+Render in actual size. Include paragraph spacing examples (spacing-md, spacing-lg).
+
+
+#### Subsection: UI Text
+
+
+```
+Button Text — 16px, weight 500
+Label Text — 12px, weight 600, uppercase
+Caption Text — 12px, weight 400
+```
+
+
+Each rendered in context (e.g., label above a form field).
+
+
+---
+
+
+### Section 2: Color Palette
+
+
+Display color tokens in organized stacks.
+
+
+#### Subsection: Neutral Colors
+
+
+Display all 11 neutral colors (color-neutral-50 through color-neutral-900) as a horizontal or vertical stack.
+
+
+**For each color**:
+- Color swatch (50px × 50px or similar)
+- Token name (e.g., `color-neutral-50`)
+- Hex value (e.g., `#fffaf5`)
+- Suggested use (e.g., "page background", "text", "border")
+
+
+Example layout:
+```
+[Swatch] color-neutral-50 #fffaf5 — Off-white base; page background
+[Swatch] color-neutral-100 #fef9f3 — Warm off-white; card background
+...
+[Swatch] color-neutral-900 #2a2420 — True dark; headings, high-contrast text
+```
+
+
+#### Subsection: Accent Colors
+
+
+Display all 6 accent colors (color-accent-50 through color-accent-600) in a similar stack.
+
+
+Include suggested uses (e.g., "secondary CTA hover", "primary accent").
+
+
+#### Subsection: Semantic Colors
+
+
+Display success, warning, error, info color sets:
+
+
+```
+Success:     [light] [main] [dark]
+Warning:     [light] [main] [dark]
+Error:       [light] [main] [dark]
+Info:        [light] [main] [dark]
+```
+
+
+#### Subsection: Contrast Checker (optional)
+
+
+Show text samples on various backgrounds to verify WCAG contrast ratios:
+
+
+```
+color-text-primary on color-bg-primary
+color-text-primary on color-bg-secondary
+color-text-secondary on color-bg-primary
+color-text-secondary on color-bg-secondary
+color-neutral-0 on color-cta-primary (white text on accent)
+```
+
+
+**Expected**: All pairs should meet WCAG AA or AAA contrast ratios.
+
+
+---
+
+
+### Section 3: Surfaces
+
+
+Display predefined surface token styles.
+
+
+#### Subsection: Surface Variants
+
+
+```
+[Surface with border and shadow] surface-default
+Default card with border and standard shadow.
+
+
+[Surface with elevated shadow] surface-elevated
+Elevated surface; card with more prominent shadow.
+
+
+[Surface with overlay shadow] surface-overlay
+Overlay surface; modal or overlay style.
+
+
+[Surface with accent background] surface-accent
+Accent surface for highlighted or special sections.
+
+
+[Surface disabled] surface-disabled
+Disabled surface appearance; reduced contrast.
+```
+
+
+Each surface should include:
+- Sample content (e.g., "Card title" + body text)
+- Hover state (if applicable)
+- Token name and CSS properties used
+
+
+---
+
+
+### Section 4: Buttons
+
+
+Display all button variants and states.
+
+
+#### Subsection: Button Variants
+
+
+```
+[Primary Button] button-primary
+Primary CTA for main actions.
+
+
+[Primary Button Hover] (on hover or screenshot)
+Darker background, shadow visible.
+
+
+[Primary Button Disabled] (disabled state)
+Grayed out, cursor not-allowed.
+
+
+---
+
+
+[Secondary Button] button-secondary
+Secondary action; outlined style.
+
+
+[Secondary Button Hover]
+Accent background fills, border color changes.
+
+
+[Secondary Button Disabled]
+Disabled appearance; reduced opacity.
+
+
+---
+
+
+[Ghost Button] button-ghost
+Minimal style; underlined.
+
+
+[Ghost Button Hover]
+Background fill, underline maintained.
+
+
+[Ghost Button Disabled]
+Disabled appearance.
+```
+
+
+Each button:
+- Rendered in actual state
+- Token name
+- HTML/CSS class used
+- Size guidance (if relevant)
+
+
+#### Subsection: Button Sizes (if applicable)
+
+
+```
+[Button] Large (if used)
+[Button] Default
+[Button] Small
+```
+
+
+---
+
+
+### Section 5: Form Elements
+
+
+Display input fields and form controls in various states.
+
+
+#### Subsection: Text Input
+
+
+```
+[Input field] Default state
+Placeholder text visible.
+
+
+[Input field] Focused state
+Focus ring and border highlight visible.
+
+
+[Input field] Filled state
+User text entered.
+
+
+[Input field] Disabled state
+Grayed out; cursor not-allowed.
+
+
+[Input field] Error state (if applicable)
+Error border color; error message below.
+```
+
+
+Each state shows:
+- Visual rendering
+- Border, background, focus ring colors
+- Token names used
+
+
+#### Subsection: Labels and Help Text
+
+
+```
+Form Field Label — text-label token
+input field with label above
+Help text below input — text-caption token
+
+
+Error text below input — color-error-main
+```
+
+
+#### Subsection: Other Form Elements (if used)
+
+
+```
+[ ] Checkbox
+[o] Radio button
+[Dropdown ▼] Select field
+[Textarea text area...] Text area
+```
+
+
+All with default, hover, and disabled states.
+
+
+---
+
+
+### Section 6: Cards
+
+
+Display card component variations.
+
+
+#### Subsection: Default Card
+
+
+```
+[Card with surface-default styling]
+Card Title — h5 or h6 token
+Card description text using body-md token.
+[Link] or [Button] optional CTA
+```
+
+
+With and without hover state.
+
+
+#### Subsection: Accent Card
+
+
+```
+[Card with surface-accent styling]
+Accent Card Title
+Card description text with accent background.
+[Link] optional CTA
+```
+
+
+#### Subsection: Elevated Card
+
+
+```
+[Card with surface-elevated styling]
+Elevated Card Title
+Higher shadow; appears more prominent.
+```
+
+
+---
+
+
+### Section 7: Badges
+
+
+Display badge component variants.
+
+
+```
+[Badge] Default (text-label, color-accent-*)
+[Badge] Success (text-label, color-success-*)
+[Badge] Warning (text-label, color-warning-*)
+[Badge] Error (text-label, color-error-*)
+[Badge] Info (text-label, color-info-*)
+```
+
+
+Multiple sizes if applicable:
+
+
+```
+[Small Badge]
+[Default Badge]
+[Large Badge]
+```
+
+
+---
+
+
+### Section 8: Spacing & Layout
+
+
+Demonstrate the spacing system and responsive layout.
+
+
+#### Subsection: Spacing Scale
+
+
+Display visual guide to spacing tokens:
+
+
+```
+spacing-xs (4px)   [small gap]
+spacing-sm (8px)   [gap]
+spacing-md (16px)  [gap]
+spacing-lg (24px)  [gap]
+spacing-xl (32px)  [gap]
+spacing-2xl (48px) [gap]
+spacing-3xl (64px) [gap]
+spacing-4xl (80px) [gap]
+spacing-5xl (96px) [gap]
+spacing-6xl (128px) [gap]
+```
+
+
+Each spacing shown as a horizontal or vertical bar with label and pixel value.
+
+
+#### Subsection: Section Spacing
+
+
+Demonstrate section-to-section vertical spacing:
+
+
+```
+[Section with section-spacing-md applied below]
+↓ section-spacing-md (48px)
+[Next section with section-spacing-md applied below]
+↓ section-spacing-lg (64px)
+[Next section with section-spacing-lg applied below]
+```
+
+
+#### Subsection: Container & Gutter
+
+
+```
+[Container max-width: container-xl (1200px)]
+  [Gutter left]   Content area   [Gutter right]
+ 
+Mobile: gutter-mobile (16px)
+Tablet: gutter-tablet (24px)
+Desktop: gutter-desktop (32px)
+```
+
+
+Visual demonstration showing how content is positioned and padded at different breakpoints.
+
+
+#### Subsection: Grid Demo
+
+
+Display grid structure at different breakpoints:
+
+
+```
+Mobile (4-column grid)
+[Grid item] [Grid item] [Grid item] [Grid item]
+[Grid item] [Grid item] [Grid item] [Grid item]
+
+
+Tablet (8-column grid)
+[Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item]
+
+
+Desktop (12-column grid)
+[Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item] [Grid item]
+```
+
+
+---
+
+
+### Section 9: Shadows & Elevation
+
+
+Display shadow tokens and elevation hierarchy.
+
+
+```
+[Surface with shadow-none] shadow-none
+No shadow; flat appearance.
+
+
+[Surface with shadow-sm] shadow-sm
+Very subtle shadow; minimal elevation.
+
+
+[Surface with shadow-md] shadow-md
+Standard elevation; card appearance.
+
+
+[Surface with shadow-lg] shadow-lg
+Higher elevation; prominent card.
+
+
+[Surface with shadow-xl] shadow-xl
+Maximum elevation; modal or overlay appearance.
+```
+
+
+Each with:
+- Visual rendering
+- Token name
+- CSS property value (optional)
+
+
+---
+
+
+### Section 10: Corner Radius
+
+
+Display radius tokens.
+
+
+```
+[Box] radius-none (0px)
+[Box] radius-sm (4px)
+[Box] radius-md (8px)
+[Box] radius-lg (12px)
+[Box] radius-xl (16px)
+[Box] radius-2xl (24px)
+[Box] radius-full (9999px) — circle or pill shape
+```
+
+
+Each rendered as a colored box showing the corner rounding applied.
+
+
+---
+
+
+### Section 11: Transitions & Motion
+
+
+Demonstrate transition tokens and microinteractions.
+
+
+#### Subsection: Transition Timing
+
+
+```
+Hover me for transition-fast (150ms):     [Button]
+Hover me for transition-base (200ms):     [Button]
+Hover me for transition-standard (300ms): [Button]
+Hover me for transition-slow (400ms):     [Button]
+```
+
+
+Each button changes color on hover, demonstrating the timing difference.
+
+
+#### Subsection: Easing Functions
+
+
+```
+[Button] ease-in
+[Button] ease-out
+[Button] ease-in-out
+[Button] linear
+```
+
+
+Optional: Show animation curves or descriptions.
+
+
+#### Subsection: Prefers Reduced Motion
+
+
+Display a message indicating whether `prefers-reduced-motion` is active:
+
+
+```
+Current setting: Respects prefers-reduced-motion ✓
+Animations and transitions are disabled or significantly simplified.
+```
+
+
+---
+
+
+### Section 12: Accessibility Checklist
+
+
+Display checklist items to verify the design system supports accessibility.
+
+
+```
+Typography:
+  ✓ Heading hierarchy is correct (h1 → h6, no skipped levels)
+  ✓ Line-height is >= 1.5 for body text
+  ✓ Color contrast meets WCAG AA (4.5:1 for normal text)
+
+
+Interaction:
+  ✓ All buttons have clear focus states
+  ✓ Focus rings are visible (minimum 2px)
+  ✓ Disabled states are visually distinct
+  ✓ Hover and active states are differentiated
+
+
+Color:
+  ✓ Color alone is not used to convey information (icons or text used too)
+  ✓ Accent colors meet contrast requirements
+  ✓ Placeholder text has sufficient contrast
+
+
+Spacing & Layout:
+  ✓ Touch targets are minimum 48px × 48px (or 44px × 44px with padding)
+  ✓ Sections are clearly separated
+  ✓ Content reflows properly at mobile widths
+
+
+Motion:
+  ✓ All animations respect prefers-reduced-motion
+  ✓ Transitions are not jarring (timing is appropriate)
+```
+
+
+---
+
+
+### Section 13: Responsive Breakpoints
+
+
+Show how key components and layouts respond at each breakpoint.
+
+
+#### Subsection: Mobile (< 640px)
+
+
+```
+[Responsive Navigation]
+- Navigation is collapsed into menu or hamburger
+- Content is single-column
+- Buttons and form fields are touch-friendly (48px min height)
+- Text size is legible (16px minimum)
+```
+
+
+#### Subsection: Tablet (640px – 768px)
+
+
+```
+[Responsive Navigation]
+- Navigation may expand; still mobile-optimized
+- Content is 1–2 columns
+- Cards may stack or display in grid
+```
+
+
+#### Subsection: Desktop (768px+)
+
+
+```
+[Responsive Navigation]
+- Full navigation visible
+- Content is multi-column grid
+- Cards display in organized grid
+- Max-width container engaged
+```
+
+
+---
+
+
+### Section 14: Component Combinations
+
+
+Show realistic component pairings to ensure harmony.
+
+
+#### Subsection: Hero-like Section
+
+
+```
+[Hero Heading] h1 token
+[Hero Subheading] text-body-lg token
+[Primary Button] CTA button
+```
+
+
+#### Subsection: Feature Card Set
+
+
+```
+[Feature Card 1]           [Feature Card 2]           [Feature Card 3]
+Card Title (h5)            Card Title (h5)            Card Title (h5)
+Card description           Card description           Card description
+[Learn More Link]          [Learn More Link]          [Learn More Link]
+```
+
+
+#### Subsection: Form Section
+
+
+```
+[Section Heading] h3 token
+Form Field Label             [Input field]
+Help text below input
+Form Field Label             [Input field]
+Form Field Label             [Select ▼]
+                             [Primary Button] [Secondary Button]
+```
+
+
+---
+
+
+### Section 15: Light Mode / Dark Mode (if applicable)
+
+
+**Current scope**: Light mode only.
+
+
+**Future enhancement note**: If dark mode is planned, this section should include:
+
+
+```
+Toggle Dark Mode [Toggle]
+
+
+Light Mode:
+  [Sample card in light colors]
+
+
+Dark Mode:
+  [Sample card in dark colors]
+```
+
+
+For now, document as "Future enhancement; requires additional token variants."
+
+
+---
+
+
+## Implementation Requirements
+
+
+**What the page must do**:
+
+
+1. Render without business content or marketing messaging
+2. Display all typography, color, spacing, shadow, radius, and motion tokens
+3. Show all component variants (button, card, input, badge)
+4. Display states (default, hover, focus, disabled)
+5. Demonstrate responsive behavior at multiple breakpoints
+6. Be clearly marked as a non-production design sandbox
+7. Be accessible (pass basic a11y checks; semantic HTML)
+8. Include no external business data or CMS content
+9. Use placeholder/fixture data only (e.g., "Sample Title", "Lorem ipsum")
+
+
+**What the page must NOT do**:
+
+
+- Include production business copy or messaging
+- Display actual classes, instructors, or pricing data
+- Implement authentication or access control (if kept private, document the access method)
+- Use heavy JavaScript or complex state management
+- Depend on external APIs or services
+- Include any visual elements that suggest a finished product
+
+
+---
+
+
+## Verification Checklist
+
+
+Before considering the design system complete, verify:
+
+
+- [ ] All 11 neutral color tokens display correctly
+- [ ] All 6 accent color tokens display correctly
+- [ ] All 4 semantic color sets (success, warning, error, info) are visible
+- [ ] All typography styles (h1–h6, body, button, label, caption) render at correct sizes and weights
+- [ ] All spacing tokens are displayed and labeled with pixel values
+- [ ] All radius tokens show corner rounding progression
+- [ ] All shadow tokens display elevation hierarchy
+- [ ] Button variants show primary, secondary, and ghost styles with all states
+- [ ] Input fields display default, focused, filled, disabled, and error states
+- [ ] Cards display default, accent, and elevated variants
+- [ ] Badges display all color variants
+- [ ] Responsive layout adjusts correctly at mobile, tablet, and desktop breakpoints
+- [ ] Focus rings are visible and meet accessibility standards
+- [ ] Contrast ratios for text meet WCAG AA minimum (4.5:1 for body text)
+- [ ] Microinteractions (hover, transitions) work smoothly
+- [ ] Page is clearly marked as non-production
+- [ ] Placeholder text is used throughout (no business content)
+
+
+---
+
+
+## Deployment
+
+
+The design test page should be:
+
+
+- **Route**: Accessible at a clear, non-production URL (e.g., `/design`)
+- **Visibility**: Can be marked as:
+  - Public (for stakeholder review), or
+  - Password-protected (if sensitive), or
+  - Private/hidden from search (robots.txt exclusion)
+- **Documentation**: Link to this spec from the design system docs
+- **Maintenance**: Update whenever design tokens change
+
+
+---
+
+
+## Next Steps
+
+
+1. **Implement the design test page** (Task 7) using this specification
+2. **Validate tokens visually** against the rendering
+3. **Gather feedback** from design stakeholders
+4. **Iterate on tokens** if needed based on visual review
+5. **Lock tokens** and move to component implementation
+
+
+**Not for this milestone**: Dark mode, advanced interactive states, or production deployment of the test page.
+desing tokens:
+# Design Tokens — Corehouse Pilates Studio
+
+
+This document defines the complete design token system for the website. Tokens are organized by category and include naming conventions, values, and usage guidance.
+
+
+**Foundation**: Tokens are based on the **Warm Elegance** brand direction (see `docs/brand-direction.md`). If a different direction is chosen, adjust hue and saturation values while preserving the token structure and naming convention.
+
+
+**Naming convention**: `{category}-{subcategory}-{variant}` (e.g., `color-neutral-50`, `spacing-lg`, `shadow-elevation-sm`).
+
+
+---
+
+
+## Color Tokens
+
+
+All color values are in hex format. Use semantic token names (e.g., `color-text-primary`) in components; map to these base values in configuration.
+
+
+### Neutral Colors
+
+
+Core palette for text, backgrounds, and borders. Warm-toned to support the Warm Elegance direction.
+
+
+```
+color-neutral-0    = #ffffff    /* Pure white; use sparingly */
+color-neutral-50   = #fffaf5   /* Off-white base; page background */
+color-neutral-100  = #fef9f3   /* Warm off-white; card background */
+color-neutral-200  = #f8f4f0   /* Light surface; hover states */
+color-neutral-300  = #e8e2da   /* Divider, border */
+color-neutral-400  = #d4cfc6   /* Disabled text, subtle accent */
+color-neutral-500  = #a89080   /* Secondary text, muted elements */
+color-neutral-600  = #8b7d76   /* Body text variant */
+color-neutral-700  = #6b6360   /* Strong secondary text */
+color-neutral-800  = #3d3a35   /* Near-black; text on light backgrounds */
+color-neutral-900  = #2a2420   /* True dark; headings, high-contrast text */
+```
+
+
+### Accent Colors
+
+
+Warm earth tones used for secondary CTAs, highlights, and visual interest.
+
+
+```
+color-accent-50    = #fef4ed   /* Very light accent background */
+color-accent-100   = #fadec8   /* Light accent background */
+color-accent-200   = #f4c9a8   /* Softest accent */
+color-accent-300   = #daa968   /* Warm accent; hover state for secondary elements */
+color-accent-400   = #c9a878   /* Primary accent; secondary CTAs, badges */
+color-accent-500   = #b8945a   /* Slightly darker accent */
+color-accent-600   = #a39079   /* Muted accent; can use for icons */
+```
+
+
+### Semantic Colors
+
+
+Purpose-driven colors for common interface states and messaging.
+
+
+```
+color-success-light   = #e8f5e9   /* Success background */
+color-success-main    = #66bb6a   /* Success indicator */
+color-success-dark    = #43a047   /* Success text */
+
+
+color-warning-light   = #fff3e0   /* Warning background */
+color-warning-main    = #ffa726   /* Warning indicator */
+color-warning-dark    = #f57c00   /* Warning text */
+
+
+color-error-light     = #ffebee   /* Error background */
+color-error-main      = #ef5350   /* Error indicator */
+color-error-dark      = #c62828   /* Error text */
+
+
+color-info-light      = #e3f2fd   /* Info background */
+color-info-main       = #42a5f5   /* Info indicator */
+color-info-dark       = #1565c0   /* Info text */
+```
+
+
+### Semantic Aliases
+
+
+Map semantic names to neutral and accent tokens for components.
+
+
+```
+color-text-primary       = color-neutral-900     /* Body text, primary content */
+color-text-secondary     = color-neutral-600     /* Secondary content, meta info */
+color-text-disabled      = color-neutral-400     /* Disabled controls */
+color-text-inverse       = color-neutral-50      /* Text on dark backgrounds (if used) */
+
+
+color-bg-primary         = color-neutral-50      /* Page background */
+color-bg-secondary       = color-neutral-100     /* Card, section background */
+color-bg-tertiary        = color-neutral-200     /* Hover/active background for light elements */
+color-bg-accent          = color-accent-50       /* Accent section background */
+
+
+color-border-primary     = color-neutral-300     /* Standard borders */
+color-border-secondary   = color-neutral-200     /* Subtle borders, dividers */
+color-border-accent      = color-accent-300      /* Accent borders, highlights */
+
+
+color-cta-primary        = color-accent-400      /* Primary CTA button */
+color-cta-primary-hover  = color-accent-500      /* Primary CTA hover */
+color-cta-secondary      = color-accent-300      /* Secondary CTA button */
+color-cta-secondary-hover= color-accent-400      /* Secondary CTA hover */
+```
+
+
+---
+
+
+## Surface Tokens
+
+
+Predefined surface styles combining color, shadow, and sometimes corner radius.
+
+
+```
+surface-default
+  background: color-bg-secondary
+  border: 1px solid color-border-primary
+  border-radius: radius-md
+  box-shadow: none
+
+
+surface-elevated
+  background: color-neutral-0
+  border: none
+  border-radius: radius-md
+  box-shadow: shadow-elevation-sm
+
+
+surface-overlay
+  background: color-neutral-0
+  border: 1px solid color-border-primary
+  border-radius: radius-lg
+  box-shadow: shadow-elevation-lg
+
+
+surface-accent
+  background: color-accent-50
+  border: 1px solid color-accent-200
+  border-radius: radius-md
+  box-shadow: none
+
+
+surface-disabled
+  background: color-neutral-100
+  border: 1px solid color-border-secondary
+  border-radius: radius-md
+  box-shadow: none
+  opacity: 0.6
+```
+
+
+---
+
+
+## Text / Typography Tokens
+
+
+Font families, sizes, weights, and line-height values.
+
+
+### Font Families
+
+
+```
+font-family-heading        = 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+font-family-body           = 'Figtree', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif
+font-family-mono           = 'Menlo', 'Monaco', 'Courier New', monospace
+```
+
+
+### Text Styles
+
+
+Define typography as composable styles (scale, weight, line-height).
+
+
+```
+text-h1
+  font-family: font-family-heading
+  font-size: 52px
+  font-weight: 600
+  line-height: 1.1
+  letter-spacing: -0.01em
+  color: color-text-primary
+
+
+text-h2
+  font-family: font-family-heading
+  font-size: 44px
+  font-weight: 600
+  line-height: 1.15
+  letter-spacing: -0.01em
+  color: color-text-primary
+
+
+text-h3
+  font-family: font-family-heading
+  font-size: 32px
+  font-weight: 600
+  line-height: 1.2
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-h4
+  font-family: font-family-heading
+  font-size: 24px
+  font-weight: 600
+  line-height: 1.25
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-h5
+  font-family: font-family-heading
+  font-size: 20px
+  font-weight: 600
+  line-height: 1.3
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-h6
+  font-family: font-family-heading
+  font-size: 18px
+  font-weight: 600
+  line-height: 1.35
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-body-lg
+  font-family: font-family-body
+  font-size: 18px
+  font-weight: 400
+  line-height: 1.6
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-body-md
+  font-family: font-family-body
+  font-size: 16px
+  font-weight: 400
+  line-height: 1.6
+  letter-spacing: 0em
+  color: color-text-primary
+
+
+text-body-sm
+  font-family: font-family-body
+  font-size: 14px
+  font-weight: 400
+  line-height: 1.5
+  letter-spacing: 0.01em
+  color: color-text-secondary
+
+
+text-button
+  font-family: font-family-body
+  font-size: 16px
+  font-weight: 500
+  line-height: 1.5
+  letter-spacing: 0.01em
+  text-transform: none
+
+
+text-button-sm
+  font-family: font-family-body
+  font-size: 14px
+  font-weight: 500
+  line-height: 1.4
+  letter-spacing: 0.01em
+  text-transform: none
+
+
+text-label
+  font-family: font-family-body
+  font-size: 12px
+  font-weight: 600
+  line-height: 1.4
+  letter-spacing: 0.05em
+  text-transform: uppercase
+  color: color-text-secondary
+
+
+text-caption
+  font-family: font-family-body
+  font-size: 12px
+  font-weight: 400
+  line-height: 1.4
+  letter-spacing: 0em
+  color: color-text-secondary
+```
+
+
+---
+
+
+## Spacing Tokens
+
+
+Consistent spacing scale used for margins, padding, and gaps. Based on 8px base unit.
+
+
+```
+spacing-xs     = 4px
+spacing-sm     = 8px
+spacing-md     = 16px
+spacing-lg     = 24px
+spacing-xl     = 32px
+spacing-2xl    = 48px
+spacing-3xl    = 64px
+spacing-4xl    = 80px
+spacing-5xl    = 96px
+spacing-6xl    = 128px
+```
+
+
+### Usage Guide
+
+
+- **Components**: Use `spacing-sm` to `spacing-lg` for padding and margins
+- **Sections**: Use `spacing-2xl` to `spacing-5xl` for vertical spacing between sections
+- **Gaps**: Use `spacing-md` to `spacing-lg` for grid/flex gaps
+- **Page margins**: Use `spacing-lg` to `spacing-2xl` depending on viewport
+
+
+---
+
+
+## Radius Tokens
+
+
+Corner radius values for consistent roundness across surfaces.
+
+
+```
+radius-none    = 0px
+radius-sm      = 4px
+radius-md      = 8px
+radius-lg      = 12px
+radius-xl      = 16px
+radius-2xl     = 24px
+radius-full    = 9999px
+```
+
+
+### Usage Guide
+
+
+- **Buttons, inputs**: `radius-md`
+- **Cards, surfaces**: `radius-lg`
+- **Large containers**: `radius-xl`
+- **Avatars, badges**: `radius-full` or `radius-lg`
+
+
+---
+
+
+## Shadow Tokens
+
+
+Elevation shadows to create depth hierarchy.
+
+
+```
+shadow-none
+  box-shadow: none
+
+
+shadow-sm
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05)
+
+
+shadow-md
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07), 0 1px 3px rgba(0, 0, 0, 0.06)
+
+
+shadow-lg
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05)
+
+
+shadow-xl
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04)
+
+
+shadow-elevation-sm
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08)
+
+
+shadow-elevation-md
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.10)
+
+
+shadow-elevation-lg
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.12)
+```
+
+
+### Usage Guide
+
+
+- **Hover states**: `shadow-sm`
+- **Cards, elevated surfaces**: `shadow-md` to `shadow-lg`
+- **Modals, overlays**: `shadow-xl`
+
+
+---
+
+
+## Layout / Container Tokens
+
+
+Global layout constraints and spacing patterns.
+
+
+### Container Max-Widths
+
+
+```
+container-xs      = 480px
+container-sm      = 640px
+container-md      = 768px
+container-lg      = 1024px
+container-xl      = 1200px
+container-2xl     = 1344px
+container-full    = 100%
+```
+
+
+**Default for site**: `container-xl` (1200px)
+
+
+### Breakpoints
+
+
+Mobile-first responsive breakpoints.
+
+
+```
+breakpoint-sm     = 640px    /* Small phones, landscape */
+breakpoint-md     = 768px    /* Tablets */
+breakpoint-lg     = 1024px   /* Desktops */
+breakpoint-xl     = 1280px   /* Large desktops */
+breakpoint-2xl    = 1536px   /* Extra-large desktops */
+```
+
+
+### Grid
+
+
+```
+grid-columns-mobile    = 4     /* Mobile grid: 4 columns */
+grid-columns-tablet    = 8     /* Tablet grid: 8 columns */
+grid-columns-desktop   = 12    /* Desktop grid: 12 columns */
+
+
+grid-gap-mobile        = spacing-md      /* 16px */
+grid-gap-tablet        = spacing-lg      /* 24px */
+grid-gap-desktop       = spacing-lg      /* 24px */
+```
+
+
+### Section Spacing
+
+
+Vertical spacing between major page sections.
+
+
+```
+section-spacing-sm     = spacing-2xl   /* 48px — compact sections */
+section-spacing-md     = spacing-3xl   /* 64px — standard sections */
+section-spacing-lg     = spacing-4xl   /* 80px — prominent sections */
+section-spacing-xl     = spacing-5xl   /* 96px — hero to content transition */
+```
+
+
+### Gutter (horizontal padding on container)
+
+
+```
+gutter-mobile          = spacing-md    /* 16px padding on sides */
+gutter-tablet          = spacing-lg    /* 24px padding on sides */
+gutter-desktop         = spacing-xl    /* 32px padding on sides */
+```
+
+
+---
+
+
+## Transition / Motion Tokens
+
+
+Timing functions for smooth, intentional motion.
+
+
+```
+transition-fast        = 150ms ease-in-out
+transition-base        = 200ms ease-in-out
+transition-standard    = 300ms ease-in-out
+transition-slow        = 400ms ease-in-out
+
+
+easing-in              = ease-in
+easing-out             = ease-out
+easing-in-out          = ease-in-out
+easing-linear          = linear
+
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce)
+  transition: none
+  animation: none
+```
+
+
+---
+
+
+## Component Intent Tokens
+
+
+High-level tokens for common component patterns. Use these in component specs.
+
+
+### Button
+
+
+```
+button-primary
+  bg: color-cta-primary
+  text: color-neutral-0
+  border: none
+  padding: spacing-md spacing-lg
+  radius: radius-md
+  font: text-button
+  shadow: shadow-none
+  transition: all transition-standard
+
+
+button-primary:hover
+  bg: color-cta-primary-hover
+  shadow: shadow-sm
+
+
+button-primary:disabled
+  bg: color-neutral-400
+  text: color-neutral-600
+  cursor: not-allowed
+  opacity: 0.6
+
+
+button-secondary
+  bg: transparent
+  text: color-cta-secondary
+  border: 2px solid color-cta-secondary
+  padding: spacing-md spacing-lg
+  radius: radius-md
+  font: text-button
+  shadow: shadow-none
+  transition: all transition-standard
+
+
+button-secondary:hover
+  bg: color-accent-50
+  border-color: color-cta-secondary-hover
+  text: color-cta-secondary-hover
+
+
+button-ghost
+  bg: transparent
+  text: color-text-primary
+  border: none
+  padding: spacing-md spacing-lg
+  radius: radius-md
+  font: text-button
+  shadow: shadow-none
+  transition: all transition-standard
+  text-decoration: underline
+
+
+button-ghost:hover
+  bg: color-neutral-200
+  text-decoration: underline
+```
+
+
+### Card
+
+
+```
+card
+  background: surface-default
+  padding: spacing-lg
+  border-radius: radius-lg
+  transition: all transition-standard
+
+
+card:hover
+  background: surface-elevated
+  shadow: shadow-md
+
+
+card-accent
+  background: surface-accent
+  padding: spacing-lg
+  border-radius: radius-lg
+```
+
+
+### Input / Form Field
+
+
+```
+input
+  background: color-neutral-0
+  border: 1px solid color-border-primary
+  border-radius: radius-md
+  padding: spacing-md
+  font: text-body-md
+  color: color-text-primary
+  transition: all transition-standard
+
+
+input:hover
+  border-color: color-border-accent
+
+
+input:focus
+  outline: none
+  border-color: color-cta-primary
+  box-shadow: 0 0 0 3px rgba(color-cta-primary, 0.1)
+
+
+input:disabled
+  background: color-neutral-100
+  border-color: color-border-secondary
+  color: color-text-disabled
+  cursor: not-allowed
+```
+
+
+### Badge
+
+
+```
+badge-default
+  background: color-accent-50
+  text: color-accent-600
+  padding: spacing-xs spacing-sm
+  border-radius: radius-full
+  font: text-label
+  display: inline-block
+
+
+badge-success
+  background: color-success-light
+  text: color-success-dark
+
+
+badge-warning
+  background: color-warning-light
+  text: color-warning-dark
+
+
+badge-error
+  background: color-error-light
+  text: color-error-dark
+```
+
+
+### Section Container
+
+
+```
+section
+  padding-top: section-spacing-md
+  padding-bottom: section-spacing-md
+  padding-left: gutter-mobile
+  padding-right: gutter-mobile
+
+
+@media (breakpoint-md)
+  padding-left: gutter-tablet
+  padding-right: gutter-tablet
+
+
+@media (breakpoint-lg)
+  padding-left: gutter-desktop
+  padding-right: gutter-desktop
+```
+
+
+---
+
+
+## Implementation Notes
+
+
+### CSS Variables
+
+
+Implement tokens as CSS custom properties for runtime flexibility:
+
+
+```css
+:root {
+  /* Colors */
+  --color-neutral-50: #fffaf5;
+  --color-neutral-900: #2a2420;
+  --color-accent-400: #c9a878;
+ 
+  /* Spacing */
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+ 
+  /* Text */
+  --text-h1-font-size: 52px;
+  --text-h1-font-weight: 600;
+  --text-h1-line-height: 1.1;
+ 
+  /* Transitions */
+  --transition-standard: 300ms ease-in-out;
+}
+
+
+/* Example usage in component */
+.button-primary {
+  background: var(--color-cta-primary);
+  color: var(--color-neutral-0);
+  padding: var(--spacing-md) var(--spacing-lg);
+  transition: all var(--transition-standard);
+}
+```
+
+
+### Tailwind Configuration (if used)
+
+
+Map tokens to Tailwind theme for rapid component development:
+
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  theme: {
+    colors: {
+      neutral: {
+        50: '#fffaf5',
+        900: '#2a2420',
+      },
+      accent: {
+        400: '#c9a878',
+      },
+    },
+    spacing: {
+      md: '16px',
+      lg: '24px',
+    },
+  },
+}
+```
+
+
+### Token Adjustments for Other Brand Directions
+
+
+If a different brand direction is chosen, adjust tokens as follows:
+
+
+- **Refined Minimalist**: Use cooler neutrals (grays); reduce accent saturation; increase spacing; simplify shadows
+- **Strong Modern**: Use bolder accent colors; increase contrast; tighter spacing in some areas; more pronounced shadows
+
+
+---
+
+
+## Validation Checklist
+
+
+Before moving to the design test page:
+
+
+- [ ] All color tokens have defined hex values
+- [ ] Typography tokens include font-family, size, weight, and line-height
+- [ ] Spacing tokens follow 8px base unit consistently
+- [ ] All component intent tokens are specified with states (default, hover, focus, disabled)
+- [ ] Transition tokens respect `prefers-reduced-motion`
+- [ ] Container and breakpoint values are documented and implemented
+- [ ] Accessibility is considered (contrast ratios, focus states, disabled states)
+
+
+---
+
+
+## Next Steps
+
+
+1. **Review tokens** with design stakeholders to confirm alignment with brand direction
+2. **Create the design test page** (`docs/design-test-page-spec.md`, Task 6) to validate tokens visually
+3. **Build the design test page component** (Task 7) to test typography, color, spacing, and component patterns
+4. **Iterate on tokens** based on test page feedback before full-scale implementation
+manual-qa-checklist:
+# Manual QA Checklist — Milestone 2 Scaffold Smoke Scope
+
+
+Use this checklist before and after automated test setup to verify the current scaffold manually.
+
+
+## Run metadata
+
+
+- Date (UTC):
+- Environment: Local / Preview
+- Base URL:
+- Tester:
+- Result summary: Pass / Fail
+- Notes:
+
+
+## Do now checks (current scaffold smoke scope)
+
+
+Mark each item:
+- [ ] Pass
+- [ ] Fail
+- [ ] N/A
+
+
+### A. Route loading and basic rendering
+
+
+- [ ] `/` loads without error and shows a clear page heading.
+- [ ] `/about` loads without error and shows a meaningful page heading.
+- [ ] `/classes` loads without error and shows a meaningful page heading.
+- [ ] `/contact` loads without error and shows a meaningful page heading.
+- [ ] `/faq` loads without error and shows a meaningful page heading.
+- [ ] `/instructors` loads without error and shows a meaningful page heading.
+- [ ] `/pricing` loads without error and shows a meaningful page heading.
+- [ ] `/blog` loads without error and shows blog placeholder/stub content.
+
+
+### B. Layout shell and navigation
+
+
+- [ ] Global layout appears on public pages with visible header, main content area, and footer.
+- [ ] Primary navigation is visible in header.
+- [ ] Each primary nav link loads the expected destination page without 404.
+- [ ] Footer renders and includes at least one meaningful link.
+
+
+### C. Placeholder rendering
+
+
+- [ ] Placeholder-based pages render expected placeholder heading/text (no blank states).
+- [ ] Blog index placeholder content is visible and readable.
+
+
+### D. Blog slug handling limits (current known constraint)
+
+
+- [ ] Blog slug behavior is treated as limited/deferred in this milestone due to missing guaranteed fixtures.
+- [ ] If testing a sample slug manually, record exact slug and observed behavior in Notes.
+
+
+### E. Metadata spot-checks (manual)
+
+
+- [ ] Home page has a non-empty document title.
+- [ ] At least two additional marketing pages have non-empty and route-appropriate document titles.
+- [ ] At least one checked page has a non-empty meta description.
+
+
+### F. Robots and sitemap
+
+
+- [ ] `/robots.txt` is reachable and contains `User-agent` rules.
+- [ ] `/sitemap.xml` is reachable and parseable as XML in browser.
+- [ ] Sitemap includes expected marketing route URLs (home + primary public pages).
+
+
+### G. Mobile and responsive spot-checks
+
+
+- [ ] At a mobile viewport (~375px wide), header/nav remain usable and readable.
+- [ ] At a mobile viewport, page heading and primary content remain visible without horizontal scroll.
+- [ ] At a desktop viewport, layout spacing remains readable and stable.
+
+
+### H. Static assets and broken links (smoke)
+
+
+- [ ] Representative static assets used by layout/pages load without obvious missing-file errors.
+- [ ] No obvious broken internal links are found during primary nav click-through.
+
+
+### I. Basic accessibility spot-checks
+
+
+- [ ] Each checked page includes one main landmark (`<main>`).
+- [ ] Navigation landmark is present and identifiable.
+- [ ] A meaningful heading is present on each checked page.
+- [ ] Keyboard-only tab flow reaches primary nav links and at least one footer link.
+
+
+## Deferred / later checks (do not block this milestone)
+
+
+- [ ] Blog slug fixture-based validation across multiple known slugs.
+- [ ] Contact form submission behavior (backend/stub dependent).
+- [ ] Full broken-link crawl across all internal links.
+- [ ] Automated accessibility scanning and broader WCAG conformance checks.
+- [ ] Visual regression or design-token regression checks.
+
+
+## Failure log (fill only if any item fails)
+
+
+- Item:
+- Route/URL:
+- Steps to reproduce:
+- Expected:
+- Actual:
+- Severity: Low / Medium / High
+- Follow-up owner:
+
+
+## Sign-off
+
+
+- QA checklist completed by:
+- Completion date (UTC):
+- Ready to proceed to automated testing setup: Yes / No
+testing-runbook:
+# Testing Runbook — Milestone 2 Implementation Target
+
+
+This runbook describes the testing setup, folder structure, naming conventions, and workflow for Codex to implement Milestone 2 testing foundation cleanly.
+
+
+**Do not** add test implementations yet. This file is the specification for the test scaffolding setup.
+
+
+## Test stack (locked for Milestone 2)
+
+
+- **Unit/integration runner**: Vitest
+- **Unit/integration query library**: React Testing Library
+- **E2E runner**: Playwright
+- **Test configuration**: TypeScript; ESLint rules applied; Prettier formatting applied
+
+
+## Folder structure
+
+
+```
+src/
+├── test/
+│   ├── setup.ts                    # global test configuration, providers, mocks
+│   ├── utils.ts                    # shared test utilities (e.g., render helpers)
+│   └── fixtures/                   # reusable test data
+│       └── navigation.ts           # sample nav config, routes, etc.
+│
+├── components/
+│   ├── ui/
+│   │   ├── button-link.tsx
+│   │   ├── button-link.test.tsx    # unit test (React Testing Library)
+│   │   └── ...
+│   │
+│   ├── layout/
+│   │   ├── site-header.tsx
+│   │   ├── site-header.test.tsx    # unit test
+│   │   ├── site-footer.tsx
+│   │   ├── site-footer.test.tsx    # unit test
+│   │   ├── page-shell.tsx
+│   │   ├── page-shell.test.tsx     # integration test
+│   │   └── ...
+│   │
+│   └── sections/
+│       ├── page-placeholder.tsx
+│       └── page-placeholder.test.tsx # unit test
+│
+├── lib/
+│   ├── metadata.ts
+│   ├── metadata.test.ts            # unit test
+│   └── ...
+│
+└── app/
+    └── (marketing)/
+        ├── page.tsx
+        ├── page.test.tsx           # integration test
+        └── ...
+│
+e2e/
+├── smoke.spec.ts                   # basic navigation, route loading, indexing
+├── navigation.spec.ts              # primary nav click-throughs
+├── metadata.spec.ts                # title/description spot-checks (if practical)
+└── fixtures/
+    └── routes.ts                   # canonical route list for E2E
+```
+
+
+## Naming conventions
+
+
+### Test file naming
+
+
+- **Collocated unit/integration tests**: `<Component>.test.tsx` next to `<Component>.tsx`
+- **Utility test files**: `<module>.test.ts` next to `<module>.ts`
+- **E2E test files**: `<feature>.spec.ts` under `e2e/` folder
+
+
+### Test names (describe/it blocks)
+
+
+Use clear, user-behavior-oriented test names:
+
+
+```typescript
+// ✅ Good
+describe('SiteHeader', () => {
+  it('renders logo and primary navigation')
+  it('primary nav link has href matching route')
+  it('header is keyboard navigable')
+})
+
+
+// ❌ Avoid
+describe('SiteHeader', () => {
+  it('renders')
+  it('nav links work')
+})
+```
+
+
+### Import patterns
+
+
+```typescript
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { describe, it, expect } from 'vitest'
+
+
+import SiteHeader from '@/components/layout/site-header'
+import { setupTest } from '@/test/setup'
+```
+
+
+## Test file patterns
+
+
+### Unit test template
+
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+
+
+import Button from '@/components/ui/button'
+
+
+describe('Button', () => {
+  it('renders button with label', () => {
+    render(<Button label="Click me" />)
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument()
+  })
+
+
+  it('calls onClick when clicked', async () => {
+    const handleClick = vi.fn()
+    render(<Button label="Click" onClick={handleClick} />)
+    await userEvent.click(screen.getByRole('button', { name: /click/i }))
+    expect(handleClick).toHaveBeenCalledOnce()
+  })
+})
+```
+
+
+### Integration test template
+
+
+```typescript
+import { describe, it, expect } from 'vitest'
+import { render, screen } from '@testing-library/react'
+
+
+import Page from '@/app/(marketing)/page'
+
+
+describe('Home Page', () => {
+  it('renders page shell with main landmark', () => {
+    render(<Page />)
+    expect(screen.getByRole('main')).toBeInTheDocument()
+  })
+
+
+  it('renders primary heading', () => {
+    render(<Page />)
+    expect(screen.getByRole('heading', { level: 1 })).toBeInTheDocument()
+  })
+})
+```
+
+
+### E2E test template
+
+
+```typescript
+import { test, expect } from '@playwright/test'
+
+
+test.describe('Navigation smoke tests', () => {
+  test('home page loads and has main CTA', async ({ page }) => {
+    await page.goto('/')
+    expect(await page.status()).toBe(200)
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  })
+
+
+  test('primary nav link to /about loads without 404', async ({ page }) => {
+    await page.goto('/')
+    await page.getByRole('link', { name: /about/i }).click()
+    expect(page.url()).toContain('/about')
+    expect(await page.status()).toBe(200)
+  })
+})
+```
+
+
+## Smoke-test philosophy
+
+
+### What to test now (Milestone 2)
+
+
+1. **Renderability**: components and pages render without errors
+2. **Structure**: expected landmarks (`<main>`, `<nav>`, `<header>`, `<footer>`), headings, and layout nesting exist
+3. **Navigation**: primary nav links are present and load destination pages
+4. **Metadata**: robots, sitemap, and page titles are present
+5. **Accessibility basics**: semantic HTML structure; keyboard nav on primary elements
+
+
+### What to defer until later
+
+
+- Full WCAG compliance scanning (axe-core integration)
+- Form submission flows (requires backend/stub)
+- Blog slug fixtures (requires sample content)
+- Visual regression tests
+- Full site link crawls
+- Performance metrics
+
+
+### Test count targets for Milestone 2
+
+
+- **Unit tests**: 5–10 (layout components, placeholder, helpers)
+- **Integration tests**: 5–8 (page rendering, nav composition)
+- **E2E smoke tests**: 3–5 (critical user journeys, robots/sitemap checks)
+
+
+Total: ~15–20 tests to establish baseline confidence.
+
+
+## Selector guidance
+
+
+### Prefer these selectors (in order of reliability)
+
+
+1. **Role-based** (most resilient to UI changes)
+   ```typescript
+   screen.getByRole('button', { name: /submit/i })
+   screen.getByRole('heading', { level: 1 })
+   screen.getByRole('navigation')
+   screen.getByRole('link', { name: /about/i })
+   ```
+
+
+2. **Label-based** (for form inputs)
+   ```typescript
+   screen.getByLabelText(/email/i)
+   ```
+
+
+3. **Text content** (for headings, labels)
+   ```typescript
+   screen.getByText(/about us/i)
+   ```
+
+
+4. **TestId** (when role/label not practical; use sparingly)
+   ```typescript
+   screen.getByTestId('hero-cta')
+   ```
+
+
+### Avoid these selectors (brittle; break easily)
+
+
+- ❌ CSS classes: `.btn-primary`
+- ❌ Element tags without context: `getByRole('button')` (too many)
+- ❌ nth-child pseudo-selectors: `nth-child(2)`
+- ❌ IDs that are not semantic: `#popup-123`
+
+
+## Test boundaries
+
+
+### Unit tests
+
+
+**What**: Small, isolated components and utilities.
+
+
+**Scope**: Render output, props handling, conditional logic, utility function behavior.
+
+
+**NOT testing**: page routing, navigation between routes, API calls, complex interactions.
+
+
+**Location**: Collocated with component or utility file.
+
+
+**Examples**:
+- `Button` renders with correct variant
+- `PagePlaceholder` shows title and description
+- `metadataHelpers.formatTitle()` returns expected shape
+
+
+### Integration tests
+
+
+**What**: Component composition, page structure, multi-component interactions.
+
+
+**Scope**: Page layout, navigation presence, form composition, accessibility structure.
+
+
+**NOT testing**: end-to-end user journeys, routing between different pages, external APIs.
+
+
+**Location**: Collocated with page or feature.
+
+
+**Examples**:
+- Home page renders header, main content, footer
+- Contact page renders form with expected fields
+- Navigation component renders all expected links
+
+
+### End-to-end tests
+
+
+**What**: Critical user journeys from entry to completion.
+
+
+**Scope**: Full page loads, navigation clicks, form submission paths, metadata availability.
+
+
+**NOT testing**: detailed error messages, complex multi-step flows (defer until later).
+
+
+**Location**: `e2e/` folder with `.spec.ts` extension.
+
+
+**Examples**:
+- User lands on home, sees CTA
+- User clicks About link, loads /about without 404
+- Robots.txt is available and valid
+- Sitemap includes expected routes
+
+
+## Expected commands
+
+
+### Run all tests
+
+
+```bash
+npm run test
+```
+
+
+### Run tests in watch mode
+
+
+```bash
+npm run test:watch
+```
+
+
+### Run only unit/integration tests
+
+
+```bash
+npm run test src
+```
+
+
+### Run only E2E tests
+
+
+```bash
+npm run test:e2e
+```
+
+
+### Run specific test file
+
+
+```bash
+npm run test -- src/components/layout/site-header.test.tsx
+```
+
+
+### Run E2E tests with UI
+
+
+```bash
+npm run test:e2e -- --ui
+```
+
+
+### Generate coverage report
+
+
+```bash
+npm run test -- --coverage
+```
+
+
+## Test configuration files (to create in Milestone 2)
+
+
+### `vitest.config.ts`
+
+
+```typescript
+import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: './src/test/setup.ts',
+  },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+})
+```
+
+
+### `playwright.config.ts`
+
+
+```typescript
+import { defineConfig, devices } from '@playwright/test'
+
+
+export default defineConfig({
+  testDir: './e2e',
+  fullyParallel: true,
+  forbidOnly: !!process.env.CI,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+  },
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] },
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] },
+    },
+    {
+      name: 'mobile-chrome',
+      use: { ...devices['Pixel 5'] },
+    },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+})
+```
+
+
+### `src/test/setup.ts`
+
+
+```typescript
+import { expect, afterEach, vi } from 'vitest'
+import { cleanup } from '@testing-library/react'
+
+
+// Cleanup after each test
+afterEach(() => {
+  cleanup()
+})
+
+
+// Mock window.matchMedia
+Object.defineProperty(window, 'matchMedia', {
+  writable: true,
+  value: vi.fn().mockImplementation(query => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    dispatchEvent: vi.fn(),
+  })),
+})
+```
+
+
+### `src/test/utils.ts`
+
+
+```typescript
+import { ReactElement } from 'react'
+import { render, RenderOptions } from '@testing-library/react'
+
+
+// Custom render function with providers, if needed later
+const customRender = (
+  ui: ReactElement,
+  options?: Omit<RenderOptions, 'wrapper'>
+) => {
+  return render(ui, { ...options })
+}
+
+
+export * from '@testing-library/react'
+export { customRender as render }
+```
+
+
+## Safe workflow for adding tests (how Codex should proceed)
+
+
+1. **Choose surface**: Pick one component or page from the testing-matrix.md "Now" list
+2. **Create test file**: Add `.test.tsx` collocated with the component or under `e2e/` for E2E
+3. **Write minimum assertions**: Use the testing matrix "minimum assertion" as the assertion target
+4. **Run the test**: Verify it passes against the current code
+5. **Commit and verify**: Ensure lint, type-check, and build still pass
+6. **Repeat**: Move to next surface; do not batch multiple test files at once
+7. **Check coverage**: Once all smoke tests are in, review coverage to identify any obvious gaps
+
+
+### Example safe workflow
+
+
+```bash
+# 1. Create unit test for page-placeholder component
+# (edit: src/components/sections/page-placeholder.test.tsx)
+
+
+# 2. Run and verify
+npm run test -- src/components/sections/page-placeholder.test.tsx
+
+
+# 3. Check lint and type
+npm run lint
+npm run test:type
+
+
+# 4. Commit
+git add src/components/sections/page-placeholder.*
+git commit -m "test: add unit test for page-placeholder"
+
+
+# 5. Move to next surface (e.g., site-header)
+# (repeat pattern)
+```
+
+
+## Tips for test maintainability
+
+
+1. **Keep tests small and focused**: one test = one behavior
+2. **Use descriptive names**: describe what the user should see/experience, not implementation
+3. **Avoid implementation details**: test role/text/visual output, not component state/props directly
+4. **Use fixtures for shared data**: store nav routes, metadata templates in `src/test/fixtures/`
+5. **Comment WHY, not WHAT**: if the assertion is not obvious, explain the business reason
+6. **Defer advanced mocking**: keep mocking minimal; mock only external APIs, not internal modules
+7. **Run full test suite before committing**: ensure no regressions
+
+
+## Expected test directory tree after Milestone 2
+
+
+```
+src/
+├── test/
+│   ├── setup.ts
+│   ├── utils.ts
+│   └── fixtures/
+│       └── navigation.ts
+├── components/
+│   ├── layout/
+│   │   ├── site-header.test.tsx
+│   │   ├── site-footer.test.tsx
+│   │   ├── page-shell.test.tsx
+│   │   └── ...
+│   ├── sections/
+│   │   ├── page-placeholder.test.tsx
+│   │   └── ...
+│   └── ui/
+│       └── (minimal unit tests for critical primitives)
+├── lib/
+│   ├── metadata.test.ts
+│   └── ...
+└── app/
+    └── (marketing)/
+        ├── page.test.tsx
+        ├── about/
+        │   └── page.test.tsx
+        ├── classes/
+        │   └── page.test.tsx
+        └── ...
+
+
+e2e/
+├── smoke.spec.ts
+├── navigation.spec.ts
+└── fixtures/
+    └── routes.ts
+```
+
+
+## Next steps for Codex in Milestone 2
+
+
+1. Install and configure Vitest, React Testing Library, and Playwright (follow their official docs).
+2. Create test configuration files as shown above.
+3. Implement smoke tests in order per the testing-matrix.md "Now" list.
+4. Run full test suite and verify all tests pass.
+5. Run lint, type-check, and build to ensure no regressions.
+6. Log the completed Milestone 2 setup with test count and coverage summary.

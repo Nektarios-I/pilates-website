@@ -1,0 +1,37 @@
+npm run dev
+
+npm run build
+npm run start
+
+npm run test:e2e -- --ui
+
+What to use
+Use these tools/extensions:
+
+Chrome or Edge DevTools: main visual preview, responsive device toolbar, layout inspection.
+
+Playwright Test for VS Code: run/debug E2E tests visually.
+
+ESLint: catch code-quality regressions while coding.
+
+Prettier: keep formatting stable.
+
+Tailwind CSS IntelliSense: if you are using Tailwind classes heavily.
+
+GitHub Copilot + Copilot Chat: small local refinements after Codex milestone work.
+
+VS Code Simple Browser: optional, but a real browser is better for layout/debugging.
+
+Use these checks at the right time:
+
+npm run dev: while building sections/components.
+
+npm run test:watch: while iterating on unit/integration tests.
+
+npm run test:e2e -- --ui: when validating navigation and interaction flow.
+
+npm run build && npm run start: before commit or before opening a PR.
+
+Vercel preview deployment: after push, for branch-isolated stakeholder review and post-deploy smoke checks.
+
+Also keep in mind that the docs already define a future non-production design test page for token and component validation before final design decisions are locked, and the SEO plan says internal design routes should remain non-indexable.
