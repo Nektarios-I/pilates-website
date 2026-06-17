@@ -2,13 +2,25 @@
 
 import type { User } from '@supabase/supabase-js';
 import { useRouter } from 'next/navigation';
-import { useTransition } from 'react';
+import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
+import { createClient } from '@/lib/supabase/client';
+import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
+
+function password_input_cls(has_error?: boolean): string {
+  return [
+    'block w-full rounded-md border px-4 py-3 text-base text-stone-950 placeholder-stone-400 shadow-sm',
+    'transition-colors focus:outline-none focus:ring-1',
+    has_error
+      ? 'border-red-300 bg-white focus:border-red-500 focus:ring-red-500'
+      : 'border-stone-300 bg-white focus:border-stone-950 focus:ring-stone-950',
+  ].join(' ');
+}
 
 interface Profile {
   id: string;
@@ -72,12 +84,73 @@ export function AccountContent({
 }: AccountContentProps) {
   const router = useRouter();
   const [is_pending, start_transition] = useTransition();
+  const [cancelling_id, set_cancelling_id] = useState<string | null>(null);
+  const [cancel_errors, set_cancel_errors] = useState<Record<string, string>>({});
+  const [cancelled_ids, set_cancelled_ids] = useState<Set<string>>(new Set());
+  const [new_password, set_new_password] = useState('');
+  const [confirm_password, set_confirm_password] = useState('');
+  const [show_new_password, set_show_new_password] = useState(false);
+  const [password_loading, set_password_loading] = useState(false);
+  const [password_error, set_password_error] = useState<string | undefined>();
+  const [password_success, set_password_success] = useState(false);
 
   const handle_sign_out = async () => {
     start_transition(async () => {
       await signOut();
       router.push('/login');
     });
+  };
+
+  const handle_cancel = async (booking_id: string) => {
+    set_cancelling_id(booking_id);
+    set_cancel_errors((prev) => ({ ...prev, [booking_id]: '' }));
+
+    const result = await cancel_booking_action(booking_id, 'Cancelled by client');
+
+    if (result.success) {
+      set_cancelled_ids((prev) => new Set([...prev, booking_id]));
+      router.refresh();
+    } else {
+      set_cancel_errors((prev) => ({ ...prev, [booking_id]: result.error }));
+    }
+    set_cancelling_id(null);
+  };
+
+  const handle_change_password = async (e: React.FormEvent) => {
+    e.preventDefault();
+    set_password_error(undefined);
+    set_password_success(false);
+
+    if (!new_password) {
+      set_password_error('Please enter a new password.');
+      return;
+    }
+    if (new_password.length < 8) {
+      set_password_error('Password must be at least 8 characters.');
+      return;
+    }
+    if (new_password !== confirm_password) {
+      set_password_error('Passwords do not match.');
+      return;
+    }
+
+    set_password_loading(true);
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: new_password });
+    set_password_loading(false);
+
+    if (error) {
+      if (error.message.toLowerCase().includes('same password')) {
+        set_password_error('Your new password must be different from your current password.');
+      } else {
+        set_password_error(error.message);
+      }
+      return;
+    }
+
+    set_new_password('');
+    set_confirm_password('');
+    set_password_success(true);
   };
 
   const format_date = (date_string: string) => {
@@ -275,11 +348,21 @@ export function AccountContent({
                             {booking.status}
                           </span>
                         </div>
-                        <div className="mt-4">
-                          <Button disabled size="sm" variant="secondary">
-                            Cancel booking
-                          </Button>
-                        </div>
+                        {!cancelled_ids.has(booking.id) && (
+                          <div className="mt-4">
+                            <Button
+                              disabled={cancelling_id === booking.id}
+                              size="sm"
+                              variant="secondary"
+                              onClick={() => handle_cancel(booking.id)}
+                            >
+                              {cancelling_id === booking.id ? 'Cancelling…' : 'Cancel booking'}
+                            </Button>
+                            {cancel_errors[booking.id] && (
+                              <p className="mt-2 text-xs text-red-600">{cancel_errors[booking.id]}</p>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
@@ -291,12 +374,87 @@ export function AccountContent({
                 </div>
               )}
 
-              <div className="mt-6 rounded-md bg-blue-50 p-4">
-                <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Booking and cancellation functionality will be added in a
-                  future update. Contact the studio to book or cancel classes.
-                </p>
-              </div>
+            </div>
+
+            {/* Change Password Section */}
+            <div className="rounded-md border border-border bg-background p-6">
+              <h2 className="text-xl font-semibold text-stone-950">Change password</h2>
+              <p className="mt-1 text-sm text-stone-600">
+                Update the password you use to sign in with email and password.
+              </p>
+
+              {password_success && (
+                <div
+                  aria-live="polite"
+                  className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
+                  role="status"
+                >
+                  Your password has been updated.
+                </div>
+              )}
+
+              {password_error && (
+                <div
+                  aria-live="polite"
+                  className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+                  role="alert"
+                >
+                  {password_error}
+                </div>
+              )}
+
+              <form className="mt-6 space-y-4" noValidate onSubmit={handle_change_password}>
+                <div>
+                  <label className="block text-sm font-medium text-stone-950" htmlFor="new-password">
+                    New password
+                  </label>
+                  <div className="relative mt-2">
+                    <input
+                      autoComplete="new-password"
+                      className={`pr-11 ${password_input_cls(!!password_error)}`}
+                      disabled={password_loading}
+                      id="new-password"
+                      minLength={8}
+                      placeholder="At least 8 characters"
+                      type={show_new_password ? 'text' : 'password'}
+                      value={new_password}
+                      onChange={(e) => set_new_password(e.target.value)}
+                    />
+                    <button
+                      aria-label={show_new_password ? 'Hide password' : 'Show password'}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-950"
+                      type="button"
+                      onClick={() => set_show_new_password((prev) => !prev)}
+                    >
+                      {show_new_password ? 'Hide' : 'Show'}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label
+                    className="block text-sm font-medium text-stone-950"
+                    htmlFor="confirm-password"
+                  >
+                    Confirm new password
+                  </label>
+                  <input
+                    autoComplete="new-password"
+                    className={`mt-2 ${password_input_cls(!!password_error)}`}
+                    disabled={password_loading}
+                    id="confirm-password"
+                    minLength={8}
+                    placeholder="Re-enter your new password"
+                    type={show_new_password ? 'text' : 'password'}
+                    value={confirm_password}
+                    onChange={(e) => set_confirm_password(e.target.value)}
+                  />
+                </div>
+
+                <Button disabled={password_loading} size="sm" type="submit" variant="secondary">
+                  {password_loading ? 'Updating…' : 'Update password'}
+                </Button>
+              </form>
             </div>
 
             {/* Sign Out Section */}

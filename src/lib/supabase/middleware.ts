@@ -35,25 +35,20 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Protected routes that require authentication
-  const protected_routes = ['/account'];
+  // Routes that require the user to be authenticated.
+  // Role-level enforcement (instructor / owner / admin) is handled inside each
+  // page/action — the middleware only ensures a valid session exists.
+  const protected_routes = ['/account', '/staff'];
   const is_protected_route = protected_routes.some((route) =>
     request.nextUrl.pathname.startsWith(route),
   );
 
-  // Redirect to login if accessing protected route without auth
   if (is_protected_route && !user) {
     const redirect_url = new URL('/login', request.url);
-    redirect_url.searchParams.set('message', 'Please sign in to access your account');
+    redirect_url.searchParams.set('message', 'Please sign in to continue');
     redirect_url.searchParams.set('next', request.nextUrl.pathname);
     return NextResponse.redirect(redirect_url);
   }
-
-  // TODO: Add role-based route protection for admin/staff routes when implemented
-  // Example:
-  // if (request.nextUrl.pathname.startsWith('/admin') && !has_role(user, 'admin')) {
-  //   return NextResponse.redirect(new URL('/', request.url));
-  // }
 
   return supabase_response;
 }

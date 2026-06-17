@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
+import { authDebugEnabled } from '@/lib/auth/debug';
 import { createPageMetadata } from '@/lib/metadata';
 import { createClient } from '@/lib/supabase/server';
 import { LoginForm } from './login-form';
@@ -15,7 +16,7 @@ export const metadata = createPageMetadata({
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; hint?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -44,12 +45,17 @@ export default async function LoginPage({
                 Sign in
               </h1>
               <p className="mt-5 text-base leading-7 text-stone-700">
-                Enter your email to receive a secure sign-in link. No password required.
+                Sign in with your email and password, a one-time code, or Google.
               </p>
             </div>
 
             <div className="mt-10">
-              <LoginForm error={params.error} message={params.message} />
+              <LoginForm
+                debugEnabled={authDebugEnabled()}
+                error={params.error}
+                hint={params.hint}
+                message={params.message}
+              />
             </div>
 
             <div className="mt-6 text-center">

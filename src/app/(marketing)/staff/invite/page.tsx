@@ -1,9 +1,12 @@
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 
 import { Container } from '@/components/ui/container';
+import { createClient } from '@/lib/supabase/server';
 import { createPageMetadata } from '@/lib/metadata';
 
 import { InviteForm } from './invite-form';
+import type { InviteRole } from './actions';
 
 export const metadata = createPageMetadata({
   title: 'Create Account Invitation',
@@ -11,7 +14,30 @@ export const metadata = createPageMetadata({
   path: '/staff/invite',
 });
 
-export default function StaffInvitePage() {
+// Role priority — highest-privilege role wins when a user holds multiple.
+const ROLE_PRIORITY: InviteRole[] = ['admin', 'owner', 'instructor', 'client'];
+
+export default async function StaffInvitePage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Middleware protects /staff/* — this is a belt-and-suspenders check.
+  if (!user) {
+    redirect('/login');
+  }
+
+  // Resolve the user's highest-privilege role.
+  const { data: roles } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id);
+
+  const role_values = (roles ?? []).map((r) => r.role as InviteRole);
+  const current_role: InviteRole | null =
+    ROLE_PRIORITY.find((r) => role_values.includes(r)) ?? null;
+
   return (
     <Container>
       <div className="py-8 sm:py-12">
@@ -57,7 +83,7 @@ export default function StaffInvitePage() {
         <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           {/* Form card */}
           <div className="rounded-md border border-border bg-surface p-6 sm:p-8">
-            <InviteForm />
+            <InviteForm currentRole={current_role} />
           </div>
 
           {/* Info side panel — desktop only */}
@@ -83,16 +109,12 @@ export default function StaffInvitePage() {
               <ul className="mt-4 space-y-4">
                 {[
                   {
-                    method: 'Magic link',
-                    desc: 'A secure email link signs the user in directly. No password is created.',
+                    method: 'Email + Password',
+                    desc: 'Supabase sends an invite email. The invitee opens the link and sets their own password.',
                   },
                   {
-                    method: 'Email OTP',
-                    desc: 'A one-time code is sent. The user enters it to verify their identity.',
-                  },
-                  {
-                    method: 'Manual registration',
-                    desc: 'Staff creates the record now. The invitee completes their profile setup later.',
+                    method: 'Manual account',
+                    desc: 'Staff creates the account immediately with a temporary password. No email flow is sent.',
                   },
                 ].map(({ method, desc }) => (
                   <li key={method} className="text-sm text-stone-600">
@@ -101,20 +123,6 @@ export default function StaffInvitePage() {
                   </li>
                 ))}
               </ul>
-            </div>
-
-            <div className="rounded-md border border-amber-100 bg-amber-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">
-                Development note
-              </p>
-              <p className="mt-1.5 text-sm leading-5 text-amber-700">
-                This page uses a mock role. Change{' '}
-                <code className="rounded bg-amber-100 px-1 font-mono text-xs">
-                  MOCK_CURRENT_ROLE
-                </code>{' '}
-                in <code className="rounded bg-amber-100 px-1 font-mono text-xs">invite-form.tsx</code>{' '}
-                to test different permission states.
-              </p>
             </div>
           </aside>
         </div>

@@ -75,6 +75,10 @@ declare
   v_session_id    uuid := gen_random_uuid();
 begin
 
+  -- pgcrypto is required for crypt() / gen_salt() used below.
+  -- Supabase bundles it; this ensures it is enabled before we call it.
+  create extension if not exists pgcrypto schema extensions;
+
   -- Insert auth users (bypasses normal sign-up flow for seeding)
   insert into auth.users (id, email, encrypted_password, email_confirmed_at,
     raw_user_meta_data, created_at, updated_at)

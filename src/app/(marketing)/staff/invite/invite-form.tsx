@@ -6,23 +6,14 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Mock configuration
-// TODO: Replace MOCK_CURRENT_ROLE with real session role from Supabase auth context
-// TODO: Replace MOCK_SIMULATE_ERROR with real error handling
-// ─────────────────────────────────────────────────────────────────────────────
-
-const MOCK_CURRENT_ROLE: 'user' | 'instructor' | 'owner' | 'admin' = 'admin';
-
-// Set to true to test the server-error state during development
-const MOCK_SIMULATE_ERROR = false;
+import { create_staff_invite } from './actions';
+import type { InviteMethod, InviteRole } from './actions';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 
-type Role = 'user' | 'instructor' | 'owner' | 'admin';
-type InviteMethod = 'magic_link' | 'email_otp' | 'manual';
+type Role = InviteRole;
 
 type InviteFormData = {
   full_name: string;
@@ -30,30 +21,31 @@ type InviteFormData = {
   phone: string;
   role: Role | '';
   method: InviteMethod | '';
+  password: string;
 };
 
 type InviteFormErrors = Partial<Record<keyof InviteFormData, string>>;
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Permissions and display data
+// Display constants
 // ─────────────────────────────────────────────────────────────────────────────
 
 const ROLE_PERMISSIONS: Record<Role, Role[]> = {
-  user: [],
-  instructor: ['user'],
-  owner: ['user', 'instructor'],
-  admin: ['user', 'instructor', 'owner', 'admin'],
+  client: [],
+  instructor: ['client'],
+  owner: ['client', 'instructor'],
+  admin: ['client', 'instructor', 'owner', 'admin'],
 };
 
 const ROLE_LABELS: Record<Role, string> = {
-  user: 'Client',
+  client: 'Client',
   instructor: 'Instructor',
   owner: 'Owner',
   admin: 'Admin',
 };
 
 const PERMISSION_DESCRIPTIONS: Record<Role, string> = {
-  user: 'Clients do not have permission to create account invitations.',
+  client: 'Clients do not have permission to create account invitations.',
   instructor: 'Instructors can invite clients only.',
   owner: 'Owners can invite clients and instructors.',
   admin: 'Admins can invite all account types, including other admins.',
@@ -61,21 +53,16 @@ const PERMISSION_DESCRIPTIONS: Record<Role, string> = {
 
 const INVITE_METHODS: { value: InviteMethod; label: string; description: string }[] = [
   {
-    value: 'magic_link',
-    label: 'Magic link',
+    value: 'email_password',
+    label: 'Email + Password',
     description:
-      'The invitee receives an email with a secure sign-in link. No password required.',
+      'An invite email is sent. The invitee clicks the link and sets their own password. Best for staff and regular members.',
   },
   {
-    value: 'email_otp',
-    label: 'Email OTP',
-    description: 'The invitee receives a one-time passcode by email to complete sign-in.',
-  },
-  {
-    value: 'manual',
-    label: 'Manual registration',
+    value: 'manual_account',
+    label: 'Manual account',
     description:
-      'Staff creates the account record now. The invitee completes their profile setup later.',
+      'Creates the account immediately with a temporary password. No invite email or OTP email is sent.',
   },
 ];
 
@@ -100,7 +87,7 @@ function validate_email(value: string): string | undefined {
 function validate_phone(value: string): string | undefined {
   const trimmed = value.trim();
   if (!trimmed) return 'Phone number is required.';
-  if (!/^[+\d\s\-().]+$/.test(trimmed)) return 'Phone number contains invalid characters.';
+  if (!/^[+\d\s\-(). ]+$/.test(trimmed)) return 'Phone number contains invalid characters.';
   const digits = trimmed.replace(/\D/g, '');
   if (digits.length < 7) return 'Please enter a valid phone number.';
   if (digits.length > 15) return 'Phone number is too long.';
@@ -116,6 +103,13 @@ function validate_role(value: string, allowed_roles: Role[]): string | undefined
 
 function validate_method(value: string): string | undefined {
   if (!value) return 'Please select an invitation method.';
+  return undefined;
+}
+
+function validate_password(value: string, method: string): string | undefined {
+  if (method !== 'manual_account') return undefined;
+  if (!value) return 'Temporary password is required for manual accounts.';
+  if (value.length < 8) return 'Temporary password must be at least 8 characters.';
   return undefined;
 }
 
@@ -135,6 +129,8 @@ function validate_single_field(
       return validate_role(value, allowed_roles);
     case 'method':
       return validate_method(value);
+    case 'password':
+      return undefined;
   }
 }
 
@@ -145,35 +141,12 @@ function validate_all(data: InviteFormData, allowed_roles: Role[]): InviteFormEr
     phone: validate_phone(data.phone),
     role: validate_role(data.role, allowed_roles),
     method: validate_method(data.method),
+    password: validate_password(data.password, data.method),
   };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Mock submit
-// TODO: Replace with Supabase admin.inviteUserByEmail or admin.createUser
-// Expected data shape: { full_name, email, phone, role, method }
-// ─────────────────────────────────────────────────────────────────────────────
-
-async function mock_submit(
-  // TODO: Pass data to Supabase admin.inviteUserByEmail or admin.createUser
-  data: InviteFormData,
-): Promise<{ success: boolean; error?: string }> {
-  void data;
-  const delay = 800 + Math.random() * 400;
-  await new Promise((resolve) => setTimeout(resolve, delay));
-
-  if (MOCK_SIMULATE_ERROR) {
-    return {
-      success: false,
-      error: 'The server could not process this invitation. Please try again.',
-    };
-  }
-
-  return { success: true };
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared style helper
+// Style helper
 // ─────────────────────────────────────────────────────────────────────────────
 
 function input_classes(error?: string, disabled?: boolean): string {
@@ -194,7 +167,7 @@ function input_classes(error?: string, disabled?: boolean): string {
 
 function PermissionBadge({ role }: { role: Role }) {
   const badge_styles: Record<Role, string> = {
-    user: 'bg-stone-100 text-stone-600',
+    client: 'bg-stone-100 text-stone-600',
     instructor: 'bg-blue-50 text-blue-700 border border-blue-100',
     owner: 'bg-emerald-50 text-emerald-700 border border-emerald-100',
     admin: 'bg-amber-50 text-amber-700 border border-amber-100',
@@ -203,7 +176,7 @@ function PermissionBadge({ role }: { role: Role }) {
   return (
     <div className="mb-6 rounded-md border border-border bg-muted p-4">
       <div className="flex items-start gap-3">
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-medium text-stone-950">Acting as</p>
             <span
@@ -257,13 +230,15 @@ function AccessDeniedState() {
 
 function SuccessBanner({
   data,
+  method,
   on_create_another,
 }: {
   data: InviteFormData;
+  method: InviteMethod;
   on_create_another: () => void;
 }) {
-  const method_label = INVITE_METHODS.find((m) => m.value === data.method)?.label ?? data.method;
-  const role_label = data.role ? ROLE_LABELS[data.role] : '';
+  const role_label = data.role ? ROLE_LABELS[data.role as Role] : '';
+  const method_label = INVITE_METHODS.find((m) => m.value === method)?.label ?? method;
 
   return (
     <div
@@ -286,17 +261,19 @@ function SuccessBanner({
             strokeWidth={2}
           />
         </svg>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-emerald-800">Invitation created successfully</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-emerald-800">
+            {method === 'email_password' ? 'Invite email sent' : 'Account created'}
+          </p>
           <p className="mt-1 text-sm text-emerald-700">
-            {data.method === 'manual'
-              ? 'The account record has been created. Staff can complete setup at any time.'
-              : `An invitation has been queued for ${data.email.trim()}.`}
+            {method === 'email_password'
+              ? `An invite email has been sent to ${data.email.trim()}. They will click the link and set their own password.`
+              : `The account for ${data.email.trim()} was created immediately. Share the temporary password securely and ask them to change it after signing in.`}
           </p>
 
           <div className="mt-4 rounded-md border border-emerald-200 bg-white p-4">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">
-              Invitation summary
+              Account summary
             </p>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
@@ -305,7 +282,7 @@ function SuccessBanner({
               </div>
               <div>
                 <dt className="font-medium text-stone-700">Email</dt>
-                <dd className="mt-0.5 text-stone-950 break-all">{data.email.trim()}</dd>
+                <dd className="mt-0.5 break-all text-stone-950">{data.email.trim()}</dd>
               </div>
               <div>
                 <dt className="font-medium text-stone-700">Phone</dt>
@@ -319,6 +296,14 @@ function SuccessBanner({
                 <dt className="font-medium text-stone-700">Invitation method</dt>
                 <dd className="mt-0.5 text-stone-950">{method_label}</dd>
               </div>
+              {method === 'manual_account' && (
+                <div className="sm:col-span-2">
+                  <dt className="font-medium text-stone-700">Temporary password</dt>
+                  <dd className="mt-0.5 text-stone-950">
+                    Created by staff. Share it privately with the user.
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
 
@@ -328,7 +313,7 @@ function SuccessBanner({
               onClick={on_create_another}
               type="button"
             >
-              Create another invitation
+              Create another account
             </button>
           </div>
         </div>
@@ -338,7 +323,7 @@ function SuccessBanner({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Main form component
+// Main form
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EMPTY_FORM: InviteFormData = {
@@ -347,31 +332,51 @@ const EMPTY_FORM: InviteFormData = {
   phone: '',
   role: '',
   method: '',
+  password: '',
 };
 
-export function InviteForm() {
-  const current_role = MOCK_CURRENT_ROLE;
-  const allowed_roles = ROLE_PERMISSIONS[current_role];
+type InviteFormProps = {
+  currentRole: Role | null;
+};
+
+export function InviteForm({ currentRole }: InviteFormProps) {
+  const current_role = currentRole;
+  const allowed_roles: Role[] = current_role ? (ROLE_PERMISSIONS[current_role] ?? []) : [];
 
   const [form_data, set_form_data] = useState<InviteFormData>(EMPTY_FORM);
   const [errors, set_errors] = useState<InviteFormErrors>({});
   const [touched, set_touched] = useState<Partial<Record<keyof InviteFormData, boolean>>>({});
   const [is_submitting, set_is_submitting] = useState(false);
   const [submit_error, set_submit_error] = useState<string | undefined>();
-  const [success_data, set_success_data] = useState<InviteFormData | null>(null);
+  const [success_data, set_success_data] = useState<{
+    data: InviteFormData;
+    method: InviteMethod;
+  } | null>(null);
 
   function handle_change(field: keyof InviteFormData, value: string) {
     const updated = { ...form_data, [field]: value };
     set_form_data(updated);
     if (touched[field]) {
-      const field_error = validate_single_field(field, value, allowed_roles);
-      set_errors((prev) => ({ ...prev, [field]: field_error }));
+      const field_error =
+        field === 'password'
+          ? validate_password(value, updated.method)
+          : field === 'method'
+            ? validate_method(value)
+            : validate_single_field(field, value, allowed_roles);
+      set_errors((prev) => ({
+        ...prev,
+        [field]: field_error,
+        ...(field === 'method' ? { password: validate_password(updated.password, value) } : {}),
+      }));
     }
   }
 
   function handle_blur(field: keyof InviteFormData) {
     set_touched((prev) => ({ ...prev, [field]: true }));
-    const field_error = validate_single_field(field, form_data[field], allowed_roles);
+    const field_error =
+      field === 'password'
+        ? validate_password(form_data.password, form_data.method)
+        : validate_single_field(field, form_data[field], allowed_roles);
     set_errors((prev) => ({ ...prev, [field]: field_error }));
   }
 
@@ -386,21 +391,27 @@ export function InviteForm() {
     const all_errors = validate_all(form_data, allowed_roles);
     set_errors(all_errors);
 
-    const has_errors = Object.values(all_errors).some(Boolean);
-    if (has_errors) return;
-
-    // Final guard: role must be allowed for current acting role
+    if (Object.values(all_errors).some(Boolean)) return;
     if (!form_data.role || !allowed_roles.includes(form_data.role)) return;
+    if (!form_data.method) return;
 
     set_is_submitting(true);
     set_submit_error(undefined);
 
     try {
-      const result = await mock_submit(form_data);
+      const result = await create_staff_invite({
+        full_name: form_data.full_name.trim(),
+        email: form_data.email.trim(),
+        phone: form_data.phone.trim(),
+        role: form_data.role as Role,
+        method: form_data.method as InviteMethod,
+    password: form_data.method === 'manual_account' ? form_data.password : undefined,
+      });
+
       if (result.success) {
-        set_success_data(form_data);
+        set_success_data({ data: form_data, method: form_data.method as InviteMethod });
       } else {
-        set_submit_error(result.error ?? 'Something went wrong. Please try again.');
+        set_submit_error(result.error);
       }
     } catch {
       set_submit_error('An unexpected error occurred. Please try again.');
@@ -417,17 +428,20 @@ export function InviteForm() {
     set_submit_error(undefined);
   }
 
-  // ── Access denied state ──────────────────────────────────────────────────
-  if (current_role === 'user') {
+  if (!current_role || current_role === 'client') {
     return <AccessDeniedState />;
   }
 
-  // ── Success state ────────────────────────────────────────────────────────
   if (success_data !== null) {
-    return <SuccessBanner data={success_data} on_create_another={handle_create_another} />;
+    return (
+      <SuccessBanner
+        data={success_data.data}
+        method={success_data.method}
+        on_create_another={handle_create_another}
+      />
+    );
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────
   const is_disabled = is_submitting;
 
   return (
@@ -485,7 +499,7 @@ export function InviteForm() {
           {/* Phone */}
           <FormField
             error={errors.phone}
-            hint="Include country code for international numbers, e.g. +44 7700 900000"
+            hint="Include country code, e.g. +357 97621017"
             id="phone"
             label="Phone number"
             required
@@ -498,7 +512,7 @@ export function InviteForm() {
               disabled={is_disabled}
               id="phone"
               name="phone"
-              placeholder="+1 555 000 0000"
+              placeholder="+357 99 000 000"
               type="tel"
               value={form_data.phone}
               onBlur={() => handle_blur('phone')}
@@ -532,20 +546,13 @@ export function InviteForm() {
 
           {/* Invitation method */}
           <div>
-            <p
-              className="block text-sm font-medium text-stone-950"
-              id="method-label"
-            >
+            <p className="block text-sm font-medium text-stone-950" id="method-label">
               Invitation method
               <span aria-hidden="true" className="ml-1 text-red-500">
                 *
               </span>
             </p>
-            <div
-              aria-labelledby="method-label"
-              className="mt-2 space-y-3"
-              role="radiogroup"
-            >
+            <div aria-labelledby="method-label" className="mt-2 space-y-3" role="radiogroup">
               {INVITE_METHODS.map((m) => {
                 const is_checked = form_data.method === m.value;
                 return (
@@ -585,6 +592,31 @@ export function InviteForm() {
               </p>
             )}
           </div>
+
+          {form_data.method === 'manual_account' && (
+            <FormField
+              error={errors.password}
+              hint="Use at least 8 characters. Share this privately and ask the user to change it after first sign-in."
+              id="password"
+              label="Temporary password"
+              required
+            >
+              <input
+                aria-describedby={errors.password ? 'password-error' : 'password-hint'}
+                aria-invalid={!!errors.password}
+                autoComplete="new-password"
+                className={input_classes(errors.password, is_disabled)}
+                disabled={is_disabled}
+                id="password"
+                name="password"
+                placeholder="Temporary password"
+                type="password"
+                value={form_data.password}
+                onBlur={() => handle_blur('password')}
+                onChange={(e) => handle_change('password', e.target.value)}
+              />
+            </FormField>
+          )}
         </div>
 
         {/* Actions */}
@@ -595,13 +627,8 @@ export function InviteForm() {
           >
             Cancel
           </Link>
-          <Button
-            className="w-full sm:w-auto"
-            disabled={is_disabled}
-            size="lg"
-            type="submit"
-          >
-            {is_submitting ? 'Creating invitation…' : 'Create invitation'}
+          <Button className="w-full sm:w-auto" disabled={is_disabled} size="lg" type="submit">
+            {is_submitting ? 'Creating account…' : 'Create account'}
           </Button>
         </div>
       </form>
