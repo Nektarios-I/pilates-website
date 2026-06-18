@@ -49,3 +49,12 @@ create trigger set_staff_invites_updated_at
   for each row execute procedure extensions.moddatetime(updated_at);
 
 alter table public.staff_invites enable row level security;
+
+grant select, insert, update on public.staff_invites to authenticated;
+
+drop policy if exists "staff_invites: admin manages" on public.staff_invites;
+create policy "staff_invites: admin manages"
+  on public.staff_invites for all
+  to authenticated
+  using ( (select private.is_admin()) )
+  with check ( (select private.is_admin()) );

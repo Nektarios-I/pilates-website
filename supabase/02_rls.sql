@@ -89,6 +89,7 @@ $$;
 alter table public.profiles      enable row level security;
 alter table public.user_roles    enable row level security;
 alter table public.packages      enable row level security;
+alter table public.session_cards enable row level security;
 alter table public.user_packages enable row level security;
 alter table public.sessions      enable row level security;
 alter table public.bookings      enable row level security;
@@ -110,6 +111,11 @@ grant select                    on public.user_roles    to authenticated;
 grant select                    on public.packages      to anon;
 grant select                    on public.packages      to authenticated;
 grant insert, update, delete    on public.packages      to authenticated;
+
+-- session_cards
+grant select                    on public.session_cards to anon;
+grant select                    on public.session_cards to authenticated;
+grant insert, update, delete    on public.session_cards to authenticated;
 
 -- user_packages
 grant select, insert, update    on public.user_packages to authenticated;
@@ -210,6 +216,29 @@ create policy "packages: admin views all"
 drop policy if exists "packages: admin manages" on public.packages;
 create policy "packages: admin manages"
   on public.packages for all
+  to authenticated
+  using  ( (select private.is_admin()) )
+  with check ( (select private.is_admin()) );
+
+-- =============================================================================
+-- POLICIES: session_cards
+-- =============================================================================
+
+drop policy if exists "session_cards: public views active" on public.session_cards;
+create policy "session_cards: public views active"
+  on public.session_cards for select
+  to anon, authenticated
+  using ( is_active = true );
+
+drop policy if exists "session_cards: admin views all" on public.session_cards;
+create policy "session_cards: admin views all"
+  on public.session_cards for select
+  to authenticated
+  using ( (select private.is_admin()) );
+
+drop policy if exists "session_cards: admin manages" on public.session_cards;
+create policy "session_cards: admin manages"
+  on public.session_cards for all
   to authenticated
   using  ( (select private.is_admin()) )
   with check ( (select private.is_admin()) );

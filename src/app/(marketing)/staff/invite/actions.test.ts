@@ -28,13 +28,33 @@ function server_client_for_admin() {
   };
 }
 
-function admin_client() {
+function admin_client(options?: {
+  profile_email?: { id: string } | null;
+  auth_users?: { id: string; email: string; email_confirmed_at?: string | null }[];
+  create_user_error?: { message: string } | null;
+}) {
   const inviteUserByEmail = vi.fn(async () => ({
     data: { user: { id: 'new-auth-user' } },
     error: null,
   }));
-  const createUser = vi.fn(async () => ({
-    data: { user: { id: 'manual-auth-user' } },
+  const createUser = vi.fn(async () => {
+    if (options?.create_user_error) {
+      return { data: { user: null }, error: options.create_user_error };
+    }
+    return {
+      data: { user: { id: 'manual-auth-user' } },
+      error: null,
+    };
+  });
+  const updateUserById = vi.fn(async () => ({ data: { user: { id: 'orphan-user' } }, error: null }));
+  const listUsers = vi.fn(async () => ({
+    data: {
+      users: (options?.auth_users ?? []).map((user) => ({
+        id: user.id,
+        email: user.email,
+        email_confirmed_at: user.email_confirmed_at ?? null,
+      })),
+    },
     error: null,
   }));
 
@@ -42,10 +62,14 @@ function admin_client() {
     if (table === 'profiles') {
       return {
         select: vi.fn(() => ({
+          ilike: vi.fn(() => ({
+            maybeSingle: vi.fn(async () => ({ data: options?.profile_email ?? null, error: null })),
+          })),
           eq: vi.fn(() => ({
             maybeSingle: vi.fn(async () => ({ data: null, error: null })),
           })),
         })),
+        insert: vi.fn(async () => ({ error: null })),
         update: vi.fn(() => ({
           eq: vi.fn(async () => ({ error: null })),
         })),
@@ -54,6 +78,9 @@ function admin_client() {
 
     if (table === 'user_roles') {
       return {
+        select: vi.fn(() => ({
+          eq: vi.fn(async () => ({ data: [], error: null })),
+        })),
         insert: vi.fn(async () => ({ error: null })),
       };
     }
@@ -66,6 +93,8 @@ function admin_client() {
       admin: {
         createUser,
         inviteUserByEmail,
+        listUsers,
+        updateUserById,
       },
     },
     from,
@@ -84,7 +113,7 @@ describe('create_staff_invite', () => {
     create_admin_client_mock.mockReturnValue(admin as never);
 
     const result = await create_staff_invite({
-      full_name: 'New Owner',
+      full_name: 'NEW OWNER',
       email: 'owner@example.com',
       phone: '+357 97621017',
       role: 'owner',
@@ -110,7 +139,7 @@ describe('create_staff_invite', () => {
     create_admin_client_mock.mockReturnValue(admin as never);
 
     const result = await create_staff_invite({
-      full_name: 'Manual Client',
+      full_name: 'MANUAL CLIENT',
       email: 'manual@example.com',
       phone: '+357 97621017',
       role: 'client',
@@ -128,10 +157,35 @@ describe('create_staff_invite', () => {
       password: 'temporary-password',
       email_confirm: true,
       user_metadata: {
-        full_name: 'Manual Client',
+        full_name: 'MANUAL CLIENT',
         phone: '+357 97621017',
       },
     });
     expect(admin.auth.admin.inviteUserByEmail).not.toHaveBeenCalled();
+  });
+
+  it('repairs orphaned auth.users rows when profiles were cleared by a data reset', async () => {
+    const admin = admin_client({
+      auth_users: [{ id: 'orphan-user', email: 'orphan@example.com' }],
+      create_user_error: { message: 'User already registered' },
+    });
+    create_admin_client_mock.mockReturnValue(admin as never);
+
+    const result = await create_staff_invite({
+      full_name: 'ORPHAN CLIENT',
+      email: 'orphan@example.com',
+      phone: '+357 97621017',
+      role: 'client',
+      method: 'manual_account',
+      password: 'temporary-password',
+    });
+
+    expect(result).toEqual({
+      success: true,
+      user_id: 'orphan-user',
+      method: 'manual_account',
+    });
+    expect(admin.auth.admin.updateUserById).toHaveBeenCalled();
+    expect(admin.auth.admin.createUser).not.toHaveBeenCalled();
   });
 });

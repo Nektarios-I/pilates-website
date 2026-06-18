@@ -43,6 +43,7 @@ export default async function AccountPage() {
       packages (
         id,
         name,
+        class_type,
         package_type
       )
     `,
@@ -59,7 +60,7 @@ export default async function AccountPage() {
       id,
       status,
       created_at,
-      sessions (
+      sessions!inner (
         id,
         title,
         starts_at,

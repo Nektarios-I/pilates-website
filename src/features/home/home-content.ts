@@ -69,22 +69,7 @@ export const homeContent = {
     description: site_content.pricing_preview.intro_text,
     cta_label: site_content.pricing_preview.cta_label,
     cta_href: site_content.pricing_preview.cta_href,
-    intro_offer: {
-      title: site_content.pricing_preview.intro_offer.title,
-      price: site_content.pricing_preview.intro_offer.price,
-      description: site_content.pricing_preview.intro_offer.description,
-    },
-    items: [
-      {
-        title: site_content.pricing_preview.intro_offer.title,
-        description: site_content.pricing_preview.intro_offer.description,
-        meta: site_content.pricing_preview.intro_offer.price,
-        cta: {
-          label: site_content.pricing_preview.cta_label,
-          href: site_content.pricing_preview.cta_href as "/" | `/${string}`,
-        },
-      },
-      ...site_content.pricing_preview.plans.map((plan) => ({
+    items: site_content.pricing_preview.plans.map((plan) => ({
         title: plan.name,
         description: plan.description,
         meta: plan.price,
@@ -93,7 +78,6 @@ export const homeContent = {
           href: site_content.pricing_preview.cta_href as "/" | `/${string}`,
         },
       })),
-    ],
   },
   instructors: {
     id: "instructors-preview",
@@ -121,16 +105,12 @@ export const homeContent = {
     cta_href: site_content.contact_preview.cta_href,
     items: [
       {
-        title: "Address",
-        description: `${site_content.contact_preview.address_line_1}, ${site_content.contact_preview.city} ${site_content.contact_preview.postcode}`,
-      },
-      {
-        title: "Contact",
-        description: `Phone: ${site_content.contact_preview.phone} • Email: ${site_content.contact_preview.email}`,
+        title: "Phone",
+        description: site_content.contact_preview.phone,
       },
       {
         title: "Hours",
-        description: `Weekdays: ${site_content.contact_preview.hours.weekday} • Saturdays: ${site_content.contact_preview.hours.saturday} • Sundays: ${site_content.contact_preview.hours.sunday}`,
+        description: `${site_content.contact_preview.hours.weekday} • ${site_content.contact_preview.hours.saturday} • ${site_content.contact_preview.hours.sunday}`,
       },
     ],
   },

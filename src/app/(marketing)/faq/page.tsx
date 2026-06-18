@@ -61,23 +61,16 @@ export default function FaqPage() {
               Additional information
             </h2>
             <div className="mt-6 space-y-4">
-              <div className="rounded-md border border-border bg-surface p-6">
-                <h3 className="text-base font-semibold text-stone-950">Studio policies</h3>
+              <div className="rounded-md border border-border bg-surface p-6" id="rules">
+                <h3 className="text-base font-semibold text-stone-950">Studio rules</h3>
                 <p className="mt-2 text-sm leading-6 text-stone-700">
                   {site_content.pricing_preview.policies_short}
                 </p>
               </div>
               <div className="rounded-md border border-border bg-surface p-6">
-                <h3 className="text-base font-semibold text-stone-950">First-time visitors</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-700">
-                  New clients are welcome to start with any class that matches their comfort level.
-                  Our intro offer provides the best value for trying the studio.
-                </p>
-              </div>
-              <div className="rounded-md border border-border bg-surface p-6">
                 <h3 className="text-base font-semibold text-stone-950">Still have questions?</h3>
                 <p className="mt-2 text-sm leading-6 text-stone-700">
-                  Contact us directly for any additional questions not covered here.
+                  Call {site_content.contact_preview.phone} for help with booking or memberships.
                 </p>
               </div>
             </div>
@@ -95,7 +88,7 @@ export default function FaqPage() {
               Ready to book?
             </h2>
             <p className="mt-4 text-base leading-7 text-stone-200">
-              Start with our intro offer or explore our full class schedule and pricing.
+              Book a class or review pricing and studio hours.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
               <ButtonLink

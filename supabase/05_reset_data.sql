@@ -33,6 +33,7 @@ begin
   end if;
 
   raise notice 'reset_data.sql: safety check passed — clearing all application data...';
+  raise notice 'NOTE: auth.users rows are NOT deleted. Orphaned auth emails will block re-invites unless handled by the app or cleaned manually.';
 end;
 $$;
 
@@ -45,6 +46,7 @@ truncate table
   public.sessions,
   public.user_roles,
   public.profiles
+
 restart identity
 cascade;
 

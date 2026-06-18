@@ -11,6 +11,8 @@ import {
 } from '@/lib/auth/debug';
 import { createClient } from '@/lib/supabase/client';
 
+import { resolve_sign_in_email } from './actions';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
@@ -163,7 +165,7 @@ export function LoginForm({
   const [forgot_step, set_forgot_step] = useState<ForgotStep>('idle');
 
   // ── Fields ─────────────────────────────────────────────────────────────────
-  const [email, set_email] = useState('');
+  const [identifier, set_identifier] = useState('');
   const [password, set_password] = useState('');
   const [show_password, set_show_password] = useState(false);
   const [otp_email, set_otp_email] = useState('');
@@ -195,15 +197,22 @@ export function LoginForm({
     e.preventDefault();
     clear_status();
 
-    if (!email.trim() || !password) {
-      set_error('Email and password are required.');
+    if (!identifier.trim() || !password) {
+      set_error('Email or name and password are required.');
       return;
     }
 
     set_is_loading(true);
+    const resolved = await resolve_sign_in_email(identifier);
+    if (!resolved.success) {
+      set_is_loading(false);
+      set_error(resolved.error);
+      return;
+    }
+
     const supabase = createClient();
     const { error: err } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: resolved.email,
       password,
     });
     set_is_loading(false);
@@ -211,7 +220,7 @@ export function LoginForm({
     if (err) {
       const msg = err.message.toLowerCase();
       if (msg.includes('invalid login credentials') || msg.includes('invalid password')) {
-        set_error('Incorrect email or password. Check your details and try again.');
+        set_error('Incorrect email/name or password. Check your details and try again.');
       } else if (msg.includes('email not confirmed')) {
         set_error(
           'Your email has not been confirmed yet. Check your inbox for a confirmation email.',
@@ -228,7 +237,7 @@ export function LoginForm({
 
   function open_forgot_password() {
     clear_status();
-    set_forgot_email(email.trim()); // pre-fill with whatever was typed
+    set_forgot_email(identifier.trim()); // pre-fill with whatever was typed
     set_forgot_step('form');
   }
 
@@ -534,20 +543,23 @@ export function LoginForm({
         <form noValidate onSubmit={handle_password_sign_in}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="email">
-                Email address
+              <label className="block text-sm font-medium text-stone-950" htmlFor="identifier">
+                Email or name
               </label>
               <input
-                autoComplete="email"
+                autoComplete="username"
                 className={`mt-2 ${input_cls()}`}
                 disabled={is_loading}
-                id="email"
-                name="email"
-                placeholder="you@example.com"
-                type="email"
-                value={email}
-                onChange={(e) => set_email(e.target.value)}
+                id="identifier"
+                name="identifier"
+                placeholder="NAME SURNAME or you@example.com"
+                type="text"
+                value={identifier}
+                onChange={(e) => set_identifier(e.target.value)}
               />
+              <p className="mt-2 text-xs text-stone-500">
+                For name sign-in use ALL CAPS: NAME SURNAME (as on your account).
+              </p>
             </div>
 
             <div>

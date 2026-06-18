@@ -74,6 +74,9 @@ function validate_full_name(value: string): string | undefined {
   const trimmed = value.trim();
   if (!trimmed) return 'Full name is required.';
   if (trimmed.length < 2) return 'Full name must be at least 2 characters.';
+  if (!/^[A-Z]+(?: [A-Z]+)+$/.test(trimmed)) {
+    return 'Use ALL CAPS in the format NAME SURNAME (e.g. MARIA PAPADOPOULOU).';
+  }
   return undefined;
 }
 
@@ -463,19 +466,22 @@ export function InviteForm({ currentRole }: InviteFormProps) {
           {/* Full name */}
           <FormField error={errors.full_name} id="full_name" label="Full name" required>
             <input
-              aria-describedby={errors.full_name ? 'full_name-error' : undefined}
+              aria-describedby="full_name-hint"
               aria-invalid={!!errors.full_name}
               autoComplete="name"
               className={input_classes(errors.full_name, is_disabled)}
               disabled={is_disabled}
               id="full_name"
               name="full_name"
-              placeholder="Jane Smith"
+              placeholder="MARIA PAPADOPOULOU"
               type="text"
               value={form_data.full_name}
               onBlur={() => handle_blur('full_name')}
-              onChange={(e) => handle_change('full_name', e.target.value)}
+              onChange={(e) => handle_change('full_name', e.target.value.toUpperCase())}
             />
+            <p className="mt-2 text-xs text-stone-500" id="full_name-hint">
+              Enter ALL CAPS as NAME SURNAME. Clients can sign in with this name or their email.
+            </p>
           </FormField>
 
           {/* Email */}

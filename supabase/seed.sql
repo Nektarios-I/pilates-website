@@ -1,60 +1,140 @@
 -- =============================================================================
--- 04_seed.sql  —  Seed Data (Packages + Demo Users)
--- Pilates Studio · Supabase / PostgreSQL 15+
+-- seed.sql  —  Supabase CLI convention (mirrors 04_seed.sql)
 --
--- WHAT THIS SCRIPT DOES
---   Inserts the standard package catalog (safe to run multiple times via
---   ON CONFLICT DO NOTHING) and optional demo users / sessions.
---
---   IMPORTANT: The demo user rows are wrapped in a DO block that only runs
---   when the environment setting `app.seed_demo_data` is 'true'.
---   In production leave that setting unset — only packages will be seeded.
---
--- RUN ORDER: Run after 03_functions.sql.
+-- Canonical source: 04_seed.sql — keep both files in sync when editing packages.
+-- RUN ORDER: After 03_functions.sql (see supabase/README.md).
 -- =============================================================================
 
 -- ---------------------------------------------------------------------------
 -- PACKAGES  (production data — always seeded)
 -- ---------------------------------------------------------------------------
-insert into public.packages (id, name, description, package_type,
+insert into public.packages (id, name, description, class_type, package_type,
   credits_included, validity_days, price, max_per_user, sort_order, is_active)
 values
-  -- Intro offer: one free trial class, max one per client
   (
-    'a0000000-0000-0000-0000-000000000001',
-    'Intro Class',
-    'Your first Pilates class — free and commitment-free.',
-    'intro_offer', 1, 30, 0.00, 1, 1, true
+    'b0000000-0000-0000-0000-000000000001',
+    'Reformer · Single Class',
+    'One reformer class.',
+    'reformer', 'drop_in', 1, 30, 15.00, null, 1, true
   ),
-  -- Drop-in: single class pay-as-you-go
   (
-    'a0000000-0000-0000-0000-000000000002',
-    'Drop-In Class',
-    'One class, no strings attached.',
-    'drop_in', 1, 30, 20.00, null, 2, true
+    'b0000000-0000-0000-0000-000000000002',
+    'Reformer · 1 Month · 2×/week',
+    '8 reformer classes within 30 days.',
+    'reformer', 'credit_pack', 8, 30, 100.00, null, 2, true
   ),
-  -- 5-class credit pack
   (
-    'a0000000-0000-0000-0000-000000000003',
-    '5-Class Pack',
-    'Five classes to use within 60 days.',
-    'credit_pack', 5, 60, 90.00, null, 3, true
+    'b0000000-0000-0000-0000-000000000003',
+    'Reformer · 1 Month · 3×/week',
+    '12 reformer classes within 30 days.',
+    'reformer', 'credit_pack', 12, 30, 145.00, null, 3, true
   ),
-  -- 10-class credit pack
   (
-    'a0000000-0000-0000-0000-000000000004',
-    '10-Class Pack',
-    'Ten classes to use within 90 days.',
-    'credit_pack', 10, 90, 165.00, null, 4, true
+    'b0000000-0000-0000-0000-000000000004',
+    'Reformer · 1 Month · 4×/week',
+    '16 reformer classes within 30 days.',
+    'reformer', 'credit_pack', 16, 30, 185.00, null, 4, true
   ),
-  -- Monthly unlimited
   (
-    'a0000000-0000-0000-0000-000000000005',
-    'Monthly Unlimited',
-    'Unlimited classes for 30 days.',
-    'unlimited', null, 30, 120.00, null, 5, true
+    'b0000000-0000-0000-0000-000000000005',
+    'Reformer · 3 Months · 2×/week',
+    '24 reformer classes within 90 days.',
+    'reformer', 'credit_pack', 24, 90, 285.00, null, 5, true
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000006',
+    'Reformer · 3 Months · 3×/week',
+    '36 reformer classes within 90 days.',
+    'reformer', 'credit_pack', 36, 90, 415.00, null, 6, true
+  ),
+  (
+    'b0000000-0000-0000-0000-000000000007',
+    'Reformer · 3 Months · 4×/week',
+    '48 reformer classes within 90 days.',
+    'reformer', 'credit_pack', 48, 90, 525.00, null, 7, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000001',
+    'Mat · Single Class',
+    'One mat Pilates class.',
+    'mat', 'drop_in', 1, 30, 10.00, null, 101, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000002',
+    'Mat · 1 Month · 2×/week',
+    '8 mat classes within 30 days.',
+    'mat', 'credit_pack', 8, 30, 70.00, null, 102, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000003',
+    'Mat · 1 Month · 3×/week',
+    '12 mat classes within 30 days.',
+    'mat', 'credit_pack', 12, 30, 95.00, null, 103, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000004',
+    'Mat · 1 Month · 4×/week',
+    '16 mat classes within 30 days.',
+    'mat', 'credit_pack', 16, 30, 120.00, null, 104, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000005',
+    'Mat · 3 Months · 2×/week',
+    '24 mat classes within 90 days.',
+    'mat', 'credit_pack', 24, 90, 195.00, null, 105, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000006',
+    'Mat · 3 Months · 3×/week',
+    '36 mat classes within 90 days.',
+    'mat', 'credit_pack', 36, 90, 275.00, null, 106, true
+  ),
+  (
+    'c0000000-0000-0000-0000-000000000007',
+    'Mat · 3 Months · 4×/week',
+    '48 mat classes within 90 days.',
+    'mat', 'credit_pack', 48, 90, 350.00, null, 107, true
   )
-on conflict (id) do nothing;
+on conflict (id) do update set
+  name = excluded.name,
+  description = excluded.description,
+  class_type = excluded.class_type,
+  package_type = excluded.package_type,
+  credits_included = excluded.credits_included,
+  validity_days = excluded.validity_days,
+  price = excluded.price,
+  max_per_user = excluded.max_per_user,
+  sort_order = excluded.sort_order,
+  is_active = excluded.is_active;
+
+insert into public.session_cards (
+  id, title, description, session_type, duration_minutes, instructor_name,
+  image_src, capacity, credits_required, sort_order, is_active
+)
+values
+  (
+    'd0000000-0000-0000-0000-000000000001',
+    'Reformer Pilates',
+    'Small-group equipment class for strength, alignment, and controlled movement.',
+    'reformer', 60, 'Panayiota or Irene', '', 6, 1, 1, true
+  ),
+  (
+    'd0000000-0000-0000-0000-000000000002',
+    'Mat Pilates',
+    'Floor-based Pilates focused on core strength, mobility, and breath.',
+    'mat', 60, 'Panayiota or Irene', '', 10, 1, 2, true
+  )
+on conflict (id) do update set
+  title = excluded.title,
+  description = excluded.description,
+  session_type = excluded.session_type,
+  duration_minutes = excluded.duration_minutes,
+  instructor_name = excluded.instructor_name,
+  image_src = excluded.image_src,
+  capacity = excluded.capacity,
+  credits_required = excluded.credits_required,
+  sort_order = excluded.sort_order,
+  is_active = excluded.is_active;
 
 -- ---------------------------------------------------------------------------
 -- DEMO DATA  (development / staging only)
@@ -100,7 +180,7 @@ begin
 
   -- Give the demo client a 5-class pack
   insert into public.user_packages (user_id, package_id)
-  values (v_client1_id, 'a0000000-0000-0000-0000-000000000003');
+  values (v_client1_id, 'b0000000-0000-0000-0000-000000000003');
 
   -- Create a demo session tomorrow at 10:00
   insert into public.sessions (id, title, session_type, instructor_id,

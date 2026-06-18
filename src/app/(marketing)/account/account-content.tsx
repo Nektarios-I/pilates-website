@@ -46,6 +46,7 @@ interface ActivePackage {
     | {
         id: string;
         name: string;
+        class_type: string;
         package_type: string;
       }[]
     | null;
@@ -175,6 +176,9 @@ export function AccountContent({
       .join(' ');
   };
 
+  const get_related_row = <T,>(value: T | T[] | null): T | null =>
+    Array.isArray(value) ? (value[0] ?? null) : value;
+
   return (
     <>
       <Section className="bg-surface">
@@ -261,7 +265,7 @@ export function AccountContent({
               {active_packages.length > 0 ? (
                 <div className="mt-6 space-y-4">
                   {active_packages.map((pkg) => {
-                    const package_data = pkg.packages?.[0];
+                    const package_data = get_related_row(pkg.packages);
                     if (!package_data) return null;
 
                     return (
@@ -275,7 +279,9 @@ export function AccountContent({
                             <p className="mt-1 text-sm text-stone-600">
                               {package_data.package_type === 'unlimited'
                                 ? 'Unlimited classes'
-                                : `${pkg.credits_remaining || 0} credits remaining`}
+                                : `${pkg.credits_remaining ?? 0} ${package_data.class_type} credit${
+                                    pkg.credits_remaining === 1 ? '' : 's'
+                                  } remaining`}
                             </p>
                             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
                               <span>Started {format_date(pkg.starts_at)}</span>
@@ -322,7 +328,7 @@ export function AccountContent({
               {upcoming_bookings.length > 0 ? (
                 <div className="mt-6 space-y-4">
                   {upcoming_bookings.map((booking) => {
-                    const session = booking.sessions?.[0];
+                    const session = get_related_row(booking.sessions);
                     if (!session) return null;
 
                     return (

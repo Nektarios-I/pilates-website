@@ -1,8 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { siteConfig } from "@/config/site";
-
 import { SiteFooter } from "./site-footer";
 
 describe("SiteFooter", () => {
@@ -10,13 +8,19 @@ describe("SiteFooter", () => {
     render(<SiteFooter />);
 
     const footer = screen.getByRole("contentinfo");
-    const footerNav = within(footer).getByRole("navigation", { name: "Footer navigation" });
 
-    expect(within(footer).getByText(siteConfig.name)).toBeInTheDocument();
-    expect(within(footer).getByText(/placeholder contact details/i)).toBeInTheDocument();
-    expect(within(footerNav).getByRole("link", { name: "Contact" })).toHaveAttribute(
+    expect(within(footer).getByLabelText("corehouse Pilates Studio home")).toBeInTheDocument();
+    expect(within(footer).getByRole("link", { name: "Classes" })).toHaveAttribute(
       "href",
-      "/contact",
+      "/classes",
+    );
+    expect(within(footer).getByRole("link", { name: "Rules" })).toHaveAttribute(
+      "href",
+      "/faq#rules",
+    );
+    expect(within(footer).getByRole("link", { name: "+357 99 954286" })).toHaveAttribute(
+      "href",
+      "tel:+35799954286",
     );
   });
 });

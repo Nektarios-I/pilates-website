@@ -29,6 +29,7 @@ export type PackageItem = {
   credits_remaining: number | null;
   expires_at: string | null;
   package_name: string;
+  class_type: string;
   package_type: string;
 };
 

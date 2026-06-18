@@ -14,7 +14,7 @@ const marketingPages = [
   {
     name: "home",
     Page: HomePage,
-    heading: "A calm starting point for Pilates studio information",
+    heading: "Where movement comes home.",
     metadata: homeMetadata,
     expectedTitle: "Home",
   },
@@ -28,35 +28,35 @@ const marketingPages = [
   {
     name: "classes",
     Page: ClassesPage,
-    heading: "Class overview placeholder",
+    heading: "Reformer and mat",
     metadata: classesMetadata,
     expectedTitle: "Classes",
   },
   {
     name: "pricing",
     Page: PricingPage,
-    heading: "Pricing placeholder",
+    heading: "Class packages",
     metadata: pricingMetadata,
     expectedTitle: "Pricing",
   },
   {
     name: "instructors",
     Page: InstructorsPage,
-    heading: "Instructor profiles placeholder",
+    heading: "The team",
     metadata: instructorsMetadata,
     expectedTitle: "Instructors",
   },
   {
     name: "contact",
     Page: ContactPage,
-    heading: "Contact placeholder",
+    heading: "Get in touch",
     metadata: contactMetadata,
     expectedTitle: "Contact",
   },
   {
     name: "faq",
     Page: FaqPage,
-    heading: "Frequently asked questions placeholder",
+    heading: "Before your visit",
     metadata: faqMetadata,
     expectedTitle: "FAQ",
   },
@@ -71,7 +71,7 @@ const marketingPages = [
 
 describe("marketing routes", () => {
   it.each(marketingPages)(
-    "renders the $name page placeholder with a page heading",
+    "renders the $name page with a page heading",
     ({ Page, heading }) => {
       render(<Page />);
 

@@ -19,7 +19,11 @@
 -- SAFE TO RE-RUN
 --   The script checks for an existing account by email and skips creation if
 --   one already exists, then ensures the role assignment is up to date.
+--
+-- RUN ORDER: After 01–04 (schema + seed). Re-run after 05_reset_data.sql.
 -- =============================================================================
+
+create extension if not exists pgcrypto schema extensions;
 
 do $$
 declare

@@ -48,21 +48,10 @@ export default function ContactPage() {
                   <dt className="font-semibold text-stone-950">Phone</dt>
                   <dd className="mt-1 text-stone-700">
                     <a
-                      href={`tel:${site_content.contact_preview.phone}`}
                       className="transition-colors hover:text-stone-950"
+                      href={`tel:${site_content.contact_preview.phone_href}`}
                     >
                       {site_content.contact_preview.phone}
-                    </a>
-                  </dd>
-                </div>
-                <div>
-                  <dt className="font-semibold text-stone-950">Email</dt>
-                  <dd className="mt-1 text-stone-700">
-                    <a
-                      href={`mailto:${site_content.contact_preview.email}`}
-                      className="transition-colors hover:text-stone-950"
-                    >
-                      {site_content.contact_preview.email}
                     </a>
                   </dd>
                 </div>
@@ -71,19 +60,19 @@ export default function ContactPage() {
 
             <div className="rounded-md border border-border bg-surface p-6">
               <h2 className="text-xl font-semibold tracking-normal text-stone-950">Location</h2>
-              <address className="mt-4 text-sm not-italic leading-6 text-stone-700">
-                {site_content.contact_preview.address_line_1}
-                <br />
-                {site_content.contact_preview.address_line_2 && (
-                  <>
-                    {site_content.contact_preview.address_line_2}
-                    <br />
-                  </>
-                )}
-                {site_content.contact_preview.city} {site_content.contact_preview.postcode}
-                <br />
+              <p className="mt-4 text-sm leading-6 text-stone-700">
                 {site_content.contact_preview.country}
-              </address>
+              </p>
+              {site_content.contact_preview.google_maps_url ? (
+                <a
+                  className="mt-3 inline-block text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+                  href={site_content.contact_preview.google_maps_url}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Open in Google Maps
+                </a>
+              ) : null}
             </div>
           </div>
         </Container>

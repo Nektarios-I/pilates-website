@@ -1,17 +1,17 @@
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 export const siteConfig = {
-  name: process.env.NEXT_PUBLIC_STUDIO_NAME ?? "Corehouse Pilates Studio",
+  name: process.env.NEXT_PUBLIC_STUDIO_NAME ?? "corehouse Pilates Studio",
   siteUrl: trimTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
-  defaultTitle: "Corehouse Pilates Studio",
+  defaultTitle: "corehouse Pilates Studio",
   defaultDescription:
-    "Corehouse Pilates Studio is preparing a calm, accessible, and mobile-first website for Pilates classes, pricing, instructors, and contact information.",
-  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "hello@example.com",
-  contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+357-00-000000",
+    "Reformer and mat Pilates in Cyprus. View classes, pricing, instructors, and studio hours.",
+  contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
+  contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+35799954286",
   bookingUrl: process.env.NEXT_PUBLIC_BOOKING_URL ?? "/contact",
   socialLinks: {
-    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? "https://instagram.com/example",
-    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL ?? "https://facebook.com/example",
+    instagram: process.env.NEXT_PUBLIC_INSTAGRAM_URL ?? 'https://www.instagram.com/corehouse.pilates.s/',
+    facebook: process.env.NEXT_PUBLIC_FACEBOOK_URL ?? '',
   },
   mapEmbedUrl:
     process.env.NEXT_PUBLIC_GOOGLE_MAPS_EMBED_URL ??

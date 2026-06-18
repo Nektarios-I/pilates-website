@@ -35,6 +35,7 @@ declare
   v_user_id         uuid;
   v_session         public.sessions%rowtype;
   v_user_package    public.user_packages%rowtype;
+  v_package_class_type text;
   v_confirmed_count integer;
   v_new_booking     public.bookings;
   v_status          text;
@@ -84,6 +85,16 @@ begin
 
   if v_user_package.expires_at is not null and v_user_package.expires_at < now() then
     raise exception 'Package has expired' using errcode = 'P0007';
+  end if;
+
+  select p.class_type into v_package_class_type
+    from public.packages p
+   where p.id = v_user_package.package_id;
+
+  if v_package_class_type is distinct from v_session.session_type then
+    raise exception 'Selected package is for %, but this is a % session',
+      v_package_class_type, v_session.session_type
+      using errcode = 'P0009';
   end if;
 
   if v_user_package.credits_remaining is not null
@@ -231,6 +242,7 @@ comment on function public.cancel_booking is
 -- Clients call this without arguments (defaults to auth.uid()).
 -- Admins can pass any user_id.
 -- ---------------------------------------------------------------------------
+drop function if exists public.get_active_packages(uuid);
 create or replace function public.get_active_packages(
   p_user_id uuid default null
 )
@@ -238,6 +250,7 @@ returns table (
   user_package_id   uuid,
   package_id        uuid,
   package_name      text,
+  class_type        text,
   package_type      text,
   credits_remaining integer,
   expires_at        timestamptz,
@@ -271,6 +284,7 @@ begin
     up.id,
     up.package_id,
     p.name,
+    p.class_type,
     p.package_type,
     up.credits_remaining,
     up.expires_at,

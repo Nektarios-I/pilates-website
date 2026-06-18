@@ -1,69 +1,71 @@
 -- =============================================================================
--- 06_drop_all.sql  —  Drop Everything (Full Teardown)
+-- 06_drop_all.sql  —  Full schema teardown
 -- Pilates Studio · Supabase / PostgreSQL 15+
 --
 -- WHAT THIS SCRIPT DOES
---   Removes ALL objects created by scripts 01–04 in reverse dependency order:
---   triggers, trigger functions, business functions, tables, the app_role ENUM,
---   the `private` schema, and the moddatetime extension.
+--   Drops all objects created by scripts 01–12: tables, functions, triggers,
+--   policies (via CASCADE), the app_role enum, and the private schema.
 --
--- USE CASE:
---   • Start fresh on a dev/test project.
---   • Rollback a failed migration run before re-applying.
+-- DOES NOT: delete auth.users rows. Use 05_reset_data.sql for that.
 --
--- WARNING: This is IRREVERSIBLE and DESTRUCTIVE.
---          All data will be permanently deleted.
---          NEVER run against production.
+-- USE CASE: Start completely fresh on dev/test before re-running 01_schema.sql.
+--
+-- WARNING: IRREVERSIBLE. Never run on production.
 -- =============================================================================
 
 do $$
 begin
-  raise notice 'drop_all.sql: beginning full teardown...';
+  raise notice '06_drop_all.sql: beginning full teardown...';
 end;
 $$;
 
--- ── 1. Drop auth trigger (lives on auth.users, managed by us) ────────────────
+-- ── 1. Auth trigger (lives on auth.users) ────────────────────────────────────
 drop trigger if exists on_auth_user_created on auth.users;
 
--- ── 2. Drop application tables in child-first order ─────────────────────────
---    CASCADE handles any lingering FK references.
-drop table if exists public.bookings      cascade;
-drop table if exists public.user_packages cascade;
-drop table if exists public.sessions      cascade;
-drop table if exists public.packages      cascade;
-drop table if exists public.user_roles    cascade;
-drop table if exists public.profiles      cascade;
+-- ── 2. Application tables (child-first; CASCADE drops policies/triggers) ───
+drop table if exists public.bookings            cascade;
+drop table if exists public.user_packages       cascade;
+drop table if exists public.sessions            cascade;
+drop table if exists public.staff_invites       cascade;
+drop table if exists public.studio_day_schedule cascade;
+drop table if exists public.session_cards       cascade;
+drop table if exists public.packages            cascade;
+drop table if exists public.user_roles          cascade;
+drop table if exists public.profiles            cascade;
 
--- ── 3. Drop the custom ENUM type ─────────────────────────────────────────────
+-- ── 3. Custom enum ───────────────────────────────────────────────────────────
 drop type if exists public.app_role cascade;
 
--- ── 4. Drop all public business / trigger functions ──────────────────────────
-drop function if exists public.handle_new_user()                          cascade;
-drop function if exists public.handle_new_user_package()                  cascade;
-drop function if exists public.handle_user_package_status()               cascade;
-drop function if exists public.book_session(uuid, uuid)                   cascade;
-drop function if exists public.cancel_booking(uuid, text)                 cascade;
-drop function if exists public.get_active_packages(uuid)                  cascade;
-drop function if exists public.get_session_roster(uuid)                   cascade;
-drop function if exists public.has_role(uuid, text)                       cascade;
-drop function if exists public.expire_packages()                          cascade;
+-- ── 4. Public functions (schema + booking + schedule helpers) ────────────────
+drop function if exists public.ensure_session_slot_at(date, text, text, text, integer, integer) cascade;
+drop function if exists public.ensure_session_slot_at(date, text, text, text, integer) cascade;
+drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer) cascade;
+drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer) cascade;
+drop function if exists public.get_studio_hours_for_date(date)                       cascade;
+drop function if exists public.get_default_studio_hours(date)                        cascade;
+drop function if exists public.handle_new_user()                                     cascade;
+drop function if exists public.handle_new_user_package()                             cascade;
+drop function if exists public.handle_user_package_status()                          cascade;
+drop function if exists public.book_session(uuid, uuid)                              cascade;
+drop function if exists public.cancel_booking(uuid, text)                              cascade;
+drop function if exists public.get_active_packages(uuid)                             cascade;
+drop function if exists public.get_session_roster(uuid)                              cascade;
+drop function if exists public.has_role(uuid, text)                                  cascade;
+drop function if exists public.expire_packages()                                     cascade;
 
--- ── 5. Drop private helper functions ─────────────────────────────────────────
+-- ── 5. Private RLS helper functions ──────────────────────────────────────────
 drop function if exists private.is_owner()      cascade;
 drop function if exists private.is_admin()      cascade;
 drop function if exists private.is_staff()      cascade;
 drop function if exists private.is_instructor() cascade;
 
--- ── 6. Drop the private schema ───────────────────────────────────────────────
+-- ── 6. Private schema ────────────────────────────────────────────────────────
 drop schema if exists private cascade;
 
--- ── 7. Drop the moddatetime extension ────────────────────────────────────────
---    Only drop if you are sure nothing else in your project uses it.
---    Comment this out if other tables outside this project use moddatetime.
-drop extension if exists moddatetime cascade;
+-- moddatetime extension is shared — leave it enabled (other objects may use it).
 
 do $$
 begin
-  raise notice 'drop_all.sql: teardown complete. Database is clean.';
+  raise notice '06_drop_all.sql: teardown complete. Re-run 01_schema.sql onward.';
 end;
 $$;

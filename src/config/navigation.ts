@@ -8,41 +8,31 @@ export const primaryNavigation = [
   {
     label: "Home",
     href: "/",
-    description: "Return to the Corehouse Pilates Studio homepage.",
-  },
-  {
-    label: "About",
-    href: "/about",
-    description: "Learn about the studio identity and approach.",
+    description: "Return to the corehouse Pilates Studio homepage.",
   },
   {
     label: "Classes",
     href: "/classes",
-    description: "Explore planned Pilates classes and services.",
+    description: "Explore reformer and mat Pilates classes.",
   },
   {
     label: "Pricing",
     href: "/pricing",
-    description: "Review future pricing and introductory offer information.",
+    description: "Review monthly membership pricing.",
   },
   {
     label: "Instructors",
     href: "/instructors",
-    description: "Meet the future Corehouse teaching team.",
+    description: "Meet the corehouse teaching team.",
   },
   {
     label: "Contact",
     href: "/contact",
-    description: "Find the simplest way to contact the studio.",
+    description: "Phone and studio hours.",
   },
   {
     label: "FAQ",
     href: "/faq",
-    description: "Read practical answers for new and returning visitors.",
-  },
-  {
-    label: "Blog",
-    href: "/blog",
-    description: "Visit the future article and studio update index.",
+    description: "Practical answers before your visit.",
   },
 ] satisfies NavigationItem[];

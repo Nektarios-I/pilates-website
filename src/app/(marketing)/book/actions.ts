@@ -58,6 +58,7 @@ export async function book_session_action(
       P0006: 'The selected package is not active.',
       P0007: 'The selected package has expired.',
       P0008: 'You do not have enough credits in this package for this session.',
+      P0009: 'The selected package is for a different class type.',
     };
 
     // Supabase wraps Postgres exceptions; check the detail/message for the code

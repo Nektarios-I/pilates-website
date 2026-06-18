@@ -1,4 +1,10 @@
 -- =============================================================================
+-- DEPRECATED — DO NOT RUN if you use numbered scripts 01_schema … 12_studio_schedule
+--
+-- This file is an old bundled copy of scripts 01 + 02 + 03 only. It does NOT
+-- include staff_invites (11), studio schedule (12), or current package IDs.
+-- Use supabase/README.md for the correct run order.
+-- =============================================================================
 -- 01_schema.sql  —  Core Schema
 -- Pilates Studio · Supabase / PostgreSQL 15+
 --

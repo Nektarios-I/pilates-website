@@ -1,9 +1,10 @@
 export const site_content = {
   studio_info: {
-    studio_name: 'TODO_BUSINESS_STUDIO_NAME',
-    tagline: 'TODO_BUSINESS_TAGLINE',
-    short_description: 'TODO_BUSINESS_SHORT_DESCRIPTION',
-    long_description: 'TODO_BUSINESS_LONG_DESCRIPTION',
+    studio_name: 'corehouse Pilates Studio',
+    tagline: 'Reformer and mat Pilates',
+    short_description: 'A calm studio for reformer and mat Pilates.',
+    long_description:
+      'corehouse is a focused Pilates studio offering reformer and mat classes with attentive instruction and a clear weekly schedule.',
   },
 
   navigation_items: [
@@ -17,8 +18,8 @@ export const site_content = {
 
   account_links: {
     show_account_link: true,
-    login_label: 'Login',
-    login_href: 'TODO_BUSINESS_ACCOUNT_LOGIN_URL',
+    login_label: 'Sign in',
+    login_href: '/login',
   },
 
   primary_cta: {
@@ -33,172 +34,221 @@ export const site_content = {
 
   hero_content: {
     eyebrow: 'Pilates Studio',
-    headline: 'TODO_HERO_HEADLINE',
-    subheading: 'TODO_HERO_SUBHEADING',
-    supporting_text: 'TODO_HERO_SUPPORTING_TEXT',
+    headline: 'Where movement comes home.',
+    subheading: 'Sculpt · Strengthen · Align',
+    supporting_text: 'Private and small group reformer and mat Pilates sessions.',
     primary_cta_label: 'Book Now',
     primary_cta_href: '/book',
     secondary_cta_label: 'View Classes',
     secondary_cta_href: '/classes',
     image_src: '/images/placeholders/hero-placeholder.jpg',
-    image_alt: 'TODO_HERO_IMAGE_ALT',
+    image_alt: 'Pilates reformer class at corehouse studio',
   },
 
   studio_overview: {
-    section_label: 'About the Studio',
-    heading: 'A calm and focused space for movement',
-    intro_text: 'TODO_BUSINESS_SHORT_DESCRIPTION',
-    highlights: ['TODO_STUDIO_HIGHLIGHT_1', 'TODO_STUDIO_HIGHLIGHT_2', 'TODO_STUDIO_HIGHLIGHT_3'],
+    section_label: 'Studio',
+    heading: 'A clear place to practice',
+    intro_text: 'Reformer and mat classes, a steady weekly schedule, and instruction that keeps the work precise.',
+    highlights: [
+      'Reformer and mat classes',
+      'Mon–Sat schedule with morning and afternoon sessions',
+      'Small groups and attentive teaching',
+    ],
   },
 
   classes_preview: {
     section_label: 'Classes',
-    heading: 'Find the class that fits your routine',
-    intro_text:
-      'Explore the main class types and choose the session that matches your level and schedule.',
+    heading: 'Reformer and mat',
+    intro_text: 'Two class types to match your preference and level.',
     cta_label: 'View Classes',
     cta_href: '/classes',
     items: [
       {
         name: 'Reformer',
-        description: 'TODO_CLASS_1_DESCRIPTION',
-        duration: 'TODO_CLASS_1_DURATION',
-        level: 'TODO_CLASS_1_LEVEL',
-        capacity: 'TODO_CLASS_1_CAPACITY',
+        description: 'Spring-loaded equipment for full-body strength, control, and alignment.',
+        duration: '55 min',
+        level: 'All levels',
+        capacity: 'Small group',
       },
       {
-        name: 'Mat Pilates',
-        description: 'TODO_CLASS_2_DESCRIPTION',
-        duration: 'TODO_CLASS_2_DURATION',
-        level: 'TODO_CLASS_2_LEVEL',
-        capacity: 'TODO_CLASS_2_CAPACITY',
-      },
-      {
-        name: 'Private Session',
-        description: 'TODO_CLASS_3_DESCRIPTION',
-        duration: 'TODO_CLASS_3_DURATION',
-        level: 'TODO_CLASS_3_LEVEL',
-        capacity: 'TODO_CLASS_3_CAPACITY',
-      },
-      {
-        name: 'Intro Class',
-        description: 'TODO_CLASS_4_DESCRIPTION',
-        duration: 'TODO_CLASS_4_DURATION',
-        level: 'TODO_CLASS_4_LEVEL',
-        capacity: 'TODO_CLASS_4_CAPACITY',
+        name: 'Mat',
+        description: 'Floor-based Pilates focusing on core strength, mobility, and breath.',
+        duration: '50 min',
+        level: 'All levels',
+        capacity: 'Small group',
       },
     ],
   },
 
   pricing_preview: {
     section_label: 'Pricing',
-    heading: 'Simple pricing for getting started',
-    intro_text: 'Start with an intro offer or choose the option that works best for your routine.',
+    heading: 'Class packages',
+    intro_text: 'Separate packages for reformer and mat Pilates sessions.',
     cta_label: 'View Pricing',
     cta_href: '/pricing',
-    intro_offer: {
-      title: 'Intro Offer',
-      price: 'TODO_PRICING_INTRO_PRICE',
-      description: 'TODO_PRICING_INTRO_DESCRIPTION',
+    reformer: {
+      single: {
+        name: 'Single class',
+        price: '€15',
+        description: '1 class',
+      },
+      one_month: [
+        {
+          name: '2× per week',
+          price: '€100',
+          description: '8 classes · 30 days',
+        },
+        {
+          name: '3× per week',
+          price: '€145',
+          description: '12 classes · 30 days',
+        },
+        {
+          name: '4× per week',
+          price: '€185',
+          description: '16 classes · 30 days',
+        },
+      ],
+      three_month: [
+        {
+          name: '2× per week',
+          price: '€285',
+          description: '24 classes · 90 days',
+        },
+        {
+          name: '3× per week',
+          price: '€415',
+          description: '36 classes · 90 days',
+        },
+        {
+          name: '4× per week',
+          price: '€525',
+          description: '48 classes · 90 days',
+        },
+      ],
+    },
+    mat: {
+      single: {
+        name: 'Single class',
+        price: '€10',
+        description: '1 mat class',
+      },
+      one_month: [
+        {
+          name: '2× per week',
+          price: '€70',
+          description: '8 classes · 30 days',
+        },
+        {
+          name: '3× per week',
+          price: '€95',
+          description: '12 classes · 30 days',
+        },
+        {
+          name: '4× per week',
+          price: '€120',
+          description: '16 classes · 30 days',
+        },
+      ],
+      three_month: [
+        {
+          name: '2× per week',
+          price: '€195',
+          description: '24 classes · 90 days',
+        },
+        {
+          name: '3× per week',
+          price: '€275',
+          description: '36 classes · 90 days',
+        },
+        {
+          name: '4× per week',
+          price: '€350',
+          description: '48 classes · 90 days',
+        },
+      ],
     },
     plans: [
-      {
-        name: 'Single Class',
-        price: 'TODO_PRICING_PACKAGE_1_PRICE',
-        description: 'TODO_PRICING_PACKAGE_1_DESCRIPTION',
-      },
-      {
-        name: 'Class Pack',
-        price: 'TODO_PRICING_PACKAGE_2_PRICE',
-        description: 'TODO_PRICING_PACKAGE_2_DESCRIPTION',
-      },
-      {
-        name: 'Membership',
-        price: 'TODO_PRICING_PACKAGE_3_PRICE',
-        description: 'TODO_PRICING_PACKAGE_3_DESCRIPTION',
-      },
+      { name: 'Single class', price: '€15', description: '1 reformer class' },
+      { name: '1 month · 2×/week', price: '€100', description: '8 classes' },
+      { name: '3 months · 2×/week', price: '€285', description: '24 classes' },
     ],
-    policies_short: 'TODO_PRICING_POLICIES_SHORT',
+    policies_short:
+      'Arrive a few minutes early. Cancel at least 12 hours before class. Grip socks required for reformer.',
   },
 
   instructors_preview: {
     section_label: 'Instructors',
-    heading: 'Meet the team',
-    intro_text: 'Get to know the instructors who guide classes and support your progress.',
+    heading: 'The team',
+    intro_text: 'Experienced teachers on a fixed weekly schedule.',
     cta_label: 'View Instructors',
     cta_href: '/instructors',
     items: [
       {
-        name: 'TODO_INSTRUCTOR_1_NAME',
-        role: 'Pilates Instructor',
-        bio: 'TODO_INSTRUCTOR_1_BIO',
+        name: 'Panayiota',
+        role: 'Instructor',
+        bio: 'Monday and Tuesday mornings (6:00–12:00).',
         image_src: '/images/placeholders/instructor-1.jpg',
-        image_alt: 'TODO_INSTRUCTOR_1_IMAGE_ALT',
+        image_alt: 'Panayiota, Pilates instructor at corehouse',
       },
       {
-        name: 'TODO_INSTRUCTOR_2_NAME',
-        role: 'Pilates Instructor',
-        bio: 'TODO_INSTRUCTOR_2_BIO',
+        name: 'Irene',
+        role: 'Instructor',
+        bio: 'Monday to Wednesday afternoons (15:00–20:00).',
         image_src: '/images/placeholders/instructor-2.jpg',
-        image_alt: 'TODO_INSTRUCTOR_2_IMAGE_ALT',
-      },
-      {
-        name: 'TODO_INSTRUCTOR_3_NAME',
-        role: 'Pilates Instructor',
-        bio: 'TODO_INSTRUCTOR_3_BIO',
-        image_src: '/images/placeholders/instructor-3.jpg',
-        image_alt: 'TODO_INSTRUCTOR_3_IMAGE_ALT',
+        image_alt: 'Irene, Pilates instructor at corehouse',
       },
     ],
   },
 
   contact_preview: {
     section_label: 'Contact',
-    heading: 'Visit the studio',
-    intro_text: 'Find the studio, get in touch, or use the booking link to reserve your class.',
-    cta_label: 'Contact Us',
+    heading: 'Get in touch',
+    intro_text: 'Call to book or ask a question.',
+    cta_label: 'Contact',
     cta_href: '/contact',
-    phone: 'TODO_BUSINESS_PHONE',
-    email: 'TODO_BUSINESS_EMAIL',
-    address_line_1: 'TODO_BUSINESS_ADDRESS_LINE_1',
-    address_line_2: 'TODO_BUSINESS_ADDRESS_LINE_2',
-    city: 'TODO_BUSINESS_CITY',
-    postcode: 'TODO_BUSINESS_POSTCODE',
-    country: 'TODO_BUSINESS_COUNTRY',
-    google_maps_url: 'TODO_BUSINESS_GOOGLE_MAPS_URL',
+    phone: '+357 99 954286',
+    phone_href: '+35799954286',
+    email: '',
+    address_line_1: '',
+    address_line_2: '',
+    city: 'Cyprus',
+    postcode: '',
+    country: 'Cyprus',
+    google_maps_url: 'https://maps.app.goo.gl/foVSeBbNCW9pTwVj7',
     hours: {
-      weekday: 'TODO_BUSINESS_HOURS_WEEKDAY',
-      saturday: 'TODO_BUSINESS_HOURS_SATURDAY',
-      sunday: 'TODO_BUSINESS_HOURS_SUNDAY',
-      note: 'TODO_BUSINESS_HOURS_NOTE',
+      weekday: 'Mon–Fri: 6:00–12:00 & 15:00–20:00',
+      saturday: 'Sat: 7:00–11:00',
+      sunday: 'Closed',
+      note: '',
     },
     map_embed_mode: 'placeholder',
   },
 
   faq_preview: {
     section_label: 'FAQ',
-    heading: 'What first-time clients usually ask',
-    intro_text: 'A few practical answers to help you feel ready before your first visit.',
+    heading: 'Before your visit',
+    intro_text: 'Practical details for booking and attending class.',
     cta_label: 'View FAQ',
     cta_href: '/faq',
     items: [
       {
         question: 'What should I bring?',
-        answer: 'TODO_FAQ_1_ANSWER',
+        answer: 'Comfortable fitted clothing and grip socks for reformer. A water bottle if you like.',
       },
       {
         question: 'How early should I arrive?',
-        answer: 'TODO_FAQ_2_ANSWER',
+        answer: 'Arrive 5–10 minutes before class so you can settle in calmly.',
       },
       {
         question: 'How do cancellations work?',
-        answer: 'TODO_FAQ_3_ANSWER',
+        answer: 'Cancel at least 12 hours before class. Late cancellations may forfeit the session credit.',
       },
     ],
   },
 
   footer_content: {
-    brand_line: 'TODO_BUSINESS_SHORT_DESCRIPTION',
+    brand_line: 'Where movement comes home. Reformer and mat Pilates in Cyprus.',
     navigation_groups: [
       {
         title: 'Pages',
@@ -209,37 +259,32 @@ export const site_content = {
           { label: 'Instructors', href: '/instructors' },
           { label: 'Contact', href: '/contact' },
           { label: 'FAQ', href: '/faq' },
+          { label: 'Rules', href: '/faq#rules' },
         ],
       },
       {
         title: 'Contact',
         links: [
-          { label: 'Phone', href: 'tel:TODO_BUSINESS_PHONE' },
-          { label: 'Email', href: 'mailto:TODO_BUSINESS_EMAIL' },
+          { label: '+357 99 954286', href: 'tel:+35799954286' },
           { label: 'Book Now', href: '/book' },
-        ],
-      },
-      {
-        // TODO: Remove or replace with real staff navigation once staff portal is built
-        title: 'Staff (Dev)',
-        links: [
-          { label: 'Invite team member', href: '/staff/invite' },
         ],
       },
     ],
     social_links: [
-      { label: 'Instagram', href: 'TODO_BUSINESS_INSTAGRAM_URL' },
-      { label: 'Facebook', href: 'TODO_BUSINESS_FACEBOOK_URL' },
-      { label: 'TikTok', href: 'TODO_BUSINESS_TIKTOK_URL' },
-    ],
-    legal_links: [{ label: 'Rules', href: '/faq' }],
+      {
+        label: 'Instagram',
+        href: 'https://www.instagram.com/corehouse.pilates.s/',
+      },
+    ] as { label: string; href: string }[],
+    legal_links: [] as { label: string; href: string }[],
   },
 
   seo: {
-    site_title: 'TODO_SEO_SITE_TITLE',
-    site_description: 'TODO_SEO_SITE_DESCRIPTION',
-    og_image: 'TODO_SEO_OG_IMAGE',
-    canonical_url: 'TODO_SEO_CANONICAL_URL',
+    site_title: 'corehouse Pilates Studio',
+    site_description:
+      'Reformer and mat Pilates in Cyprus. View classes, pricing, instructors, and studio hours.',
+    og_image: '/images/placeholders/hero-placeholder.jpg',
+    canonical_url: '',
   },
 } as const;
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import MarketingLayout from "./layout";
 import HomePage from "./page";
+import { homeContent } from "@/features/home/home-content";
 
 describe("HomePage", () => {
   it("renders inside the shared marketing landmarks", () => {
@@ -24,29 +25,25 @@ describe("HomePage", () => {
     expect(
       screen.getByRole("heading", {
         level: 1,
-        name: "A calm starting point for Pilates studio information",
+        name: homeContent.hero.title,
       }),
     ).toBeInTheDocument();
 
     const sectionHeadings = [
-      "Designed to explain the studio clearly",
-      "Class paths ready for confirmed details",
-      "A place for reviewed teacher profiles",
-      "Prepared for verified proof points",
-      "Start with a simple studio inquiry",
+      homeContent.studio_overview.title,
+      homeContent.classes.title,
+      homeContent.pricing.title,
+      homeContent.instructors.title,
+      homeContent.contact.title,
+      homeContent.faq.title,
     ];
 
     for (const heading of sectionHeadings) {
       expect(screen.getByRole("heading", { level: 2, name: heading })).toBeInTheDocument();
     }
 
-    expect(screen.getByRole("heading", { level: 3, name: "Reformer Pilates" })).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { level: 3, name: "Lead instructor profile" }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { level: 3, name: "Testimonials pending" }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Reformer" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 3, name: "Panayiota" })).toBeInTheDocument();
   });
 
   it("shows the primary CTA in the main homepage content", () => {
@@ -57,11 +54,6 @@ describe("HomePage", () => {
     );
 
     const main = screen.getByRole("main");
-    const contactActions = within(main).getAllByRole("link", { name: "Contact the studio" });
-
-    expect(contactActions).toHaveLength(2);
-    for (const action of contactActions) {
-      expect(action).toHaveAttribute("href", "/contact");
-    }
+    expect(within(main).getAllByRole("link", { name: "Book Now" }).length).toBeGreaterThan(0);
   });
 });

@@ -91,6 +91,8 @@ create table if not exists public.packages (
   id               uuid          primary key default gen_random_uuid(),
   name             text          not null,
   description      text,
+  class_type       text          not null default 'reformer'
+                     check (class_type in ('reformer','mat')),
   -- credit_pack  : fixed credits, expire after validity_days
   -- monthly      : credits reset monthly (subscription)
   -- unlimited    : no credit cap; validity_days = subscription length
@@ -109,13 +111,47 @@ create table if not exists public.packages (
   updated_at       timestamptz   not null default now()
 );
 
+alter table public.packages
+  add column if not exists class_type text not null default 'reformer'
+  check (class_type in ('reformer','mat'));
+
 comment on table  public.packages                  is 'Studio package / membership catalog.';
+comment on column public.packages.class_type       is 'Class category this package can book: reformer or mat.';
 comment on column public.packages.credits_included is 'Credits bundled; NULL = unlimited.';
 comment on column public.packages.validity_days    is 'Days from purchase until expiry; NULL = never expires.';
 comment on column public.packages.max_per_user     is 'Max purchases per client; NULL = unlimited. Set 1 for intro offers.';
 
 create trigger set_packages_updated_at
   before update on public.packages
+  for each row execute procedure extensions.moddatetime(updated_at);
+
+-- =============================================================================
+-- TABLE: session_cards
+-- Bookable class templates displayed before clients choose a slot.
+-- =============================================================================
+create table if not exists public.session_cards (
+  id               uuid        primary key default gen_random_uuid(),
+  title            text        not null,
+  description      text        not null,
+  session_type     text        not null
+                     check (session_type in ('reformer','mat','private','intro')),
+  duration_minutes integer     not null default 60
+                     check (duration_minutes between 15 and 180),
+  instructor_name  text,
+  image_src        text,
+  capacity         integer     not null default 6 check (capacity > 0),
+  credits_required integer     not null default 1 check (credits_required > 0),
+  sort_order       integer     not null default 0,
+  is_active        boolean     not null default true,
+  created_at       timestamptz not null default now(),
+  updated_at       timestamptz not null default now()
+);
+
+comment on table public.session_cards is
+  'Public booking class templates. Admins/owners can add/remove cards without editing code.';
+
+create trigger set_session_cards_updated_at
+  before update on public.session_cards
   for each row execute procedure extensions.moddatetime(updated_at);
 
 -- =============================================================================
@@ -315,8 +351,9 @@ create trigger on_user_package_update
 -- =============================================================================
 
 -- profiles
-create index if not exists idx_profiles_email   on public.profiles (email);
-create index if not exists idx_profiles_status  on public.profiles (status);
+create index if not exists idx_profiles_email     on public.profiles (email);
+create index if not exists idx_profiles_full_name on public.profiles (full_name);
+create index if not exists idx_profiles_status    on public.profiles (status);
 
 -- user_roles — hit on EVERY query by is_admin() / is_staff() helpers
 create index if not exists idx_user_roles_user_id  on public.user_roles (user_id);
@@ -325,6 +362,11 @@ create index if not exists idx_user_roles_user_role on public.user_roles (user_i
 
 -- packages
 create index if not exists idx_packages_is_active   on public.packages (is_active);
+create index if not exists idx_packages_class_type  on public.packages (class_type);
+
+-- session_cards
+create index if not exists idx_session_cards_active_type
+  on public.session_cards (is_active, session_type, sort_order);
 
 -- user_packages
 create index if not exists idx_user_packages_user_id    on public.user_packages (user_id);
