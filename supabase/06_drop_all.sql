@@ -24,6 +24,7 @@ drop trigger if exists on_auth_user_created on auth.users;
 
 -- ── 2. Application tables (child-first; CASCADE drops policies/triggers) ───
 drop table if exists public.bookings            cascade;
+drop table if exists public.booking_credit_charges cascade;
 drop table if exists public.user_packages       cascade;
 drop table if exists public.sessions            cascade;
 drop table if exists public.staff_invites       cascade;
@@ -38,8 +39,10 @@ drop type if exists public.app_role cascade;
 
 -- ── 4. Public functions (schema + booking + schedule helpers) ────────────────
 drop function if exists public.ensure_session_slot_at(date, text, text, text, integer, integer) cascade;
+drop function if exists public.ensure_session_slot_at(date, text, text, text, integer, integer, integer, integer) cascade;
 drop function if exists public.ensure_session_slot_at(date, text, text, text, integer) cascade;
 drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer) cascade;
+drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer, integer, integer) cascade;
 drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer) cascade;
 drop function if exists public.get_studio_hours_for_date(date)                       cascade;
 drop function if exists public.get_default_studio_hours(date)                        cascade;
@@ -47,6 +50,7 @@ drop function if exists public.handle_new_user()                                
 drop function if exists public.handle_new_user_package()                             cascade;
 drop function if exists public.handle_user_package_status()                          cascade;
 drop function if exists public.book_session(uuid, uuid)                              cascade;
+drop function if exists public.book_session_with_credits(uuid, uuid, uuid)           cascade;
 drop function if exists public.cancel_booking(uuid, text)                              cascade;
 drop function if exists public.get_active_packages(uuid)                             cascade;
 drop function if exists public.get_session_roster(uuid)                              cascade;

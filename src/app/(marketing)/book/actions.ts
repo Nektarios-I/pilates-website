@@ -38,14 +38,22 @@ export type CancelResult =
 
 export async function book_session_action(
   session_id: string,
-  package_id: string,
+  reformer_package_id: string | null,
+  mat_package_id?: string | null,
 ): Promise<BookResult> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.rpc('book_session', {
-    p_session_id: session_id,
-    p_user_package_id: package_id,
-  });
+  const { data, error } =
+    mat_package_id !== undefined
+      ? await supabase.rpc('book_session_with_credits', {
+          p_session_id: session_id,
+          p_reformer_user_package_id: reformer_package_id,
+          p_mat_user_package_id: mat_package_id,
+        })
+      : await supabase.rpc('book_session', {
+          p_session_id: session_id,
+          p_user_package_id: reformer_package_id,
+        });
 
   if (error) {
     // Map known Postgres error codes to friendly messages.

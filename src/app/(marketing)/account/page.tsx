@@ -53,7 +53,7 @@ export default async function AccountPage() {
     .order('created_at', { ascending: false });
 
   // Fetch upcoming bookings
-  const { data: upcoming_bookings } = await supabase
+  const { data: booking_rows } = await supabase
     .from('bookings')
     .select(
       `
@@ -72,9 +72,24 @@ export default async function AccountPage() {
     )
     .eq('user_id', user.id)
     .in('status', ['booked', 'waitlisted'])
-    .gte('sessions.starts_at', new Date().toISOString())
-    .order('sessions.starts_at', { ascending: true })
-    .limit(5);
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  const current_time = new Date().getTime();
+  const upcoming_bookings = (booking_rows ?? [])
+    .filter((booking) => {
+      const session = Array.isArray(booking.sessions) ? booking.sessions[0] : booking.sessions;
+      return session ? new Date(session.starts_at).getTime() >= current_time : false;
+    })
+    .sort((a, b) => {
+      const a_session = Array.isArray(a.sessions) ? a.sessions[0] : a.sessions;
+      const b_session = Array.isArray(b.sessions) ? b.sessions[0] : b.sessions;
+      return (
+        new Date(a_session?.starts_at ?? 0).getTime() -
+        new Date(b_session?.starts_at ?? 0).getTime()
+      );
+    })
+    .slice(0, 5);
 
   return (
     <>

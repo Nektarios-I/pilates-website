@@ -93,6 +93,7 @@ alter table public.session_cards enable row level security;
 alter table public.user_packages enable row level security;
 alter table public.sessions      enable row level security;
 alter table public.bookings      enable row level security;
+alter table public.booking_credit_charges enable row level security;
 
 -- =============================================================================
 -- GRANT PERMISSIONS
@@ -127,6 +128,10 @@ grant insert, update, delete    on public.sessions      to authenticated;
 
 -- bookings
 grant select, insert, update    on public.bookings      to authenticated;
+
+-- booking_credit_charges
+grant select                    on public.booking_credit_charges to authenticated;
+grant insert, update, delete    on public.booking_credit_charges to authenticated;
 
 -- =============================================================================
 -- POLICIES: profiles
@@ -347,6 +352,34 @@ create policy "bookings: client cancels own"
 drop policy if exists "bookings: admin manages" on public.bookings;
 create policy "bookings: admin manages"
   on public.bookings for all
+  to authenticated
+  using  ( (select private.is_admin()) )
+  with check ( (select private.is_admin()) );
+
+-- =============================================================================
+-- POLICIES: booking_credit_charges
+-- =============================================================================
+
+drop policy if exists "booking_credit_charges: client reads own" on public.booking_credit_charges;
+create policy "booking_credit_charges: client reads own"
+  on public.booking_credit_charges for select
+  to authenticated
+  using (
+    booking_id in (
+      select id from public.bookings
+      where user_id = (select auth.uid())
+    )
+  );
+
+drop policy if exists "booking_credit_charges: staff reads all" on public.booking_credit_charges;
+create policy "booking_credit_charges: staff reads all"
+  on public.booking_credit_charges for select
+  to authenticated
+  using ( (select private.is_staff()) );
+
+drop policy if exists "booking_credit_charges: admin manages" on public.booking_credit_charges;
+create policy "booking_credit_charges: admin manages"
+  on public.booking_credit_charges for all
   to authenticated
   using  ( (select private.is_admin()) )
   with check ( (select private.is_admin()) );

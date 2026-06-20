@@ -69,7 +69,8 @@ export function BookingCalendar({
   const [day_schedule, set_day_schedule] = useState<DaySchedule | null>(initial_schedule);
   const [slots, set_slots] = useState<SlotSession[]>(initial_slots);
   const [selected_slot, set_selected_slot] = useState<SlotSession | null>(null);
-  const [selected_package, set_selected_package] = useState('');
+  const [selected_reformer_package, set_selected_reformer_package] = useState('');
+  const [selected_mat_package, set_selected_mat_package] = useState('');
   const [show_available_only, set_show_available_only] = useState(false);
   const [error, set_error] = useState('');
   const [confirmed, set_confirmed] = useState<{
@@ -149,11 +150,16 @@ export function BookingCalendar({
   }
 
   function handle_book() {
-    const package_to_use = selected_package_is_eligible
-      ? selected_package
-      : (eligible_packages[0]?.id ?? '');
+    const reformer_package_to_use = selected_reformer_package_is_eligible
+      ? selected_reformer_package
+      : (eligible_reformer_packages[0]?.id ?? '');
+    const mat_package_to_use = selected_mat_package_is_eligible
+      ? selected_mat_package
+      : (eligible_mat_packages[0]?.id ?? '');
 
-    if (!selected_slot || !package_to_use || !selected_card) return;
+    if (!selected_slot || !selected_card) return;
+    if (requires_reformer && !reformer_package_to_use) return;
+    if (requires_mat && !mat_package_to_use) return;
 
     start_transition(async () => {
       set_error('');
@@ -161,7 +167,8 @@ export function BookingCalendar({
         selected_date,
         selected_slot.slot_start,
         selected_slot.slot_end,
-        package_to_use,
+        requires_reformer ? reformer_package_to_use : null,
+        requires_mat ? mat_package_to_use : null,
         selected_card.id,
       );
 
@@ -191,16 +198,34 @@ export function BookingCalendar({
     ? generate_hourly_slots(day_schedule.time_ranges, selected_card?.duration_minutes ?? 60)
     : [];
 
-  const eligible_packages = packages.filter((pkg) => {
-    if (selected_card && pkg.class_type !== selected_card.session_type) return false;
+  const requires_reformer = (selected_card?.reformer_credits_required ?? 0) > 0;
+  const requires_mat = (selected_card?.mat_credits_required ?? 0) > 0;
+  const eligible_reformer_packages = packages.filter((pkg) => {
+    if (pkg.class_type !== 'reformer') return false;
     if (pkg.package_type === 'unlimited' || pkg.package_type === 'monthly') return true;
-    return (pkg.credits_remaining ?? 0) >= 1;
+    return (pkg.credits_remaining ?? 0) >= (selected_card?.reformer_credits_required ?? 0);
+  });
+  const eligible_mat_packages = packages.filter((pkg) => {
+    if (pkg.class_type !== 'mat') return false;
+    if (pkg.package_type === 'unlimited' || pkg.package_type === 'monthly') return true;
+    return (pkg.credits_remaining ?? 0) >= (selected_card?.mat_credits_required ?? 0);
   });
 
-  const selected_package_is_eligible = eligible_packages.some((pkg) => pkg.id === selected_package);
-  const selected_package_value = selected_package_is_eligible
-    ? selected_package
-    : (eligible_packages[0]?.id ?? '');
+  const selected_reformer_package_is_eligible = eligible_reformer_packages.some(
+    (pkg) => pkg.id === selected_reformer_package,
+  );
+  const selected_mat_package_is_eligible = eligible_mat_packages.some(
+    (pkg) => pkg.id === selected_mat_package,
+  );
+  const selected_reformer_package_value = selected_reformer_package_is_eligible
+    ? selected_reformer_package
+    : (eligible_reformer_packages[0]?.id ?? '');
+  const selected_mat_package_value = selected_mat_package_is_eligible
+    ? selected_mat_package
+    : (eligible_mat_packages[0]?.id ?? '');
+  const can_pay_required_credits =
+    (!requires_reformer || eligible_reformer_packages.length > 0) &&
+    (!requires_mat || eligible_mat_packages.length > 0);
 
   if (session_cards.length === 0) {
     return (
@@ -247,6 +272,9 @@ export function BookingCalendar({
                     <span>{card.duration_minutes} min</span>
                     <span>{card.instructor_name ?? 'Instructor varies'}</span>
                     <span>{card.session_type}</span>
+                    <span>
+                      {card.reformer_credits_required} reformer / {card.mat_credits_required} mat
+                    </span>
                   </div>
                 </div>
               </button>
@@ -466,33 +494,64 @@ export function BookingCalendar({
             {selected_slot.slot_end}
           </p>
 
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-stone-950" htmlFor="book-package">
-              Pay with package
-            </label>
-            <select
-              className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm"
-              id="book-package"
-              onChange={(event) => set_selected_package(event.target.value)}
-              value={selected_package_value}
-            >
-              {eligible_packages.map((pkg) => (
-                <option key={pkg.id} value={pkg.id}>
-                  {package_label(pkg)}
-                </option>
-              ))}
-            </select>
-            {eligible_packages.length === 0 ? (
-              <p className="mt-2 text-xs text-red-600">
-                You do not have active {selected_card?.session_type} credits for this class.
-              </p>
+          <div className="mt-4 space-y-4">
+            {requires_reformer ? (
+              <div>
+                <label className="block text-sm font-medium text-stone-950" htmlFor="book-reformer-package">
+                  Pay {selected_card?.reformer_credits_required} reformer credit
+                  {selected_card?.reformer_credits_required === 1 ? '' : 's'} with
+                </label>
+                <select
+                  className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm"
+                  id="book-reformer-package"
+                  onChange={(event) => set_selected_reformer_package(event.target.value)}
+                  value={selected_reformer_package_value}
+                >
+                  {eligible_reformer_packages.map((pkg) => (
+                    <option key={pkg.id} value={pkg.id}>
+                      {package_label(pkg)}
+                    </option>
+                  ))}
+                </select>
+                {eligible_reformer_packages.length === 0 ? (
+                  <p className="mt-2 text-xs text-red-600">
+                    You do not have enough active reformer credits for this class.
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+
+            {requires_mat ? (
+              <div>
+                <label className="block text-sm font-medium text-stone-950" htmlFor="book-mat-package">
+                  Pay {selected_card?.mat_credits_required} mat credit
+                  {selected_card?.mat_credits_required === 1 ? '' : 's'} with
+                </label>
+                <select
+                  className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm"
+                  id="book-mat-package"
+                  onChange={(event) => set_selected_mat_package(event.target.value)}
+                  value={selected_mat_package_value}
+                >
+                  {eligible_mat_packages.map((pkg) => (
+                    <option key={pkg.id} value={pkg.id}>
+                      {package_label(pkg)}
+                    </option>
+                  ))}
+                </select>
+                {eligible_mat_packages.length === 0 ? (
+                  <p className="mt-2 text-xs text-red-600">
+                    You do not have enough active mat credits for this class.
+                  </p>
+                ) : null}
+              </div>
             ) : null}
           </div>
 
           {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
 
           <div className="mt-4 flex gap-3">
-            <Button disabled={is_pending || eligible_packages.length === 0} onClick={handle_book} type="button">
+            <Button disabled={is_pending || !can_pay_required_credits} onClick={handle_book} type="button">
               {is_pending ? 'Booking…' : 'Confirm booking'}
             </Button>
             <Button

@@ -141,14 +141,26 @@ create table if not exists public.session_cards (
   image_src        text,
   capacity         integer     not null default 6 check (capacity > 0),
   credits_required integer     not null default 1 check (credits_required > 0),
+  reformer_credits_required integer not null default 1 check (reformer_credits_required >= 0),
+  mat_credits_required      integer not null default 0 check (mat_credits_required >= 0),
   sort_order       integer     not null default 0,
   is_active        boolean     not null default true,
   created_at       timestamptz not null default now(),
   updated_at       timestamptz not null default now()
 );
 
+alter table public.session_cards
+  add column if not exists reformer_credits_required integer not null default 1
+    check (reformer_credits_required >= 0),
+  add column if not exists mat_credits_required integer not null default 0
+    check (mat_credits_required >= 0);
+
 comment on table public.session_cards is
   'Public booking class templates. Admins/owners can add/remove cards without editing code.';
+comment on column public.session_cards.reformer_credits_required is
+  'How many reformer credits this card consumes when booked.';
+comment on column public.session_cards.mat_credits_required is
+  'How many mat credits this card consumes when booked.';
 
 create trigger set_session_cards_updated_at
   before update on public.session_cards
@@ -203,6 +215,8 @@ create table if not exists public.sessions (
   -- Credits deducted from client package on booking.
   -- Set > 1 for premium sessions (e.g. private = 2 credits).
   credits_required    integer     not null default 1,
+  reformer_credits_required integer not null default 1 check (reformer_credits_required >= 0),
+  mat_credits_required      integer not null default 0 check (mat_credits_required >= 0),
   status              text        not null default 'scheduled'
                         check (status in ('scheduled','cancelled','completed')),
   cancellation_reason text,
@@ -213,8 +227,23 @@ create table if not exists public.sessions (
   constraint sessions_positive_credits  check (credits_required > 0)
 );
 
+alter table public.sessions
+  add column if not exists reformer_credits_required integer not null default 1
+    check (reformer_credits_required >= 0),
+  add column if not exists mat_credits_required integer not null default 0
+    check (mat_credits_required >= 0);
+
+update public.sessions
+   set reformer_credits_required = 0,
+       mat_credits_required = credits_required
+ where session_type = 'mat'
+   and reformer_credits_required = 1
+   and mat_credits_required = 0;
+
 comment on table  public.sessions                  is 'Scheduled Pilates classes and private sessions.';
 comment on column public.sessions.credits_required is 'Credits deducted from client package on booking. Default 1.';
+comment on column public.sessions.reformer_credits_required is 'Reformer credits required to book this session.';
+comment on column public.sessions.mat_credits_required      is 'Mat credits required to book this session.';
 comment on column public.sessions.capacity         is 'Max confirmed (non-waitlisted) bookings. Set 1 for private sessions.';
 
 create trigger set_sessions_updated_at
@@ -254,6 +283,23 @@ create unique index if not exists bookings_one_active_per_session
 create trigger set_bookings_updated_at
   before update on public.bookings
   for each row execute procedure extensions.moddatetime(updated_at);
+
+-- =============================================================================
+-- TABLE: booking_credit_charges
+-- Exact package deductions for bookings that may require reformer and/or mat credits.
+-- =============================================================================
+create table if not exists public.booking_credit_charges (
+  id              uuid        primary key default gen_random_uuid(),
+  booking_id      uuid        not null references public.bookings(id) on delete cascade,
+  user_package_id uuid        not null references public.user_packages(id) on delete restrict,
+  class_type      text        not null check (class_type in ('reformer','mat')),
+  credits_used    integer     not null check (credits_used > 0),
+  created_at      timestamptz not null default now(),
+  unique (booking_id, class_type)
+);
+
+comment on table public.booking_credit_charges is
+  'Per-booking credit deductions, used for mixed reformer/mat credit requirements and accurate refunds.';
 
 -- =============================================================================
 -- TRIGGER FUNCTIONS
@@ -384,3 +430,9 @@ create index if not exists idx_bookings_user_id       on public.bookings (user_i
 create index if not exists idx_bookings_session_id    on public.bookings (session_id);
 create index if not exists idx_bookings_status        on public.bookings (status);
 create index if not exists idx_bookings_user_package  on public.bookings (user_package_id);
+
+-- booking_credit_charges
+create index if not exists idx_booking_credit_charges_booking
+  on public.booking_credit_charges (booking_id);
+create index if not exists idx_booking_credit_charges_user_package
+  on public.booking_credit_charges (user_package_id);

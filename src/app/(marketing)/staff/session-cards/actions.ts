@@ -13,6 +13,8 @@ export type EditableSessionCard = {
   image_src: string | null;
   capacity: number;
   credits_required: number;
+  reformer_credits_required: number;
+  mat_credits_required: number;
   sort_order: number;
   is_active: boolean;
 };
@@ -42,7 +44,7 @@ export async function list_session_cards_for_staff(): Promise<EditableSessionCar
   const { data, error } = await admin
     .from('session_cards')
     .select(
-      'id, title, description, session_type, duration_minutes, instructor_name, image_src, capacity, credits_required, sort_order, is_active',
+      'id, title, description, session_type, duration_minutes, instructor_name, image_src, capacity, credits_required, reformer_credits_required, mat_credits_required, sort_order, is_active',
     )
     .order('sort_order', { ascending: true });
 
@@ -64,7 +66,12 @@ function validate_card(input: SessionCardInput): string | null {
     return 'Duration must be between 15 and 180 minutes.';
   }
   if (input.capacity <= 0) return 'Capacity must be positive.';
-  if (input.credits_required <= 0) return 'Credits required must be positive.';
+  if (input.reformer_credits_required < 0 || input.mat_credits_required < 0) {
+    return 'Credit requirements cannot be negative.';
+  }
+  if (input.reformer_credits_required === 0 && input.mat_credits_required === 0) {
+    return 'At least one reformer or mat credit is required.';
+  }
   return null;
 }
 
@@ -79,6 +86,7 @@ export async function create_session_card(input: SessionCardInput): Promise<Sess
   const admin = createAdminClient();
   const { error } = await admin.from('session_cards').insert({
     ...input,
+    credits_required: input.reformer_credits_required + input.mat_credits_required,
     title: input.title.trim(),
     description: input.description.trim(),
     instructor_name: input.instructor_name?.trim() || null,
@@ -105,6 +113,7 @@ export async function update_session_card(
     .from('session_cards')
     .update({
       ...input,
+      credits_required: input.reformer_credits_required + input.mat_credits_required,
       title: input.title.trim(),
       description: input.description.trim(),
       instructor_name: input.instructor_name?.trim() || null,

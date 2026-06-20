@@ -19,6 +19,7 @@ alter table public.session_cards       disable row level security;
 alter table public.user_packages       disable row level security;
 alter table public.sessions            disable row level security;
 alter table public.bookings            disable row level security;
+alter table public.booking_credit_charges disable row level security;
 alter table public.staff_invites       disable row level security;
 alter table public.studio_day_schedule disable row level security;
 
@@ -27,6 +28,7 @@ from pg_tables
 where schemaname = 'public'
   and tablename in (
     'profiles', 'user_roles', 'packages', 'session_cards', 'user_packages', 'sessions', 'bookings',
+    'booking_credit_charges',
     'staff_invites', 'studio_day_schedule'
   )
 order by tablename;

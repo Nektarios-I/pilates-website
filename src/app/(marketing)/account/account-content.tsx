@@ -240,12 +240,6 @@ export function AccountContent({
                 )}
               </dl>
 
-              <div className="mt-6 rounded-md bg-blue-50 p-4">
-                <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Profile editing functionality will be added in a future
-                  update. Contact the studio to update your information.
-                </p>
-              </div>
             </div>
 
             {/* Active Packages Section */}
@@ -305,12 +299,6 @@ export function AccountContent({
                 </div>
               )}
 
-              <div className="mt-6 rounded-md bg-blue-50 p-4">
-                <p className="text-xs text-blue-800">
-                  <strong>Note:</strong> Package purchase functionality will be added in a future
-                  update. Contact the studio to purchase packages.
-                </p>
-              </div>
             </div>
 
             {/* Upcoming Bookings Section */}
@@ -320,9 +308,14 @@ export function AccountContent({
                   <h2 className="text-xl font-semibold text-stone-950">Upcoming Bookings</h2>
                   <p className="mt-1 text-sm text-stone-600">Your scheduled classes</p>
                 </div>
-                <ButtonLink href="/book" variant="secondary">
-                  Book class
-                </ButtonLink>
+                <div className="flex flex-wrap gap-2">
+                  <ButtonLink href="/book" variant="secondary">
+                    Book class
+                  </ButtonLink>
+                  <ButtonLink href="/account/bookings" variant="secondary">
+                    All bookings
+                  </ButtonLink>
+                </div>
               </div>
 
               {upcoming_bookings.length > 0 ? (

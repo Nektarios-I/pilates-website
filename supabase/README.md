@@ -50,7 +50,9 @@ If your database already has the earlier booking system, run these files in this
 4. `04_seed.sql`
 5. `12_studio_schedule.sql`
 
-This adds `packages.class_type`, creates `session_cards`, updates booking validation, seeds mat packages, and updates the slot helper signature. You do **not** need to reset data unless you want a clean dev database.
+This adds `packages.class_type`, creates `session_cards`, creates `booking_credit_charges`, updates booking validation, seeds mat packages, and updates the slot helper signature. You do **not** need to reset data unless you want a clean dev database.
+
+For the latest session-card credit split (`reformer_credits_required` and `mat_credits_required`), run the same upgrade order above.
 
 ---
 
@@ -62,6 +64,11 @@ Dev/test only:
 2. Run the first-time setup list above from `01_schema.sql`
 
 `06_drop_all.sql` does **not** delete `auth.users`. Run `05_reset_data.sql` (with the safety flag) if you only need to clear data including auth.
+
+After `05_reset_data.sql`, run:
+
+1. `04_seed.sql`
+2. `10_add_admin.sql`
 
 ---
 

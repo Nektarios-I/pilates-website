@@ -109,20 +109,21 @@ on conflict (id) do update set
 
 insert into public.session_cards (
   id, title, description, session_type, duration_minutes, instructor_name,
-  image_src, capacity, credits_required, sort_order, is_active
+  image_src, capacity, credits_required, reformer_credits_required,
+  mat_credits_required, sort_order, is_active
 )
 values
   (
     'd0000000-0000-0000-0000-000000000001',
     'Reformer Pilates',
     'Small-group equipment class for strength, alignment, and controlled movement.',
-    'reformer', 60, 'Panayiota or Irene', '', 6, 1, 1, true
+    'reformer', 60, 'Panayiota or Irene', '', 6, 1, 1, 0, 1, true
   ),
   (
     'd0000000-0000-0000-0000-000000000002',
     'Mat Pilates',
     'Floor-based Pilates focused on core strength, mobility, and breath.',
-    'mat', 60, 'Panayiota or Irene', '', 10, 1, 2, true
+    'mat', 60, 'Panayiota or Irene', '', 10, 1, 0, 1, 2, true
   )
 on conflict (id) do update set
   title = excluded.title,
@@ -133,6 +134,8 @@ on conflict (id) do update set
   image_src = excluded.image_src,
   capacity = excluded.capacity,
   credits_required = excluded.credits_required,
+  reformer_credits_required = excluded.reformer_credits_required,
+  mat_credits_required = excluded.mat_credits_required,
   sort_order = excluded.sort_order,
   is_active = excluded.is_active;
 

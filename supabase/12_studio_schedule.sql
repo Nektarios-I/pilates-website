@@ -113,12 +113,15 @@ grant execute on function public.get_studio_hours_for_date(date) to anon, authen
 -- Creates (or returns) a scheduled reformer session for a 1-hour slot.
 -- ---------------------------------------------------------------------------
 drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer);
+drop function if exists public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer);
 create or replace function public.ensure_session_slot(
   p_starts_at     timestamptz,
   p_ends_at       timestamptz,
   p_session_type  text default 'reformer',
   p_capacity      integer default 6,
-  p_credits_required integer default 1
+  p_credits_required integer default 1,
+  p_reformer_credits_required integer default 1,
+  p_mat_credits_required integer default 0
 )
 returns uuid
 language plpgsql
@@ -141,8 +144,12 @@ begin
     raise exception 'Capacity must be positive' using errcode = 'P0022';
   end if;
 
-  if p_credits_required <= 0 then
-    raise exception 'Credits required must be positive' using errcode = 'P0023';
+  if p_reformer_credits_required < 0 or p_mat_credits_required < 0 then
+    raise exception 'Credit requirements cannot be negative' using errcode = 'P0023';
+  end if;
+
+  if p_reformer_credits_required = 0 and p_mat_credits_required = 0 then
+    raise exception 'At least one class credit is required' using errcode = 'P0024';
   end if;
 
   select id into v_session_id
@@ -154,6 +161,14 @@ begin
    limit 1;
 
   if v_session_id is not null then
+    update public.sessions
+       set capacity = p_capacity,
+           credits_required = p_credits_required,
+           reformer_credits_required = p_reformer_credits_required,
+           mat_credits_required = p_mat_credits_required
+     where id = v_session_id
+       and status = 'scheduled';
+
     return v_session_id;
   end if;
 
@@ -161,10 +176,12 @@ begin
              to_char(p_starts_at at time zone 'Europe/Nicosia', 'DD Mon HH24:MI');
 
   insert into public.sessions (
-    title, session_type, starts_at, ends_at, capacity, credits_required, status
+    title, session_type, starts_at, ends_at, capacity, credits_required,
+    reformer_credits_required, mat_credits_required, status
   )
   values (
-    v_title, p_session_type, p_starts_at, p_ends_at, p_capacity, p_credits_required, 'scheduled'
+    v_title, p_session_type, p_starts_at, p_ends_at, p_capacity, p_credits_required,
+    p_reformer_credits_required, p_mat_credits_required, 'scheduled'
   )
   returning id into v_session_id;
 
@@ -172,10 +189,10 @@ begin
 end;
 $$;
 
-comment on function public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer) is
+comment on function public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer, integer, integer) is
   'Idempotently creates a scheduled session for a time slot. Used by the booking flow.';
 
-grant execute on function public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer)
+grant execute on function public.ensure_session_slot(timestamptz, timestamptz, text, integer, integer, integer, integer)
   to authenticated;
 
 -- ---------------------------------------------------------------------------
@@ -183,13 +200,16 @@ grant execute on function public.ensure_session_slot(timestamptz, timestamptz, t
 -- Preferred entry point from the booking UI.
 -- ---------------------------------------------------------------------------
 drop function if exists public.ensure_session_slot_at(date, text, text, text, integer);
+drop function if exists public.ensure_session_slot_at(date, text, text, text, integer, integer);
 create or replace function public.ensure_session_slot_at(
   p_schedule_date date,
   p_start_time    text,
   p_end_time      text,
   p_session_type  text default 'reformer',
   p_capacity      integer default 6,
-  p_credits_required integer default 1
+  p_credits_required integer default 1,
+  p_reformer_credits_required integer default 1,
+  p_mat_credits_required integer default 0
 )
 returns uuid
 language plpgsql
@@ -203,11 +223,19 @@ begin
   v_starts := (p_schedule_date + p_start_time::time) at time zone 'Europe/Nicosia';
   v_ends   := (p_schedule_date + p_end_time::time) at time zone 'Europe/Nicosia';
 
-  return public.ensure_session_slot(v_starts, v_ends, p_session_type, p_capacity, p_credits_required);
+  return public.ensure_session_slot(
+    v_starts,
+    v_ends,
+    p_session_type,
+    p_capacity,
+    p_credits_required,
+    p_reformer_credits_required,
+    p_mat_credits_required
+  );
 end;
 $$;
 
-grant execute on function public.ensure_session_slot_at(date, text, text, text, integer, integer)
+grant execute on function public.ensure_session_slot_at(date, text, text, text, integer, integer, integer, integer)
   to authenticated;
 
 -- ---------------------------------------------------------------------------

@@ -26,6 +26,8 @@ const empty_card: SessionCardInput = {
   image_src: '',
   capacity: 6,
   credits_required: 1,
+  reformer_credits_required: 1,
+  mat_credits_required: 0,
   sort_order: 10,
   is_active: true,
 };
@@ -222,15 +224,27 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-credits`}>
-        Credits required
+      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-reformer-credits`}>
+        Reformer credits required
         <input
           className={input_class()}
-          id={`${id_prefix}-credits`}
-          min={1}
+          id={`${id_prefix}-reformer-credits`}
+          min={0}
           type="number"
-          value={card.credits_required}
-          onChange={(event) => onChange('credits_required', Number(event.target.value))}
+          value={card.reformer_credits_required}
+          onChange={(event) => onChange('reformer_credits_required', Number(event.target.value))}
+        />
+      </label>
+
+      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-mat-credits`}>
+        Mat credits required
+        <input
+          className={input_class()}
+          id={`${id_prefix}-mat-credits`}
+          min={0}
+          type="number"
+          value={card.mat_credits_required}
+          onChange={(event) => onChange('mat_credits_required', Number(event.target.value))}
         />
       </label>
 

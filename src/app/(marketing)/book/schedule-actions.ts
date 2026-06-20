@@ -25,6 +25,8 @@ export type SessionCard = {
   image_src: string | null;
   capacity: number;
   credits_required: number;
+  reformer_credits_required: number;
+  mat_credits_required: number;
 };
 
 export type BookSlotResult =
@@ -96,7 +98,7 @@ export async function get_session_cards(include_inactive = false): Promise<Sessi
   let query = supabase
     .from('session_cards')
     .select(
-      'id, title, description, session_type, duration_minutes, instructor_name, image_src, capacity, credits_required',
+      'id, title, description, session_type, duration_minutes, instructor_name, image_src, capacity, credits_required, reformer_credits_required, mat_credits_required',
     )
     .order('sort_order', { ascending: true });
 
@@ -165,7 +167,8 @@ export async function book_slot_action(
   date_key: string,
   slot_start: string,
   slot_end: string,
-  package_id: string,
+  reformer_package_id: string | null,
+  mat_package_id: string | null,
   session_card_id: string,
 ): Promise<BookSlotResult> {
   const supabase = await createClient();
@@ -184,7 +187,9 @@ export async function book_slot_action(
 
   const { data: session_card, error: card_error } = await supabase
     .from('session_cards')
-    .select('id, title, session_type, capacity, credits_required, is_active')
+    .select(
+      'id, title, session_type, capacity, credits_required, reformer_credits_required, mat_credits_required, is_active',
+    )
     .eq('id', session_card_id)
     .eq('is_active', true)
     .single();
@@ -200,13 +205,19 @@ export async function book_slot_action(
     p_session_type: session_card.session_type,
     p_capacity: session_card.capacity,
     p_credits_required: session_card.credits_required,
+    p_reformer_credits_required: session_card.reformer_credits_required,
+    p_mat_credits_required: session_card.mat_credits_required,
   });
 
   if (ensure_error || !session_id) {
     return { success: false, error: ensure_error?.message ?? 'Could not reserve this time slot.' };
   }
 
-  const result = await book_session_action(session_id as string, package_id);
+  const result = await book_session_action(
+    session_id as string,
+    reformer_package_id,
+    mat_package_id,
+  );
 
   if (!result.success) {
     return { success: false, error: result.error };
