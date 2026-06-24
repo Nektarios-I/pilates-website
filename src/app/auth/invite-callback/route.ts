@@ -6,6 +6,7 @@ import {
   decideInviteCallback,
   readInviteCallbackPayload,
 } from '@/lib/auth/invite-callback';
+import { getSupabasePublishableKey, getSupabaseUrl } from '@/lib/supabase/env';
 
 // Dedicated callback for admin-initiated invites sent via inviteUserByEmail.
 //
@@ -52,22 +53,18 @@ export async function GET(request: NextRequest) {
   const destination = `${origin}/auth/reset-password`;
   const response = NextResponse.redirect(destination);
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookies_to_set) {
-          cookies_to_set.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
+  const supabase = createServerClient(getSupabaseUrl(), getSupabasePublishableKey(), {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookies_to_set) {
+        cookies_to_set.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
-  );
+  });
 
   const before_user = await supabase.auth.getUser();
   const before_session = await supabase.auth.getSession();

@@ -1,9 +1,18 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { primaryNavigation } from "@/config/navigation";
 
+import { SiteHeaderView } from "./site-header-view";
 import { PageShell } from "./page-shell";
+
+vi.mock("./site-header", () => ({
+  SiteHeader: () => (
+    <SiteHeaderView
+      auth={{ is_signed_in: false, is_staff: false, is_admin_or_owner: false, display_name: null }}
+    />
+  ),
+}));
 
 describe("PageShell", () => {
   it("renders the shared marketing landmarks around page content", () => {

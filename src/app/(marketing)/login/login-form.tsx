@@ -9,6 +9,7 @@ import {
   authDebugLog,
   setClientAuthDebugEnabled,
 } from '@/lib/auth/debug';
+import { getAuthRedirectOrigin } from '@/lib/auth/site-url';
 import { createClient } from '@/lib/supabase/client';
 
 import { resolve_sign_in_email } from './actions';
@@ -187,8 +188,8 @@ export function LoginForm({
   }
 
   function after_sign_in() {
-    router.push('/account');
     router.refresh();
+    router.push('/account');
   }
 
   // ── Email + Password sign-in ──────────────────────────────────────────────
@@ -253,7 +254,7 @@ export function LoginForm({
 
     set_is_loading(true);
     const supabase = createClient();
-    const site_url = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    const site_url = getAuthRedirectOrigin();
     const { error: err } = await supabase.auth.resetPasswordForEmail(trimmed, {
       redirectTo: `${site_url}/auth/callback?next=/auth/reset-password`,
     });
@@ -280,7 +281,7 @@ export function LoginForm({
 
     set_is_loading(true);
     const supabase = createClient();
-    const site_url = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    const site_url = getAuthRedirectOrigin();
 
     // Must be called from the browser so the PKCE verifier cookie is stored here.
     const { error: err } = await supabase.auth.signInWithOtp({
@@ -346,7 +347,7 @@ export function LoginForm({
     clear_status();
     set_is_loading(true);
     const supabase = createClient();
-    const site_url = process.env.NEXT_PUBLIC_SITE_URL ?? window.location.origin;
+    const site_url = getAuthRedirectOrigin();
     const redirect_to = `${site_url}/auth/callback`;
     authDebugLog('login: google sign-in requested', {
       provider: 'google',

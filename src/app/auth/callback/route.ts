@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
 import { authDebugError, authDebugLog } from '@/lib/auth/debug';
+import { getSupabasePublishableKey, getSupabaseUrl } from '@/lib/supabase/env';
 
 // Supabase can redirect to this callback in two different ways:
 //
@@ -79,22 +80,18 @@ export async function GET(request: NextRequest) {
   const redirect_url = `${origin}${next}`;
   const response = NextResponse.redirect(redirect_url);
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookies_to_set) {
-          cookies_to_set.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options);
-          });
-        },
+  const supabase = createServerClient(getSupabaseUrl(), getSupabasePublishableKey(), {
+    cookies: {
+      getAll() {
+        return request.cookies.getAll();
+      },
+      setAll(cookies_to_set) {
+        cookies_to_set.forEach(({ name, value, options }) => {
+          response.cookies.set(name, value, options);
+        });
       },
     },
-  );
+  });
 
   // ── PKCE flow ────────────────────────────────────────────────────────────
   if (code) {

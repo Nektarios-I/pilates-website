@@ -1,16 +1,18 @@
 import { createClient } from '@supabase/supabase-js';
 
+import { getSupabaseServiceRoleKey, getSupabaseUrl } from '@/lib/supabase/env';
+
 // Creates a Supabase client with the service role key.
 // This client bypasses RLS and has full database access.
 // NEVER expose this client or its key to the browser.
 // ONLY use this in server actions and API routes.
 export function createAdminClient() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const service_key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const url = getSupabaseUrl();
+  const service_key = getSupabaseServiceRoleKey();
 
-  if (!url || !service_key) {
+  if (!service_key) {
     throw new Error(
-      'createAdminClient: NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY must both be set.',
+      'createAdminClient: SUPABASE_SERVICE_ROLE_KEY must be set.',
     );
   }
 

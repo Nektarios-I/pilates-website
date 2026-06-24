@@ -1,6 +1,5 @@
 import { SiteHeaderView, type HeaderAuth } from '@/components/layout/site-header-view';
 import { createClient } from '@/lib/supabase/server';
-import { Suspense } from 'react';
 
 const STAFF_ROLES = ['owner', 'admin', 'instructor'] as const;
 
@@ -42,15 +41,7 @@ async function get_header_auth(): Promise<HeaderAuth> {
   }
 }
 
-async function SiteHeaderContent() {
+export async function SiteHeader() {
   const auth = await get_header_auth();
   return <SiteHeaderView auth={auth} />;
-}
-
-export function SiteHeader() {
-  return (
-    <Suspense fallback={<SiteHeaderView auth={unsigned_auth} />}>
-      <SiteHeaderContent />
-    </Suspense>
-  );
 }

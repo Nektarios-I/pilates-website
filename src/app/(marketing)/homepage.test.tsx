@@ -1,9 +1,18 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
+import { SiteHeaderView } from "@/components/layout/site-header-view";
 import MarketingLayout from "./layout";
 import HomePage from "./page";
 import { homeContent } from "@/features/home/home-content";
+
+vi.mock("@/components/layout/site-header", () => ({
+  SiteHeader: () => (
+    <SiteHeaderView
+      auth={{ is_signed_in: false, is_staff: false, is_admin_or_owner: false, display_name: null }}
+    />
+  ),
+}));
 
 describe("HomePage", () => {
   it("renders inside the shared marketing landmarks", () => {

@@ -19,7 +19,16 @@ export async function resolve_sign_in_email(identifier: string): Promise<Resolve
   }
 
   const normalized_name = trimmed.toUpperCase().replace(/\s+/g, ' ');
-  const admin = createAdminClient();
+  let admin;
+  try {
+    admin = createAdminClient();
+  } catch {
+    return {
+      success: false,
+      error:
+        'Name-based sign-in is unavailable. Sign in with your email address, or contact support if this persists.',
+    };
+  }
 
   const { data, error } = await admin
     .from('profiles')
