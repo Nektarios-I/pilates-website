@@ -1,8 +1,6 @@
 import Link from 'next/link';
 
 import { ButtonLink } from '@/components/ui/button-link';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
 import { createClient } from '@/lib/supabase/server';
 import { createPageMetadata } from '@/lib/metadata';
 
@@ -25,6 +23,9 @@ function package_has_credits(
   return (credits_remaining ?? 0) > 0;
 }
 
+const text_link_class =
+  'inline-flex min-h-11 items-center font-sans font-medium text-[#2D3A1F] border-b border-[#B8A678] pb-0.5 transition-colors duration-200 hover:text-[#B8A678]';
+
 export default async function BookPage() {
   const supabase = await createClient();
   const {
@@ -33,27 +34,25 @@ export default async function BookPage() {
 
   if (!user) {
     return (
-      <Section className="bg-background">
-        <Container>
-          <div className="mx-auto max-w-lg text-center">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-              Booking
-            </p>
-            <h1 className="mt-4 text-4xl font-semibold text-stone-950 sm:text-5xl">
-              Book a session
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-stone-700">
-              Sign in to choose a day and reserve your reformer class.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <ButtonLink href="/login">Sign in to book</ButtonLink>
-              <ButtonLink href="/pricing" variant="secondary">
-                View pricing
-              </ButtonLink>
-            </div>
+      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 py-16 md:py-24">
+        <div className="mx-auto max-w-lg text-center">
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+            Booking
+          </p>
+          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F]">
+            Book a session
+          </h1>
+          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+            Sign in to choose a day and reserve your reformer class.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <ButtonLink href="/login">Sign in to book</ButtonLink>
+            <ButtonLink href="/pricing" variant="secondary">
+              View pricing
+            </ButtonLink>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
     );
   }
 
@@ -94,78 +93,74 @@ export default async function BookPage() {
 
   return (
     <>
-      <Section className="bg-background">
-        <Container>
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-              Booking
-            </p>
-            <h1 className="mt-2 text-4xl font-semibold text-stone-950 sm:text-5xl">
-              Book a session
-            </h1>
-            <p className="mt-4 text-lg leading-8 text-stone-700">
-              Choose a class, then pick an available slot.
-            </p>
-          </div>
-        </Container>
-      </Section>
+      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 pt-16 pb-8">
+        <div className="max-w-2xl mx-auto">
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+            Booking
+          </p>
+          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F]">
+            Book a session
+          </h1>
+          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+            Choose a class, then pick an available slot.
+          </p>
+        </div>
+      </section>
 
-      <Section className="bg-muted">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-            <BookingCalendar
-              initial_date={today_key}
-              initial_schedule={initial_schedule}
-              initial_slots={initial_slots}
-              packages={packages}
-              session_cards={session_cards}
-            />
+      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 pb-16 md:pb-24">
+        <div className="max-w-7xl mx-auto grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <BookingCalendar
+            initial_date={today_key}
+            initial_schedule={initial_schedule}
+            initial_slots={initial_slots}
+            packages={packages}
+            session_cards={session_cards}
+          />
 
-            <aside>
-              <div className="rounded-md border border-border bg-surface p-6">
-                <h2 className="text-sm font-semibold text-stone-950">Your packages</h2>
+          <aside>
+            <div className="rounded-2xl bg-[#E8E2D0] p-6">
+              <h2 className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+                Your packages
+              </h2>
 
-                {packages.length === 0 ? (
-                  <div className="mt-4">
-                    <p className="text-sm text-stone-600">No active packages.</p>
-                    <Link
-                      className="mt-3 block text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
-                      href="/pricing"
-                    >
-                      View pricing
-                    </Link>
-                  </div>
-                ) : (
-                  <ul className="mt-4 space-y-3">
-                    {packages.map((pkg) => (
-                      <li key={pkg.id} className="rounded-md border border-stone-100 bg-stone-50 p-3">
-                        <p className="text-sm font-medium text-stone-950">{pkg.package_name}</p>
-                        <p className="mt-0.5 text-xs text-stone-500">
-                          {pkg.package_type === 'unlimited' || pkg.package_type === 'monthly'
-                            ? 'Unlimited classes'
-                            : `${pkg.credits_remaining ?? 0} credit${pkg.credits_remaining !== 1 ? 's' : ''} remaining`}
-                          {pkg.expires_at
-                            ? ` · expires ${new Date(pkg.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
-                            : ''}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-
-                <div className="mt-5 border-t border-stone-100 pt-4">
-                  <Link
-                    className="text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
-                    href="/account"
-                  >
-                    View account
+              {packages.length === 0 ? (
+                <div className="mt-4">
+                  <p className="font-sans text-sm leading-normal text-[#2D3A1F] opacity-80">
+                    No active packages.
+                  </p>
+                  <Link className={`mt-3 ${text_link_class}`} href="/pricing">
+                    View pricing
                   </Link>
                 </div>
+              ) : (
+                <ul className="mt-4 space-y-3">
+                  {packages.map((pkg) => (
+                    <li key={pkg.id} className="rounded-xl bg-[#F4F1E8] p-3">
+                      <p className="font-sans text-sm font-medium text-[#2D3A1F]">
+                        {pkg.package_name}
+                      </p>
+                      <p className="mt-0.5 font-sans text-xs text-[#2D3A1F] opacity-70">
+                        {pkg.package_type === 'unlimited' || pkg.package_type === 'monthly'
+                          ? 'Unlimited classes'
+                          : `${pkg.credits_remaining ?? 0} credit${pkg.credits_remaining !== 1 ? 's' : ''} remaining`}
+                        {pkg.expires_at
+                          ? ` · expires ${new Date(pkg.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+                          : ''}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <div className="mt-5 border-t border-[#CDD2C9] pt-4">
+                <Link className={text_link_class} href="/account">
+                  View account
+                </Link>
               </div>
-            </aside>
-          </div>
-        </Container>
-      </Section>
+            </div>
+          </aside>
+        </div>
+      </section>
     </>
   );
 }

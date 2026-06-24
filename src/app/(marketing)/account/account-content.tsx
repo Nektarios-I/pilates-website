@@ -186,12 +186,12 @@ export function AccountContent({
           <div className="max-w-3xl space-y-8">
             {/* Profile Section */}
             <div className="rounded-md border border-border bg-background p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-stone-950">Profile</h2>
                   <p className="mt-1 text-sm text-stone-600">Your account information</p>
                 </div>
-                <Button disabled onClick={() => {}} size="sm" variant="secondary">
+                <Button className="w-full sm:w-auto" disabled onClick={() => {}} size="sm" variant="secondary">
                   Edit profile
                 </Button>
               </div>
@@ -244,14 +244,14 @@ export function AccountContent({
 
             {/* Active Packages Section */}
             <div className="rounded-md border border-border bg-background p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-stone-950">Active Packages</h2>
                   <p className="mt-1 text-sm text-stone-600">
                     Your current memberships and credits
                   </p>
                 </div>
-                <ButtonLink href="/pricing" variant="secondary">
+                <ButtonLink className="w-full sm:w-auto" href="/pricing" variant="secondary">
                   Buy package
                 </ButtonLink>
               </div>
@@ -267,7 +267,7 @@ export function AccountContent({
                         className="rounded-md border border-stone-200 bg-stone-50 p-4"
                         key={pkg.id}
                       >
-                        <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex-1">
                             <h3 className="font-semibold text-stone-950">{package_data.name}</h3>
                             <p className="mt-1 text-sm text-stone-600">
@@ -282,7 +282,7 @@ export function AccountContent({
                               {pkg.expires_at && <span>Expires {format_date(pkg.expires_at)}</span>}
                             </div>
                           </div>
-                          <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                          <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
                             {pkg.status}
                           </span>
                         </div>
@@ -303,16 +303,16 @@ export function AccountContent({
 
             {/* Upcoming Bookings Section */}
             <div className="rounded-md border border-border bg-background p-6">
-              <div className="flex items-start justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <h2 className="text-xl font-semibold text-stone-950">Upcoming Bookings</h2>
                   <p className="mt-1 text-sm text-stone-600">Your scheduled classes</p>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  <ButtonLink href="/book" variant="secondary">
+                <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+                  <ButtonLink className="w-full sm:w-auto" href="/book" variant="secondary">
                     Book class
                   </ButtonLink>
-                  <ButtonLink href="/account/bookings" variant="secondary">
+                  <ButtonLink className="w-full sm:w-auto" href="/account/bookings" variant="secondary">
                     All bookings
                   </ButtonLink>
                 </div>
@@ -329,7 +329,7 @@ export function AccountContent({
                         className="rounded-md border border-stone-200 bg-stone-50 p-4"
                         key={booking.id}
                       >
-                        <div className="flex items-start justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex-1">
                             <h3 className="font-semibold text-stone-950">{session.title}</h3>
                             <p className="mt-1 text-sm text-stone-600">
@@ -343,13 +343,14 @@ export function AccountContent({
                               {session.location && <span>{session.location}</span>}
                             </div>
                           </div>
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                          <span className="inline-flex w-fit items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
                             {booking.status}
                           </span>
                         </div>
                         {!cancelled_ids.has(booking.id) && (
                           <div className="mt-4">
                             <Button
+                              className="w-full sm:w-auto"
                               disabled={cancelling_id === booking.id}
                               size="sm"
                               variant="secondary"
@@ -410,7 +411,7 @@ export function AccountContent({
                   <div className="relative mt-2">
                     <input
                       autoComplete="new-password"
-                      className={`pr-11 ${password_input_cls(!!password_error)}`}
+                      className={`pr-14 ${password_input_cls(!!password_error)}`}
                       disabled={password_loading}
                       id="new-password"
                       minLength={8}
@@ -421,7 +422,7 @@ export function AccountContent({
                     />
                     <button
                       aria-label={show_new_password ? 'Hide password' : 'Show password'}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-950"
+                      className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-stone-500 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
                       type="button"
                       onClick={() => set_show_new_password((prev) => !prev)}
                     >

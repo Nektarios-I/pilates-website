@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ImagePlaceholder } from '@/components/ui/image-placeholder';
 import type { DaySchedule } from '@/lib/schedule/studio-hours';
 import {
   add_days,
@@ -12,7 +13,6 @@ import {
   generate_hourly_slots,
   get_month_grid,
   is_past_day,
-  is_same_day,
   parse_date_key,
   start_of_week_monday,
   to_date_key,
@@ -28,6 +28,11 @@ import {
 } from './schedule-actions';
 
 type CalendarView = 'week' | 'month';
+
+const select_class =
+  'mt-2 block w-full rounded-xl bg-[#F4F1E8] p-4 font-sans text-[17px] text-[#2D3A1F] focus:outline-none focus:ring-2 focus:ring-[#B8A678] transition-all';
+const field_label_class =
+  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]';
 
 type BookingCalendarProps = {
   packages: PackageItem[];
@@ -239,18 +244,22 @@ export function BookingCalendar({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       <div>
-        <h2 className="text-base font-semibold text-stone-950">Choose a class</h2>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <h2 className="font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F] mb-8">
+          Choose a class
+        </h2>
+        <div className="grid gap-4 md:grid-cols-2">
           {session_cards.map((card) => {
             const is_selected = card.id === selected_card?.id;
             return (
               <button
                 key={card.id}
                 className={[
-                  'overflow-hidden rounded-lg border bg-surface text-left transition-colors',
-                  is_selected ? 'border-stone-950 ring-2 ring-stone-950 ring-offset-2' : 'border-border hover:border-stone-500',
+                  'overflow-hidden rounded-2xl text-left transition-colors duration-200',
+                  is_selected
+                    ? 'bg-[#2D3A1F] text-[#F4F1E8]'
+                    : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9]',
                 ]
                   .filter(Boolean)
                   .join(' ')}
@@ -261,14 +270,33 @@ export function BookingCalendar({
                   // eslint-disable-next-line @next/next/no-img-element
                   <img alt="" className="h-32 w-full object-cover" src={card.image_src} />
                 ) : (
-                  <div className="flex h-32 items-center justify-center bg-stone-100 text-sm font-medium text-stone-500">
-                    {card.session_type === 'mat' ? 'Mat Pilates' : 'Reformer Pilates'}
+                  <div className="h-32 w-full overflow-hidden">
+                    <ImagePlaceholder className="h-full rounded-none rounded-t-2xl" />
                   </div>
                 )}
-                <div className="p-4">
-                  <p className="text-sm font-semibold text-stone-950">{card.title}</p>
-                  <p className="mt-1 text-sm text-stone-600">{card.description}</p>
-                  <div className="mt-3 flex flex-wrap gap-2 text-xs text-stone-500">
+                <div className="p-4 md:p-6">
+                  <p
+                    className={[
+                      'font-serif font-medium text-xl leading-normal',
+                      is_selected ? 'text-[#F4F1E8]' : 'text-[#2D3A1F]',
+                    ].join(' ')}
+                  >
+                    {card.title}
+                  </p>
+                  <p
+                    className={[
+                      'mt-1 font-sans text-sm leading-normal',
+                      is_selected ? 'text-[#F4F1E8] opacity-80' : 'text-[#2D3A1F] opacity-80',
+                    ].join(' ')}
+                  >
+                    {card.description}
+                  </p>
+                  <div
+                    className={[
+                      'mt-3 flex flex-wrap gap-2 font-sans text-xs',
+                      is_selected ? 'text-[#F4F1E8] opacity-70' : 'text-[#2D3A1F] opacity-70',
+                    ].join(' ')}
+                  >
                     <span>{card.duration_minutes} min</span>
                     <span>{card.instructor_name ?? 'Instructor varies'}</span>
                     <span>{card.session_type}</span>
@@ -289,12 +317,12 @@ export function BookingCalendar({
             {confirmed.status === 'waitlisted' ? 'Added to waitlist' : 'Booking confirmed'}
           </p>
           <p className="mt-1 text-sm text-emerald-700">{confirmed.session_title}</p>
-          <div className="mt-3 flex gap-4 text-sm">
-            <a className="font-medium text-emerald-700 underline" href="/account">
+          <div className="mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:gap-4">
+            <a className="inline-flex min-h-11 items-center font-medium text-emerald-700 underline" href="/account">
               View account
             </a>
             <button
-              className="font-medium text-emerald-700 underline"
+              className="inline-flex min-h-11 items-center font-medium text-emerald-700 underline"
               onClick={() => set_confirmed(null)}
               type="button"
             >
@@ -304,7 +332,7 @@ export function BookingCalendar({
         </div>
       ) : null}
 
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div className="flex flex-wrap gap-2">
           <Button
             onClick={() => set_view('week')}
@@ -331,7 +359,7 @@ export function BookingCalendar({
           <Button onClick={() => shift_anchor(-1)} size="sm" type="button" variant="secondary">
             Prev
           </Button>
-          <p className="min-w-[10rem] text-center text-sm font-medium text-stone-950">
+          <p className="min-w-0 flex-1 text-center font-sans font-medium text-sm text-[#2D3A1F] sm:min-w-[10rem] sm:flex-none">
             {view === 'week'
               ? `${format_day_number(week_days[0])} – ${format_day_number(week_days[6])} ${format_month_year(anchor)}`
               : format_month_year(anchor)}
@@ -342,76 +370,58 @@ export function BookingCalendar({
         </div>
       </div>
 
-      <div
-        className={
-          view === 'week'
-            ? 'grid grid-cols-7 gap-2'
-            : 'grid grid-cols-7 gap-1 sm:gap-2'
-        }
-      >
-        {(view === 'month' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : []).map((label) => (
-          <div
-            key={label}
-            className="hidden text-center text-xs font-medium uppercase tracking-wide text-stone-500 sm:block"
-          >
-            {label}
-          </div>
-        ))}
+      <p className="mb-3 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+        {view === 'week' ? 'Choose a day this week' : 'Choose a day'}
+      </p>
+      <div className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <div className="flex gap-3 w-max md:w-full md:justify-start">
+          {visible_days.map((date) => {
+            const date_key = to_date_key(date);
+            const is_selected = date_key === selected_date;
+            const is_past = is_past_day(date, today);
+            const in_month = view === 'month' ? date.getMonth() === anchor.getMonth() : true;
 
-        {visible_days.map((date) => {
-          const date_key = to_date_key(date);
-          const is_today = is_same_day(date, today);
-          const is_selected = date_key === selected_date;
-          const is_past = is_past_day(date, today);
-          const in_month = view === 'month' ? date.getMonth() === anchor.getMonth() : true;
-
-          return (
-            <button
-              key={date_key}
-              className={[
-                'rounded-md border px-2 py-3 text-left transition-colors',
-                view === 'month' ? 'min-h-[3.25rem]' : 'min-h-[4.5rem]',
-                is_past ? 'cursor-not-allowed border-stone-100 bg-stone-50 text-stone-300' : '',
-                !is_past && !is_selected && !is_today
-                  ? 'border-border bg-surface hover:border-stone-400'
-                  : '',
-                is_today && !is_selected ? 'border-stone-950 ring-2 ring-stone-950 ring-offset-1' : '',
-                is_selected && !is_today ? 'border-stone-900 bg-stone-900 text-white' : '',
-                is_selected && is_today ? 'border-stone-900 bg-stone-900 text-white ring-2 ring-stone-400 ring-offset-1' : '',
-                view === 'month' && !in_month ? 'opacity-40' : '',
-              ]
-                .filter(Boolean)
-                .join(' ')}
-              disabled={is_past}
-              onClick={() => select_date(date)}
-              type="button"
-            >
-              {view === 'week' ? (
-                <>
-                  <span className="block text-xs font-medium uppercase opacity-80">
-                    {format_weekday_short(date)}
-                  </span>
-                  <span className="mt-1 block text-2xl font-semibold">{format_day_number(date)}</span>
-                </>
-              ) : (
-                <span className="block text-sm font-semibold">{format_day_number(date)}</span>
-              )}
-            </button>
-          );
-        })}
+            return (
+              <button
+                key={date_key}
+                className={[
+                  'flex flex-col items-center justify-center min-w-[72px] md:min-w-[80px] py-4 px-3 rounded-2xl snap-start shrink-0 transition-colors duration-200',
+                  is_past
+                    ? 'opacity-40 cursor-not-allowed pointer-events-none bg-[#E8E2D0] text-[#2D3A1F]'
+                    : is_selected
+                      ? 'bg-[#2D3A1F] text-[#F4F1E8] shadow-md cursor-pointer'
+                      : 'bg-[#E8E2D0] text-[#2D3A1F] cursor-pointer hover:bg-[#CDD2C9]',
+                  view === 'month' && !in_month && !is_past ? 'opacity-40' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                disabled={is_past}
+                onClick={() => select_date(date)}
+                type="button"
+              >
+                <span className="font-sans font-semibold text-[13px] uppercase tracking-widest leading-none mb-1">
+                  {format_weekday_short(date)}
+                </span>
+                <span className="font-serif font-medium text-xl leading-none">
+                  {format_day_number(date)}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="rounded-md border border-border bg-surface p-5">
+      <div>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="text-base font-semibold text-stone-950">
+            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
               {new Date(selected_date).toLocaleDateString('en-GB', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
               })}
             </h3>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 font-sans text-sm leading-normal text-[#2D3A1F]">
               {selected_card?.title ?? 'Selected class'}
             </p>
           </div>
@@ -426,13 +436,21 @@ export function BookingCalendar({
         </div>
 
         {loading_day ? (
-          <p className="mt-4 text-sm text-stone-500">Loading available times…</p>
+          <p className="mt-4 font-sans text-sm text-[#2D3A1F] opacity-80">Loading available times…</p>
         ) : day_schedule?.is_closed ? (
-          <p className="mt-4 text-sm text-stone-600">Studio closed on this day.</p>
+          <p className="mt-4 font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+            Studio closed on this day.
+          </p>
         ) : hourly_slots.length === 0 ? (
-          <p className="mt-4 text-sm text-stone-600">No sessions available.</p>
+          <p className="mt-4 font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+            No sessions available.
+          </p>
         ) : (
-          <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <>
+            <p className="mt-10 mb-4 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+              Available times
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {hourly_slots.map((slot) => {
               const slot_state = slots.find(
                 (entry) => entry.slot_start === slot.start && entry.slot_end === slot.end,
@@ -450,12 +468,12 @@ export function BookingCalendar({
                 <button
                   key={`${slot.start}-${slot.end}`}
                   className={[
-                    'rounded-md border px-4 py-3 text-left text-sm transition-colors',
+                    'w-full py-3 rounded-xl text-center font-sans text-[17px] transition-colors',
                     is_unavailable
-                      ? 'cursor-not-allowed border-stone-100 bg-stone-50 text-stone-300'
-                      : '',
-                    !is_unavailable && !is_active ? 'border-border bg-background hover:border-stone-500' : '',
-                    is_active ? 'border-stone-900 bg-stone-900 text-white' : '',
+                      ? 'opacity-40 cursor-not-allowed bg-[#E8E2D0] text-[#2D3A1F]'
+                      : is_active
+                        ? 'bg-[#2D3A1F] text-[#F4F1E8] cursor-pointer'
+                        : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9] cursor-pointer transition-colors',
                   ]
                     .filter(Boolean)
                     .join(' ')}
@@ -474,35 +492,39 @@ export function BookingCalendar({
                   }}
                   type="button"
                 >
-                  <span className="font-medium">{slot.label}</span>
-                  <span className={`mt-1 block text-xs ${is_active ? 'text-stone-200' : 'text-stone-500'}`}>
-                    {selected_card?.session_type ?? 'Class'} ·{' '}
+                  <span>{slot.label}</span>
+                  <span className="sr-only">
                     {is_past_slot ? 'Not available' : is_full ? 'Not available' : 'Available'}
                   </span>
                 </button>
               );
             })}
-          </div>
+            </div>
+          </>
         )}
       </div>
 
       {selected_slot ? (
-        <div className="rounded-md border border-stone-200 bg-stone-50 p-5">
-          <h3 className="text-sm font-semibold text-stone-950">Confirm booking</h3>
-          <p className="mt-1 text-sm text-stone-600">
-            {selected_card?.title ?? 'Class'} · {selected_date} · {selected_slot.slot_start} –{' '}
-            {selected_slot.slot_end}
-          </p>
+        <div className="mt-10 p-8 bg-[#E8E2D0] rounded-3xl flex flex-col gap-6">
+          <div>
+            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+              Confirm booking
+            </h3>
+            <p className="mt-2 font-sans text-[17px] leading-relaxed text-[#2D3A1F] opacity-80">
+              {selected_card?.title ?? 'Class'} · {selected_date} · {selected_slot.slot_start} –{' '}
+              {selected_slot.slot_end}
+            </p>
+          </div>
 
-          <div className="mt-4 space-y-4">
+          <div className="space-y-4">
             {requires_reformer ? (
               <div>
-                <label className="block text-sm font-medium text-stone-950" htmlFor="book-reformer-package">
+                <label className={field_label_class} htmlFor="book-reformer-package">
                   Pay {selected_card?.reformer_credits_required} reformer credit
                   {selected_card?.reformer_credits_required === 1 ? '' : 's'} with
                 </label>
                 <select
-                  className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm"
+                  className={select_class}
                   id="book-reformer-package"
                   onChange={(event) => set_selected_reformer_package(event.target.value)}
                   value={selected_reformer_package_value}
@@ -523,12 +545,12 @@ export function BookingCalendar({
 
             {requires_mat ? (
               <div>
-                <label className="block text-sm font-medium text-stone-950" htmlFor="book-mat-package">
+                <label className={field_label_class} htmlFor="book-mat-package">
                   Pay {selected_card?.mat_credits_required} mat credit
                   {selected_card?.mat_credits_required === 1 ? '' : 's'} with
                 </label>
                 <select
-                  className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm"
+                  className={select_class}
                   id="book-mat-package"
                   onChange={(event) => set_selected_mat_package(event.target.value)}
                   value={selected_mat_package_value}
@@ -550,11 +572,17 @@ export function BookingCalendar({
 
           {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
 
-          <div className="mt-4 flex gap-3">
-            <Button disabled={is_pending || !can_pay_required_credits} onClick={handle_book} type="button">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+            <Button
+              className="w-full sm:w-auto"
+              disabled={is_pending || !can_pay_required_credits}
+              onClick={handle_book}
+              type="button"
+            >
               {is_pending ? 'Booking…' : 'Confirm booking'}
             </Button>
             <Button
+              className="w-full sm:w-auto"
               disabled={is_pending}
               onClick={() => set_selected_slot(null)}
               type="button"

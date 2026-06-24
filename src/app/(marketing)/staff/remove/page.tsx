@@ -30,7 +30,7 @@ export default async function RemoveAccountPage() {
         {/* Back navigation */}
         <div className="mb-6">
           <Link
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
             href="/account"
           >
             <svg
@@ -73,7 +73,7 @@ export default async function RemoveAccountPage() {
           </div>
 
           {/* Info panel */}
-          <aside className="hidden space-y-6 lg:block">
+          <aside className="space-y-6">
             <div className="rounded-md border border-border bg-muted p-6">
               <h2 className="text-sm font-semibold text-stone-950">Removal permissions</h2>
               <ul className="mt-4 space-y-3">

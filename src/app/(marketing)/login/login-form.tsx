@@ -423,7 +423,7 @@ export function LoginForm({
           </p>
         </div>
         <button
-          className="mt-4 text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
           type="button"
           onClick={() => {
             set_forgot_step('idle');
@@ -466,7 +466,7 @@ export function LoginForm({
           </div>
         </form>
         <button
-          className="mt-4 text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
           type="button"
           onClick={() => {
             set_forgot_step('idle');
@@ -516,7 +516,7 @@ export function LoginForm({
           </div>
         </form>
         <button
-          className="mt-4 text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
           type="button"
           onClick={() => {
             set_otp_step('email');
@@ -569,7 +569,7 @@ export function LoginForm({
               <div className="relative mt-2">
                 <input
                   autoComplete="current-password"
-                  className={`pr-11 ${input_cls()}`}
+                  className={`pr-14 ${input_cls()}`}
                   disabled={is_loading}
                   id="password"
                   name="password"
@@ -580,7 +580,7 @@ export function LoginForm({
                 />
                 <button
                   aria-label={show_password ? 'Hide password' : 'Show password'}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-950"
+                  className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-stone-500 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
                   type="button"
                   onClick={() => set_show_password((p) => !p)}
                 >
@@ -624,7 +624,7 @@ export function LoginForm({
       {mode === 'password' && (
         <div className="mt-3 text-right">
           <button
-            className="text-sm text-stone-600 underline underline-offset-4 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center text-sm text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
             type="button"
             onClick={open_forgot_password}
           >
@@ -636,7 +636,7 @@ export function LoginForm({
       {/* Mode toggle */}
       <div className="mt-5">
         <button
-          className="w-full text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+          className="inline-flex min-h-11 w-full items-center justify-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
           type="button"
           onClick={() => {
             set_mode((m) => (m === 'password' ? 'otp' : 'password'));
@@ -661,7 +661,7 @@ export function LoginForm({
       {/* Social sign-in */}
       <div className="flex flex-col gap-3">
         <button
-          className="inline-flex items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-950 transition-colors hover:border-stone-500 hover:bg-stone-50 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-950 transition-colors hover:border-stone-500 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 disabled:cursor-not-allowed disabled:opacity-60"
           disabled={is_loading}
           type="button"
           onClick={handle_google}

@@ -109,7 +109,7 @@ export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
         <h2 className="text-lg font-semibold text-stone-950">Add session card</h2>
         <CardFields card={draft} id_prefix="new-card" onChange={update_draft} />
         <div className="mt-4">
-          <Button disabled={is_pending} onClick={handle_create} type="button">
+          <Button className="w-full sm:w-auto" disabled={is_pending} onClick={handle_create} type="button">
             Add card
           </Button>
         </div>
@@ -127,11 +127,17 @@ export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
                 id_prefix={card.id}
                 onChange={(key, value) => update_edit(card.id, key, value)}
               />
-              <div className="mt-4 flex flex-wrap gap-3">
-                <Button disabled={is_pending} onClick={() => handle_update(card.id)} type="button">
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <Button
+                  className="w-full sm:w-auto"
+                  disabled={is_pending}
+                  onClick={() => handle_update(card.id)}
+                  type="button"
+                >
                   Save
                 </Button>
                 <Button
+                  className="w-full sm:w-auto"
                   disabled={is_pending}
                   onClick={() => handle_delete(card.id)}
                   type="button"

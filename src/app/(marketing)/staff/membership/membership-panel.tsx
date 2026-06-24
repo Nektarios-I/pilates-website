@@ -167,6 +167,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                 </select>
               </div>
               <Button
+                className="w-full sm:w-auto"
                 disabled={!selected_package_id || is_pending}
                 onClick={handle_apply}
                 type="button"
@@ -203,6 +204,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                     </div>
                     {membership.status === 'active' ? (
                       <Button
+                        className="w-full sm:w-auto"
                         disabled={is_pending}
                         onClick={() => handle_deactivate(membership.id)}
                         type="button"
@@ -236,6 +238,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                       />
                     </div>
                     <Button
+                      className="w-full sm:w-auto"
                       disabled={is_pending}
                       onClick={() => handle_save_credits(membership.id)}
                       type="button"

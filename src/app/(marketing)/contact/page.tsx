@@ -1,6 +1,5 @@
+import { ContactForm } from '@/components/sections/contact-form';
 import { ButtonLink } from '@/components/ui/button-link';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
 import { site_content } from '@/config/site_content';
 import { createPageMetadata } from '@/lib/metadata';
 
@@ -12,143 +11,105 @@ export const metadata = createPageMetadata({
 });
 
 export default function ContactPage() {
+  const { contact_preview } = site_content;
+
   return (
-    <>
-      <Section aria-labelledby="contact-page-heading" className="bg-background">
-        <Container>
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-              {site_content.contact_preview.section_label}
-            </p>
-            <h1
-              className="mt-4 text-4xl font-semibold tracking-normal text-stone-950 sm:text-5xl"
-              id="contact-page-heading"
-            >
-              {site_content.contact_preview.heading}
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-stone-700">
-              {site_content.contact_preview.intro_text}
-            </p>
-          </div>
-        </Container>
-      </Section>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-24">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
+        <div>
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+            {contact_preview.section_label}
+          </p>
+          <h1
+            className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F] mb-6 mt-3"
+            id="contact-page-heading"
+          >
+            {contact_preview.heading}
+          </h1>
+          <p className="font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+            {contact_preview.intro_text}
+          </p>
 
-      <Section aria-labelledby="contact-details-heading" className="bg-muted">
-        <Container>
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="rounded-md border border-border bg-surface p-6">
-              <h2
-                className="text-xl font-semibold tracking-normal text-stone-950"
-                id="contact-details-heading"
-              >
-                Contact details
-              </h2>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div>
-                  <dt className="font-semibold text-stone-950">Phone</dt>
-                  <dd className="mt-1 text-stone-700">
-                    <a
-                      className="transition-colors hover:text-stone-950"
-                      href={`tel:${site_content.contact_preview.phone_href}`}
-                    >
-                      {site_content.contact_preview.phone}
-                    </a>
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
-            <div className="rounded-md border border-border bg-surface p-6">
-              <h2 className="text-xl font-semibold tracking-normal text-stone-950">Location</h2>
-              <p className="mt-4 text-sm leading-6 text-stone-700">
-                {site_content.contact_preview.country}
-              </p>
-              {site_content.contact_preview.google_maps_url ? (
+          <dl className="mt-10 space-y-6">
+            <div>
+              <dt className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] mb-2">
+                Phone
+              </dt>
+              <dd>
                 <a
-                  className="mt-3 inline-block text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
-                  href={site_content.contact_preview.google_maps_url}
-                  rel="noopener noreferrer"
-                  target="_blank"
+                  className="font-sans text-[17px] leading-relaxed text-[#2D3A1F] hover:text-[#B8A678] transition-colors"
+                  href={`tel:${contact_preview.phone_href}`}
                 >
-                  Open in Google Maps
+                  {contact_preview.phone}
                 </a>
+              </dd>
+            </div>
+            <div>
+              <dt className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] mb-2">
+                Location
+              </dt>
+              <dd className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+                {contact_preview.country}
+              </dd>
+              {contact_preview.google_maps_url ? (
+                <dd className="mt-2">
+                  <a
+                    className="font-sans text-[17px] leading-relaxed text-[#2D3A1F] hover:text-[#B8A678] transition-colors underline underline-offset-4"
+                    href={contact_preview.google_maps_url}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                    Open in Google Maps
+                  </a>
+                </dd>
               ) : null}
             </div>
-          </div>
-        </Container>
-      </Section>
-
-      <Section aria-labelledby="studio-hours-heading" className="bg-background">
-        <Container>
-          <div className="max-w-3xl">
-            <h2
-              className="text-3xl font-semibold tracking-normal text-stone-950"
-              id="studio-hours-heading"
-            >
-              Studio hours
-            </h2>
-            <div className="mt-6 space-y-4">
-              <div className="rounded-md border border-border bg-surface p-6">
-                <h3 className="text-base font-semibold text-stone-950">Weekdays</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-700">
-                  {site_content.contact_preview.hours.weekday}
-                </p>
-              </div>
-              <div className="rounded-md border border-border bg-surface p-6">
-                <h3 className="text-base font-semibold text-stone-950">Saturday</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-700">
-                  {site_content.contact_preview.hours.saturday}
-                </p>
-              </div>
-              <div className="rounded-md border border-border bg-surface p-6">
-                <h3 className="text-base font-semibold text-stone-950">Sunday</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-700">
-                  {site_content.contact_preview.hours.sunday}
-                </p>
-              </div>
-              {site_content.contact_preview.hours.note && (
-                <div className="rounded-md border border-border bg-surface p-6">
-                  <h3 className="text-base font-semibold text-stone-950">Note</h3>
-                  <p className="mt-2 text-sm leading-6 text-stone-700">
-                    {site_content.contact_preview.hours.note}
-                  </p>
-                </div>
-              )}
+            <div>
+              <dt className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] mb-2">
+                Studio hours
+              </dt>
+              <dd className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+                {contact_preview.hours.weekday}
+              </dd>
+              <dd className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+                {contact_preview.hours.saturday}
+              </dd>
+              <dd className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+                {contact_preview.hours.sunday}
+              </dd>
+              {contact_preview.hours.note ? (
+                <dd className="mt-2 font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+                  {contact_preview.hours.note}
+                </dd>
+              ) : null}
             </div>
-          </div>
-        </Container>
-      </Section>
+          </dl>
+        </div>
 
-      <Section aria-labelledby="contact-cta-heading" className="bg-stone-950 text-white">
-        <Container>
-          <div className="max-w-3xl text-center">
-            <h2
-              className="text-3xl font-semibold tracking-normal text-white sm:text-4xl"
-              id="contact-cta-heading"
-            >
-              Ready to visit?
-            </h2>
-            <p className="mt-4 text-base leading-7 text-stone-200">
-              Book your first class or view our FAQ for answers to common questions.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <ButtonLink
-                className="border-white bg-white text-stone-950 hover:bg-stone-100"
-                href={site_content.primary_cta.href}
-              >
-                {site_content.primary_cta.label}
-              </ButtonLink>
-              <ButtonLink
-                className="border-stone-600 bg-transparent text-white hover:border-white"
-                href="/faq"
-                variant="secondary"
-              >
-                View FAQ
-              </ButtonLink>
-            </div>
+        <ContactForm />
+      </div>
+
+      <section aria-labelledby="contact-cta-heading" className="mt-16">
+        <div className="max-w-6xl mx-auto bg-[#E8E2D0] rounded-3xl py-24 px-8 md:px-16 flex flex-col items-center text-center">
+          <h2
+            className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F]"
+            id="contact-cta-heading"
+          >
+            Ready to visit?
+          </h2>
+          <p className="mt-6 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+            Book your first class or view our FAQ for answers to common questions.
+          </p>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <ButtonLink href={site_content.primary_cta.href}>
+              {site_content.primary_cta.label}
+            </ButtonLink>
+            <ButtonLink href="/faq" variant="secondary">
+              View FAQ
+            </ButtonLink>
           </div>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </section>
+    </div>
   );
 }

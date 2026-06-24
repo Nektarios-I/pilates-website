@@ -1,6 +1,4 @@
 import { ButtonLink } from "@/components/ui/button-link";
-import { Container } from "@/components/ui/container";
-import { Section } from "@/components/ui/section";
 
 type PagePlaceholderProps = {
   eyebrow: string;
@@ -22,19 +20,21 @@ export function PagePlaceholder({
   },
 }: PagePlaceholderProps) {
   return (
-    <Section>
-      <Container>
-        <div className="max-w-3xl">
-          <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">{eyebrow}</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-normal text-stone-950 sm:text-5xl">
-            {title}
-          </h1>
-          <p className="mt-5 text-lg leading-8 text-stone-700">{description}</p>
-          <div className="mt-8">
-            <ButtonLink href={nextStep.href}>{nextStep.label}</ButtonLink>
-          </div>
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-24">
+      <div className="max-w-3xl">
+        <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+          {eyebrow}
+        </p>
+        <h1 className="mt-4 font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F]">
+          {title}
+        </h1>
+        <p className="mt-6 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+          {description}
+        </p>
+        <div className="mt-8">
+          <ButtonLink href={nextStep.href}>{nextStep.label}</ButtonLink>
         </div>
-      </Container>
-    </Section>
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { ButtonLink } from "@/components/ui/button-link";
+import { ImagePlaceholder } from "@/components/ui/image-placeholder";
 
 type PreviewCardCta = {
   label: string;
@@ -13,26 +13,28 @@ type PreviewCardProps = {
   cta?: PreviewCardCta;
 };
 
-export function PreviewCard({ title, description, eyebrow, meta, cta }: PreviewCardProps) {
+export function PreviewCard({ title, description, eyebrow, meta }: PreviewCardProps) {
   return (
-    <article className="flex h-full flex-col rounded-md border border-border bg-surface p-6">
-      <div className="flex-1">
+    <article className="flex flex-col bg-[#E8E2D0] rounded-2xl overflow-hidden group cursor-pointer transition-transform duration-300 hover:-translate-y-1">
+      <div className="w-full aspect-[16/9] bg-[#CDD2C9] rounded-t-2xl overflow-hidden">
+        <ImagePlaceholder className="h-full w-full rounded-t-2xl rounded-b-none transition-transform duration-500 group-hover:scale-105" />
+      </div>
+      <div className="p-6 md:p-8 flex flex-col gap-3">
         {eyebrow ? (
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone-500">
+          <p className="font-sans font-medium text-xs tracking-wide text-[#2D3A1F] opacity-70">
             {eyebrow}
           </p>
         ) : null}
-        <h3 className="mt-3 text-xl font-semibold tracking-normal text-stone-950">{title}</h3>
-        {meta ? <p className="mt-2 text-sm font-medium text-stone-600">{meta}</p> : null}
-        <p className="mt-4 text-sm leading-6 text-stone-700">{description}</p>
+        <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F] transition-colors group-hover:text-[#B8A678]">
+          {title}
+        </h3>
+        {meta ? (
+          <p className="font-sans font-medium text-xs tracking-wide text-[#2D3A1F] opacity-70">
+            {meta}
+          </p>
+        ) : null}
+        <p className="font-sans text-sm leading-normal text-[#2D3A1F]">{description}</p>
       </div>
-      {cta ? (
-        <div className="mt-6">
-          <ButtonLink href={cta.href} variant="secondary">
-            {cta.label}
-          </ButtonLink>
-        </div>
-      ) : null}
     </article>
   );
 }
@@ -43,7 +45,7 @@ type PreviewCardGridProps = {
 
 export function PreviewCardGrid({ items }: PreviewCardGridProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {items.map((item) => (
         <PreviewCard key={`${item.title}-${item.description}`} {...item} />
       ))}

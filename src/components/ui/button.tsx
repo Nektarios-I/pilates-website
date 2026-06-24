@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
-type ButtonVariant = 'primary' | 'secondary';
+type ButtonVariant = 'primary' | 'secondary' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 type ButtonProps = {
@@ -11,15 +11,18 @@ type ButtonProps = {
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const variants: Record<ButtonVariant, string> = {
-  primary: 'border-stone-950 bg-stone-950 text-white hover:bg-stone-800 disabled:bg-stone-400',
+  primary:
+    'border-0 bg-[#2D3A1F] text-[#F4F1E8] font-sans font-semibold text-[13px] uppercase tracking-widest transition-all duration-200 hover:bg-[#B8A678] disabled:opacity-40',
   secondary:
-    'border-stone-300 bg-white text-stone-950 hover:border-stone-500 disabled:border-stone-200 disabled:text-stone-400',
+    'border border-[#CDD2C9] text-[#2D3A1F] font-sans font-semibold text-[13px] uppercase tracking-widest bg-transparent transition-all duration-200 hover:bg-[#E8E2D0] disabled:opacity-40',
+  ghost:
+    'font-sans font-medium text-[#2D3A1F] border-b border-[#B8A678] pb-0.5 hover:text-[#B8A678] transition-colors duration-200 bg-transparent px-0 py-0 rounded-none normal-case tracking-normal min-h-0',
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: 'min-h-9 px-3 py-1.5 text-sm',
-  md: 'min-h-11 px-5 py-2.5 text-sm',
-  lg: 'min-h-12 px-6 py-3 text-base',
+  sm: 'min-h-11 px-4 py-2 rounded-full',
+  md: 'min-h-11 px-8 py-4 rounded-full',
+  lg: 'min-h-12 px-8 py-4 rounded-full',
 };
 
 export function Button({
@@ -33,9 +36,9 @@ export function Button({
   return (
     <button
       className={[
-        'inline-flex items-center justify-center rounded-md border font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 disabled:cursor-not-allowed',
+        'inline-flex items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678] disabled:cursor-not-allowed',
         variants[variant],
-        sizes[size],
+        variant !== 'ghost' ? sizes[size] : '',
         className,
       ]
         .filter(Boolean)

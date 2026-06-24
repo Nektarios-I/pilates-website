@@ -92,7 +92,7 @@ export default function ResetPasswordPage() {
             the sign-in page.
           </p>
           <a
-            className="mt-6 inline-block text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+            className="mt-6 inline-flex min-h-11 items-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
             href="/login"
           >
             Back to sign in
@@ -133,7 +133,7 @@ export default function ResetPasswordPage() {
                 <div className="relative mt-2">
                   <input
                     autoComplete="new-password"
-                    className={`pr-11 ${input_cls()}`}
+                    className={`pr-14 ${input_cls()}`}
                     disabled={is_loading}
                     id="new-password"
                     minLength={8}
@@ -144,7 +144,7 @@ export default function ResetPasswordPage() {
                   />
                   <button
                     aria-label={show_password ? 'Hide password' : 'Show password'}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-500 hover:text-stone-950"
+                    className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-stone-500 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
                     type="button"
                     onClick={() => set_show_password((p) => !p)}
                   >

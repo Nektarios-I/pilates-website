@@ -149,7 +149,40 @@ export function ScheduleEditorPanel() {
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 sm:gap-2">
+      <div className="sm:hidden">
+        <p className="mb-2 text-sm font-medium text-stone-700">Choose a schedule day</p>
+        <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2">
+          {month_days.map((date) => {
+            const date_key = to_date_key(date);
+            const is_selected = date_key === selected_date;
+            const is_today = is_same_day(date, today);
+            const in_month = date.getMonth() === anchor.getMonth();
+
+            return (
+              <button
+                key={date_key}
+                className={[
+                  'min-h-16 min-w-16 snap-start rounded-md border px-3 py-2 text-left text-sm transition-colors',
+                  !in_month ? 'opacity-40' : '',
+                  is_selected ? 'border-stone-900 bg-stone-900 text-white' : 'border-border bg-surface',
+                  is_today && !is_selected ? 'ring-2 ring-stone-950 ring-offset-1' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
+                onClick={() => set_selected_date(date_key)}
+                type="button"
+              >
+                <span className="block text-xs font-medium uppercase opacity-80">
+                  {format_weekday_short(date)}
+                </span>
+                <span className="mt-1 block text-2xl font-semibold">{format_day_number(date)}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="hidden grid-cols-7 gap-1 sm:grid sm:gap-2">
         {month_days.map((date) => {
           const date_key = to_date_key(date);
           const is_selected = date_key === selected_date;
@@ -204,34 +237,40 @@ export function ScheduleEditorPanel() {
         {!is_closed ? (
           <div className="mt-6 space-y-4">
             {time_ranges.map((range, index) => (
-              <div key={index} className="flex flex-wrap items-end gap-3">
-                <div>
+              <div key={index} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                <div className="min-w-0 flex-1 sm:min-w-32">
                   <label className="block text-xs font-medium text-stone-600">Opens</label>
                   <input
-                    className="mt-1 rounded-md border border-stone-300 px-3 py-2 text-sm"
+                    className="mt-1 min-h-11 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
                     onChange={(event) => update_range(index, 'start', event.target.value)}
                     type="time"
                     value={range.start}
                   />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1 sm:min-w-32">
                   <label className="block text-xs font-medium text-stone-600">Closes</label>
                   <input
-                    className="mt-1 rounded-md border border-stone-300 px-3 py-2 text-sm"
+                    className="mt-1 min-h-11 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
                     onChange={(event) => update_range(index, 'end', event.target.value)}
                     type="time"
                     value={range.end}
                   />
                 </div>
                 {time_ranges.length > 1 ? (
-                  <Button onClick={() => remove_range(index)} size="sm" type="button" variant="secondary">
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => remove_range(index)}
+                    size="sm"
+                    type="button"
+                    variant="secondary"
+                  >
                     Remove
                   </Button>
                 ) : null}
               </div>
             ))}
 
-            <Button onClick={add_range} size="sm" type="button" variant="secondary">
+            <Button className="w-full sm:w-auto" onClick={add_range} size="sm" type="button" variant="secondary">
               Add break / second period
             </Button>
           </div>
@@ -240,12 +279,18 @@ export function ScheduleEditorPanel() {
         {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
         {success ? <p className="mt-4 text-sm text-emerald-700">{success}</p> : null}
 
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Button disabled={is_pending} onClick={handle_save} type="button">
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button className="w-full sm:w-auto" disabled={is_pending} onClick={handle_save} type="button">
             Save day
           </Button>
           {is_override ? (
-            <Button disabled={is_pending} onClick={handle_reset_defaults} type="button" variant="secondary">
+            <Button
+              className="w-full sm:w-auto"
+              disabled={is_pending}
+              onClick={handle_reset_defaults}
+              type="button"
+              variant="secondary"
+            >
               Use default hours
             </Button>
           ) : null}

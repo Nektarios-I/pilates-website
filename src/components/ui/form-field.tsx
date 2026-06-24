@@ -12,7 +12,7 @@ type FormFieldProps = {
 export function FormField({ id, label, error, required, hint, children }: FormFieldProps) {
   return (
     <div>
-      <label className="block text-sm font-medium text-stone-950" htmlFor={id}>
+      <label className="block font-sans text-sm font-medium text-[#2D3A1F]" htmlFor={id}>
         {label}
         {required && (
           <span aria-hidden="true" className="ml-1 text-red-500">
@@ -22,7 +22,7 @@ export function FormField({ id, label, error, required, hint, children }: FormFi
       </label>
       <div className="mt-2">{children}</div>
       {hint && !error && (
-        <p className="mt-1.5 text-xs leading-5 text-stone-500" id={`${id}-hint`}>
+        <p className="mt-1.5 font-sans text-xs leading-5 text-[#2D3A1F] opacity-70" id={`${id}-hint`}>
           {hint}
         </p>
       )}

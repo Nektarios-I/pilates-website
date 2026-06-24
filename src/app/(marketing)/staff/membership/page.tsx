@@ -32,7 +32,7 @@ export default async function ManageMembershipPage() {
       <div className="py-8 sm:py-12">
         <div className="mb-6">
           <Link
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
             href="/account"
           >
             <svg

@@ -1,4 +1,4 @@
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { SiteHeaderView } from "./site-header-view";
@@ -27,6 +27,26 @@ describe("SiteHeader", () => {
     expect(within(header).getByRole("link", { name: "Sign in" })).toHaveAttribute(
       "href",
       "/login",
+    );
+  });
+
+  it("opens an accessible mobile navigation menu", () => {
+    render(
+      <SiteHeaderView
+        auth={{ is_signed_in: false, is_staff: false, is_admin_or_owner: false, display_name: null }}
+      />,
+    );
+
+    const menuButton = screen.getByRole("button", { name: "Open menu" });
+    expect(menuButton).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(menuButton);
+
+    expect(menuButton).toHaveAttribute("aria-expanded", "true");
+    const mobileNavigation = screen.getByRole("navigation", { name: "Mobile navigation" });
+    expect(within(mobileNavigation).getByRole("link", { name: "Classes" })).toHaveAttribute(
+      "href",
+      "/classes",
     );
   });
 });

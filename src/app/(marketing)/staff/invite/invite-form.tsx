@@ -221,7 +221,7 @@ function AccessDeniedState() {
       </p>
       <div className="mt-6">
         <Link
-          className="text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
           href="/account"
         >
           Return to account
@@ -312,7 +312,7 @@ function SuccessBanner({
 
           <div className="mt-5">
             <button
-              className="text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+              className="inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
               onClick={on_create_another}
               type="button"
             >
@@ -628,7 +628,7 @@ export function InviteForm({ currentRole }: InviteFormProps) {
         {/* Actions */}
         <div className="mt-8 flex flex-col-reverse items-start gap-3 border-t border-stone-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
             href="/account"
           >
             Cancel

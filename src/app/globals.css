@@ -9,18 +9,23 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
+  --color-background: #F4F1E8;
+  --color-text: #2D3A1F;
+  --color-primary: #2D3A1F;
+  --color-accent: #B8A678;
+  --color-surface: #E8E2D0;
+  --color-border: #CDD2C9;
   --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
   --color-muted: var(--muted);
-  --color-border: var(--border);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-serif: var(--font-serif), Georgia, serif;
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: #F4F1E8;
+  color: #2D3A1F;
+  font-family: var(--font-sans);
 }
 
 a {

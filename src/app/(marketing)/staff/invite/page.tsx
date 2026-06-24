@@ -44,7 +44,7 @@ export default async function StaffInvitePage() {
         {/* Back navigation */}
         <div className="mb-6">
           <Link
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
             href="/account"
           >
             <svg
@@ -86,8 +86,8 @@ export default async function StaffInvitePage() {
             <InviteForm currentRole={current_role} />
           </div>
 
-          {/* Info side panel — desktop only */}
-          <aside className="hidden space-y-6 lg:block">
+          {/* Info side panel */}
+          <aside className="space-y-6">
             <div className="rounded-md border border-border bg-muted p-6">
               <h2 className="text-sm font-semibold text-stone-950">Who can invite whom</h2>
               <ul className="mt-4 space-y-3">

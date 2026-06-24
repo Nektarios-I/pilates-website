@@ -1,7 +1,5 @@
-import { PreviewCardGrid } from '@/components/sections/preview-card';
+import { PricingTierCard } from '@/components/sections/pricing-tier-card';
 import { ButtonLink } from '@/components/ui/button-link';
-import { Container } from '@/components/ui/container';
-import { Section } from '@/components/ui/section';
 import { site_content } from '@/config/site_content';
 import { createPageMetadata } from '@/lib/metadata';
 
@@ -11,15 +9,19 @@ export const metadata = createPageMetadata({
   path: '/pricing',
 });
 
-function plan_cards(
-  plans: ReadonlyArray<{ name: string; price: string; description: string }>,
-  eyebrow?: string,
-) {
-  return plans.map((plan) => ({
+type Plan = {
+  name: string;
+  price: string;
+  description: string;
+};
+
+function plan_cards(plans: readonly Plan[], meta?: string) {
+  return plans.map((plan, index) => ({
     title: plan.name,
+    price: plan.price,
     description: plan.description,
-    meta: plan.price,
-    eyebrow,
+    meta,
+    featured: plans.length > 1 && index === 1,
   }));
 }
 
@@ -30,7 +32,6 @@ export default function PricingPage() {
     {
       title: 'Reformer Pilates',
       description: 'Equipment-based classes with small-group capacity and precise spring resistance.',
-      accent: 'bg-stone-950 text-white',
       sections: [
         { title: 'Single class', items: plan_cards([reformer.single], 'Reformer drop-in') },
         { title: '1 month packages', items: plan_cards(reformer.one_month, 'Reformer · 30 days') },
@@ -40,7 +41,6 @@ export default function PricingPage() {
     {
       title: 'Mat Pilates',
       description: 'Floor-based classes for core strength, mobility, and breath-led control.',
-      accent: 'bg-amber-100 text-stone-950',
       sections: [
         { title: 'Single class', items: plan_cards([mat.single], 'Mat drop-in') },
         { title: '1 month packages', items: plan_cards(mat.one_month, 'Mat · 30 days') },
@@ -50,103 +50,90 @@ export default function PricingPage() {
   ];
 
   return (
-    <>
-      <Section aria-labelledby="pricing-page-heading" className="bg-background">
-        <Container>
-          <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-              {site_content.pricing_preview.section_label}
-            </p>
-            <h1
-              className="mt-4 text-4xl font-semibold tracking-normal text-stone-950 sm:text-5xl"
-              id="pricing-page-heading"
+    <div className="max-w-7xl mx-auto px-4 md:px-8 py-24">
+      <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+        {site_content.pricing_preview.section_label}
+      </p>
+      <h1
+        className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F] mb-4 mt-3"
+        id="pricing-page-heading"
+      >
+        {site_content.pricing_preview.heading}
+      </h1>
+      <p className="font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F] max-w-3xl">
+        {site_content.pricing_preview.intro_text}
+      </p>
+
+      <div className="flex flex-col gap-16 mt-16">
+        {pricing_groups.map((group) => (
+          <section key={group.title} aria-labelledby={`pricing-${group.title}`}>
+            <h2
+              className="font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F] mb-4"
+              id={`pricing-${group.title}`}
             >
-              {site_content.pricing_preview.heading}
-            </h1>
-            <p className="mt-5 text-lg leading-8 text-stone-700">
-              {site_content.pricing_preview.intro_text}
+              {group.title}
+            </h2>
+            <p className="font-sans text-[17px] leading-relaxed text-[#2D3A1F] max-w-2xl mb-8">
+              {group.description}
             </p>
-          </div>
-        </Container>
-      </Section>
 
-      {pricing_groups.map((group) => (
-        <Section
-          key={group.title}
-          aria-labelledby={`pricing-${group.title}`}
-          className="bg-muted even:bg-background"
-        >
-          <Container>
-            <div className="mb-8 rounded-lg border border-border bg-surface p-6">
-              <span className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold ${group.accent}`}>
-                {group.title}
-              </span>
-              <h2
-                className="mt-4 text-2xl font-semibold text-stone-950"
-                id={`pricing-${group.title}`}
-              >
-                {group.title} packages
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-                {group.description}
-              </p>
-            </div>
-
-            <div className="space-y-10">
+            <div className="flex flex-col gap-16">
               {group.sections.map((section) => (
                 <div key={`${group.title}-${section.title}`}>
-                  <h3 className="mb-4 text-lg font-semibold text-stone-950">{section.title}</h3>
-                  <PreviewCardGrid items={section.items} />
+                  <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F] mb-8">
+                    {section.title}
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                    {section.items.map((item) => (
+                      <PricingTierCard
+                        key={`${item.title}-${item.price}`}
+                        ctaHref={site_content.primary_cta.href}
+                        ctaLabel={site_content.primary_cta.label}
+                        description={item.description}
+                        featured={item.featured}
+                        meta={item.meta}
+                        price={item.price}
+                        title={item.title}
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
-          </Container>
-        </Section>
-      ))}
+          </section>
+        ))}
+      </div>
 
-      <Section aria-labelledby="pricing-details-heading" className="bg-background">
-        <Container>
-          <div className="max-w-3xl">
-            <h2
-              className="text-3xl font-semibold tracking-normal text-stone-950"
-              id="pricing-details-heading"
-            >
-              Policies
-            </h2>
-            <p className="mt-6 text-sm leading-6 text-stone-700">
-              {site_content.pricing_preview.policies_short}
-            </p>
-          </div>
-        </Container>
-      </Section>
+      <section aria-labelledby="pricing-details-heading" className="mt-16 max-w-3xl">
+        <h2
+          className="font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F] mb-8"
+          id="pricing-details-heading"
+        >
+          Policies
+        </h2>
+        <p className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+          {site_content.pricing_preview.policies_short}
+        </p>
+      </section>
 
-      <Section aria-labelledby="pricing-cta-heading" className="bg-stone-950 text-white">
-        <Container>
-          <div className="max-w-3xl text-center">
-            <h2
-              className="text-3xl font-semibold tracking-normal text-white sm:text-4xl"
-              id="pricing-cta-heading"
-            >
-              Ready to book?
-            </h2>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-              <ButtonLink
-                className="border-white bg-white text-stone-950 hover:bg-stone-100"
-                href={site_content.primary_cta.href}
-              >
-                {site_content.primary_cta.label}
-              </ButtonLink>
-              <ButtonLink
-                className="border-stone-600 bg-transparent text-white hover:border-white"
-                href="/contact"
-                variant="secondary"
-              >
-                Contact
-              </ButtonLink>
-            </div>
+      <section aria-labelledby="pricing-cta-heading" className="mt-16">
+        <div className="max-w-6xl mx-auto bg-[#E8E2D0] rounded-3xl py-24 px-8 md:px-16 flex flex-col items-center text-center">
+          <h2
+            className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F]"
+            id="pricing-cta-heading"
+          >
+            Ready to book?
+          </h2>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <ButtonLink href={site_content.primary_cta.href}>
+              {site_content.primary_cta.label}
+            </ButtonLink>
+            <ButtonLink href="/contact" variant="secondary">
+              Contact
+            </ButtonLink>
           </div>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </section>
+    </div>
   );
 }

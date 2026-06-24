@@ -49,6 +49,13 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
   intro:    'Intro',
 };
 
+const select_class =
+  'mt-2 block w-full rounded-xl bg-[#F4F1E8] p-4 font-sans text-[17px] text-[#2D3A1F] focus:outline-none focus:ring-2 focus:ring-[#B8A678] transition-all';
+const field_label_class =
+  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]';
+const text_link_class =
+  'inline-flex min-h-11 items-center font-sans font-medium text-[#2D3A1F] border-b border-[#B8A678] pb-0.5 transition-colors duration-200 hover:text-[#B8A678]';
+
 function format_date(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', {
     weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
@@ -91,29 +98,53 @@ function SessionCard({
   return (
     <article
       className={[
-        'rounded-md border p-5 transition-colors',
+        'rounded-2xl p-5 md:p-6 transition-colors duration-200',
         is_selected
-          ? 'border-stone-950 bg-stone-50'
-          : 'border-border bg-surface hover:border-stone-400',
+          ? 'bg-[#2D3A1F] text-[#F4F1E8]'
+          : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9]',
       ].join(' ')}
     >
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-700">
+            <span
+              className={[
+                'inline-flex items-center rounded-full px-2.5 py-0.5 font-sans text-xs font-medium',
+                is_selected ? 'bg-[#F4F1E8]/20 text-[#F4F1E8]' : 'bg-[#F4F1E8] text-[#2D3A1F]',
+              ].join(' ')}
+            >
               {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
             </span>
             {is_full && (
-              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-medium text-amber-700">
+              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 font-sans text-xs font-medium text-amber-700">
                 Waitlist
               </span>
             )}
           </div>
-          <h3 className="mt-2 text-base font-semibold text-stone-950">{session.title}</h3>
+          <h3
+            className={[
+              'mt-2 font-serif font-medium text-xl leading-normal',
+              is_selected ? 'text-[#F4F1E8]' : 'text-[#2D3A1F]',
+            ].join(' ')}
+          >
+            {session.title}
+          </h3>
           {session.description && (
-            <p className="mt-1 text-sm leading-5 text-stone-600">{session.description}</p>
+            <p
+              className={[
+                'mt-1 font-sans text-sm leading-5',
+                is_selected ? 'text-[#F4F1E8] opacity-80' : 'text-[#2D3A1F] opacity-80',
+              ].join(' ')}
+            >
+              {session.description}
+            </p>
           )}
-          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
+          <div
+            className={[
+              'mt-3 flex flex-wrap gap-x-4 gap-y-1 font-sans text-xs',
+              is_selected ? 'text-[#F4F1E8] opacity-70' : 'text-[#2D3A1F] opacity-70',
+            ].join(' ')}
+          >
             <span>{format_date(session.starts_at)}</span>
             <span>
               {format_time(session.starts_at)} – {format_time(session.ends_at)}
@@ -130,7 +161,7 @@ function SessionCard({
         </div>
 
         <Button
-          className="shrink-0"
+          className="w-full shrink-0 sm:w-auto"
           size="sm"
           variant={is_selected ? 'primary' : 'secondary'}
           onClick={on_select}
@@ -185,17 +216,19 @@ function ConfirmBooking({
   }
 
   return (
-    <div className="mt-4 rounded-md border border-stone-200 bg-stone-50 p-5">
-      <h3 className="text-sm font-semibold text-stone-950">Confirm booking</h3>
-      <p className="mt-1 text-sm text-stone-600">
-        <strong>{session.title}</strong> · {format_date(session.starts_at)} ·{' '}
+    <div className="mt-4 rounded-3xl bg-[#E8E2D0] p-8">
+      <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+        Confirm booking
+      </h3>
+      <p className="mt-2 font-sans text-[17px] leading-relaxed text-[#2D3A1F] opacity-80">
+        <strong className="font-medium">{session.title}</strong> · {format_date(session.starts_at)} ·{' '}
         {format_time(session.starts_at)} – {format_time(session.ends_at)}
       </p>
 
       {eligible_packages.length === 0 ? (
-        <div className="mt-4 rounded-md border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm font-medium text-amber-800">No eligible package</p>
-          <p className="mt-1 text-sm text-amber-700">
+        <div className="mt-4 rounded-2xl bg-amber-50 p-4">
+          <p className="font-sans text-sm font-medium text-amber-800">No eligible package</p>
+          <p className="mt-1 font-sans text-sm text-amber-700">
             This session requires {session.credits_required} credit
             {session.credits_required !== 1 ? 's' : ''}. None of your active packages have
             sufficient credits. Contact the studio to purchase a package.
@@ -203,11 +236,11 @@ function ConfirmBooking({
         </div>
       ) : (
         <div className="mt-4">
-          <label className="block text-sm font-medium text-stone-950" htmlFor="package-select">
+          <label className={field_label_class} htmlFor="package-select">
             Pay with package
           </label>
           <select
-            className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-sm text-stone-950 shadow-sm focus:border-stone-950 focus:outline-none focus:ring-1 focus:ring-stone-950"
+            className={select_class}
             disabled={is_submitting}
             id="package-select"
             value={selected_package}
@@ -232,9 +265,10 @@ function ConfirmBooking({
         </div>
       )}
 
-      <div className="mt-5 flex flex-wrap gap-3">
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
         {eligible_packages.length > 0 && (
           <Button
+            className="w-full sm:w-auto"
             disabled={is_submitting || !selected_package}
             size="md"
             type="button"
@@ -243,7 +277,14 @@ function ConfirmBooking({
             {is_submitting ? 'Booking…' : 'Confirm booking'}
           </Button>
         )}
-        <Button disabled={is_submitting} size="md" type="button" variant="secondary" onClick={on_cancel}>
+        <Button
+          className="w-full sm:w-auto"
+          disabled={is_submitting}
+          size="md"
+          type="button"
+          variant="secondary"
+          onClick={on_cancel}
+        >
           Cancel
         </Button>
       </div>
@@ -297,18 +338,11 @@ function BookingConfirmed({
               : `Your spot in ${session_title} is confirmed. Check your account for details.`}
           </p>
           <p className="mt-1 text-xs text-emerald-600">Booking ID: {booking_id}</p>
-          <div className="mt-4 flex flex-wrap gap-3">
-            <a
-              className="text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
-              href="/account"
-            >
+          <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
+            <a className={text_link_class} href="/account">
               View my bookings
             </a>
-            <button
-              className="text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
-              type="button"
-              onClick={on_book_another}
-            >
+            <button className={text_link_class} type="button" onClick={on_book_another}>
               Book another class
             </button>
           </div>
@@ -357,10 +391,7 @@ export function BookingPanel({ sessions, packages }: BookingPanelProps) {
           purchase one.
         </p>
         <div className="mt-4">
-          <a
-            className="text-sm font-medium text-amber-800 underline underline-offset-4 hover:text-amber-950"
-            href="/pricing"
-          >
+          <a className={text_link_class} href="/pricing">
             View pricing
           </a>
         </div>
@@ -371,9 +402,9 @@ export function BookingPanel({ sessions, packages }: BookingPanelProps) {
   // ── No upcoming sessions ────────────────────────────────────────────────
   if (sessions.length === 0) {
     return (
-      <div className="rounded-md border border-stone-200 bg-stone-50 p-8 text-center">
-        <p className="text-sm font-semibold text-stone-950">No sessions scheduled</p>
-        <p className="mt-2 text-sm text-stone-600">
+      <div className="rounded-2xl bg-[#E8E2D0] p-8 text-center">
+        <p className="font-serif font-medium text-xl text-[#2D3A1F]">No sessions scheduled</p>
+        <p className="mt-2 font-sans text-sm leading-normal text-[#2D3A1F] opacity-80">
           There are no upcoming sessions available right now. Check back soon or contact the studio.
         </p>
       </div>

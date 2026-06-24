@@ -205,7 +205,7 @@ export default async function AccountBookingsPage() {
       <Section className="bg-background">
         <Container>
           <Link
-            className="text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
             href="/account"
           >
             Back to account

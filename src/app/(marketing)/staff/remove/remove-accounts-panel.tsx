@@ -91,6 +91,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
             <div className="shrink-0">
               {!is_confirming ? (
                 <Button
+                  className="w-full sm:w-auto"
                   disabled={is_removing}
                   size="sm"
                   variant="secondary"
@@ -99,9 +100,10 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
                   Remove
                 </Button>
               ) : (
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                   <p className="text-xs text-stone-600">Remove {display_name}?</p>
                   <Button
+                    className="w-full sm:w-auto"
                     disabled={is_removing}
                     size="sm"
                     variant="secondary"
@@ -110,7 +112,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
                     {is_removing ? 'Removing…' : 'Confirm'}
                   </Button>
                   <button
-                    className="text-xs text-stone-500 hover:text-stone-800"
+                    className="inline-flex min-h-11 items-center justify-center text-xs text-stone-500 hover:text-stone-800"
                     disabled={is_removing}
                     type="button"
                     onClick={() => set_confirm(null)}

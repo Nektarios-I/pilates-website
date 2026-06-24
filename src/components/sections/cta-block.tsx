@@ -1,6 +1,4 @@
 import { ButtonLink } from "@/components/ui/button-link";
-import { Container } from "@/components/ui/container";
-import { Section } from "@/components/ui/section";
 
 type CtaBlockCta = {
   label: string;
@@ -23,40 +21,31 @@ export function CtaBlock({
   secondaryCta,
 }: CtaBlockProps) {
   return (
-    <Section aria-labelledby="home-final-cta-heading" className="bg-stone-950 text-white">
-      <Container>
-        <div className="max-w-3xl">
-          {eyebrow ? (
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-300">
-              {eyebrow}
-            </p>
-          ) : null}
-          <h2
-            className="mt-3 text-3xl font-semibold tracking-normal text-white sm:text-4xl"
-            id="home-final-cta-heading"
-          >
-            {title}
-          </h2>
-          <p className="mt-4 text-base leading-7 text-stone-200">{description}</p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink
-              className="border-white bg-white text-stone-950 hover:bg-stone-100"
-              href={primaryCta.href}
-            >
-              {primaryCta.label}
+    <section aria-labelledby="home-final-cta-heading" className="w-full px-4 md:px-8 my-24">
+      <div className="max-w-6xl mx-auto bg-[#E8E2D0] rounded-3xl py-24 px-8 md:px-16 flex flex-col items-center text-center">
+        {eyebrow ? (
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+            {eyebrow}
+          </p>
+        ) : null}
+        <h2
+          className="mt-3 font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F] mb-6"
+          id="home-final-cta-heading"
+        >
+          {title}
+        </h2>
+        <p className="font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F] mb-10 max-w-2xl">
+          {description}
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <ButtonLink href={primaryCta.href}>{primaryCta.label}</ButtonLink>
+          {secondaryCta ? (
+            <ButtonLink href={secondaryCta.href} variant="secondary">
+              {secondaryCta.label}
             </ButtonLink>
-            {secondaryCta ? (
-              <ButtonLink
-                className="border-stone-600 bg-transparent text-white hover:border-white"
-                href={secondaryCta.href}
-                variant="secondary"
-              >
-                {secondaryCta.label}
-              </ButtonLink>
-            ) : null}
-          </div>
+          ) : null}
         </div>
-      </Container>
-    </Section>
+      </div>
+    </section>
   );
 }

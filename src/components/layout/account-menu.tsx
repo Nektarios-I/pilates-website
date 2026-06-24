@@ -13,7 +13,7 @@ type AccountMenuProps = {
 };
 
 const link_class =
-  'block rounded-sm px-3 py-2 text-sm text-stone-700 transition-colors hover:bg-stone-100 hover:text-stone-950';
+  'flex min-h-11 items-center rounded-sm px-3 py-2 font-sans text-sm text-[#2D3A1F] transition-colors duration-200 hover:bg-[#E8E2D0] hover:text-[#2D3A1F]';
 const button_class = `${link_class} w-full text-left`;
 
 export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: AccountMenuProps) {
@@ -53,14 +53,14 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
         aria-controls={menu_id}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="inline-flex items-center gap-1 rounded-md px-2 py-1.5 text-sm font-medium text-stone-700 transition-colors hover:text-stone-950"
+        className="inline-flex min-h-11 items-center gap-1 rounded-md px-3 py-2 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678]"
         onClick={() => set_open((value) => !value)}
         type="button"
       >
         Account
         <svg
           aria-hidden="true"
-          className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -71,12 +71,12 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
 
       {open ? (
         <div
-          className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-md border border-stone-200 bg-white py-1 shadow-lg"
+          className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-2xl bg-[#F4F1E8] py-1"
           id={menu_id}
           role="menu"
         >
           {display_name ? (
-            <p className="border-b border-stone-100 px-3 py-2 text-xs text-stone-500">
+            <p className="border-b border-[#CDD2C9] px-3 py-2 font-sans text-xs text-[#2D3A1F] opacity-70">
               Signed in as {display_name}
             </p>
           ) : null}
