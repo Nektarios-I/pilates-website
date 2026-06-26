@@ -20,6 +20,7 @@ Run each file **once**, top to bottom:
 | 6 | `12_studio_schedule.sql` | Studio hours + booking slot helpers |
 | 7 | `09_cron.sql` | Daily `expire_packages()` job (enable **pg_cron** extension first) |
 | 8 | `10_add_admin.sql` | Your initial admin account (edit email inside first) |
+| 9 | `14_contact_messages.sql` | Public contact form storage + admin inbox RLS |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 

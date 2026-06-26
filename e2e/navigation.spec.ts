@@ -118,4 +118,6 @@ test("serves indexing endpoints", async ({ request }) => {
   const sitemapText = await sitemapResponse.text();
   expect(sitemapText).toContain("<loc>http://localhost:3000/classes</loc>");
   expect(sitemapText).toContain("<loc>http://localhost:3000/contact</loc>");
+  expect(sitemapText).toContain("<loc>http://localhost:3000/about</loc>");
+  expect(sitemapText).toContain("<loc>http://localhost:3000/book</loc>");
 });

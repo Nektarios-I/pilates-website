@@ -7,20 +7,16 @@ import { useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { ButtonLink } from '@/components/ui/button-link';
 import { Container } from '@/components/ui/container';
+import {
+  marketingInputClass,
+  marketingSuccessBadgeClass,
+  marketingWarningBadgeClass,
+} from '@/components/ui/marketing-field-styles';
 import { Section } from '@/components/ui/section';
 import { createClient } from '@/lib/supabase/client';
 import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
 
-function password_input_cls(has_error?: boolean): string {
-  return [
-    'block w-full rounded-md border px-4 py-3 text-base text-stone-950 placeholder-stone-400 shadow-sm',
-    'transition-colors focus:outline-none focus:ring-1',
-    has_error
-      ? 'border-red-300 bg-white focus:border-red-500 focus:ring-red-500'
-      : 'border-stone-300 bg-white focus:border-stone-950 focus:ring-stone-950',
-  ].join(' ');
-}
 
 interface Profile {
   id: string;
@@ -188,8 +184,8 @@ export function AccountContent({
             <div className="rounded-md border border-border bg-background p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-stone-950">Profile</h2>
-                  <p className="mt-1 text-sm text-stone-600">Your account information</p>
+                  <h2 className="text-xl font-semibold text-foreground">Profile</h2>
+                  <p className="mt-1 text-sm text-foreground/70">Your account information</p>
                 </div>
                 <Button className="w-full sm:w-auto" disabled onClick={() => {}} size="sm" variant="secondary">
                   Edit profile
@@ -198,26 +194,26 @@ export function AccountContent({
 
               <dl className="mt-6 space-y-4 text-sm">
                 <div>
-                  <dt className="font-medium text-stone-950">Name</dt>
-                  <dd className="mt-1 text-stone-700">
+                  <dt className="font-medium text-foreground">Name</dt>
+                  <dd className="mt-1 text-foreground/80">
                     {profile?.full_name || 'Not provided yet'}
                   </dd>
                 </div>
 
                 <div>
-                  <dt className="font-medium text-stone-950">Email</dt>
-                  <dd className="mt-1 text-stone-700">{user.email}</dd>
+                  <dt className="font-medium text-foreground">Email</dt>
+                  <dd className="mt-1 text-foreground/80">{user.email}</dd>
                 </div>
 
                 <div>
-                  <dt className="font-medium text-stone-950">Phone</dt>
-                  <dd className="mt-1 text-stone-700">{profile?.phone || 'Not provided yet'}</dd>
+                  <dt className="font-medium text-foreground">Phone</dt>
+                  <dd className="mt-1 text-foreground/80">{profile?.phone || 'Not provided yet'}</dd>
                 </div>
 
                 <div>
-                  <dt className="font-medium text-stone-950">Account status</dt>
+                  <dt className="font-medium text-foreground">Account status</dt>
                   <dd className="mt-1">
-                    <span className="inline-flex items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                    <span className={marketingSuccessBadgeClass}>
                       {profile?.status || 'active'}
                     </span>
                   </dd>
@@ -225,11 +221,11 @@ export function AccountContent({
 
                 {roles.length > 0 && (
                   <div>
-                    <dt className="font-medium text-stone-950">Roles</dt>
+                    <dt className="font-medium text-foreground">Roles</dt>
                     <dd className="mt-2 flex flex-wrap gap-2">
                       {roles.map((role) => (
                         <span
-                          className="inline-flex items-center rounded-full bg-stone-100 px-2 py-1 text-xs font-medium text-stone-700"
+                          className="inline-flex items-center rounded-full bg-muted px-2 py-1 text-xs font-medium text-foreground/80"
                           key={role.role}
                         >
                           {role.role}
@@ -246,8 +242,8 @@ export function AccountContent({
             <div className="rounded-md border border-border bg-background p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-stone-950">Active Packages</h2>
-                  <p className="mt-1 text-sm text-stone-600">
+                  <h2 className="text-xl font-semibold text-foreground">Active Packages</h2>
+                  <p className="mt-1 text-sm text-foreground/70">
                     Your current memberships and credits
                   </p>
                 </div>
@@ -264,25 +260,25 @@ export function AccountContent({
 
                     return (
                       <div
-                        className="rounded-md border border-stone-200 bg-stone-50 p-4"
+                        className="rounded-md border border-border bg-surface p-4"
                         key={pkg.id}
                       >
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-stone-950">{package_data.name}</h3>
-                            <p className="mt-1 text-sm text-stone-600">
+                            <h3 className="font-semibold text-foreground">{package_data.name}</h3>
+                            <p className="mt-1 text-sm text-foreground/70">
                               {package_data.package_type === 'unlimited'
                                 ? 'Unlimited classes'
                                 : `${pkg.credits_remaining ?? 0} ${package_data.class_type} credit${
                                     pkg.credits_remaining === 1 ? '' : 's'
                                   } remaining`}
                             </p>
-                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/60">
                               <span>Started {format_date(pkg.starts_at)}</span>
                               {pkg.expires_at && <span>Expires {format_date(pkg.expires_at)}</span>}
                             </div>
                           </div>
-                          <span className="inline-flex w-fit items-center rounded-full bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700">
+                          <span className={marketingSuccessBadgeClass}>
                             {pkg.status}
                           </span>
                         </div>
@@ -291,9 +287,9 @@ export function AccountContent({
                   })}
                 </div>
               ) : (
-                <div className="mt-6 rounded-md bg-stone-50 p-8 text-center">
-                  <p className="text-sm text-stone-600">No active packages</p>
-                  <p className="mt-2 text-xs text-stone-500">
+                <div className="mt-6 rounded-md bg-surface p-8 text-center">
+                  <p className="text-sm text-foreground/70">No active packages</p>
+                  <p className="mt-2 text-xs text-foreground/60">
                     Purchase a package to start booking classes
                   </p>
                 </div>
@@ -305,8 +301,8 @@ export function AccountContent({
             <div className="rounded-md border border-border bg-background p-6">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                  <h2 className="text-xl font-semibold text-stone-950">Upcoming Bookings</h2>
-                  <p className="mt-1 text-sm text-stone-600">Your scheduled classes</p>
+                  <h2 className="text-xl font-semibold text-foreground">Upcoming Bookings</h2>
+                  <p className="mt-1 text-sm text-foreground/70">Your scheduled classes</p>
                 </div>
                 <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
                   <ButtonLink className="w-full sm:w-auto" href="/book" variant="secondary">
@@ -326,16 +322,16 @@ export function AccountContent({
 
                     return (
                       <div
-                        className="rounded-md border border-stone-200 bg-stone-50 p-4"
+                        className="rounded-md border border-border bg-surface p-4"
                         key={booking.id}
                       >
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                           <div className="flex-1">
-                            <h3 className="font-semibold text-stone-950">{session.title}</h3>
-                            <p className="mt-1 text-sm text-stone-600">
+                            <h3 className="font-semibold text-foreground">{session.title}</h3>
+                            <p className="mt-1 text-sm text-foreground/70">
                               {format_session_type(session.session_type)}
                             </p>
-                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/60">
                               <span>{format_date(session.starts_at)}</span>
                               <span>
                                 {format_time(session.starts_at)} - {format_time(session.ends_at)}
@@ -343,7 +339,13 @@ export function AccountContent({
                               {session.location && <span>{session.location}</span>}
                             </div>
                           </div>
-                          <span className="inline-flex w-fit items-center rounded-full bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700">
+                          <span
+                            className={
+                              booking.status === 'waitlisted'
+                                ? marketingWarningBadgeClass
+                                : marketingSuccessBadgeClass
+                            }
+                          >
                             {booking.status}
                           </span>
                         </div>
@@ -359,7 +361,7 @@ export function AccountContent({
                               {cancelling_id === booking.id ? 'Cancelling…' : 'Cancel booking'}
                             </Button>
                             {cancel_errors[booking.id] && (
-                              <p className="mt-2 text-xs text-red-600">{cancel_errors[booking.id]}</p>
+                              <p className="mt-2 text-xs text-destructive">{cancel_errors[booking.id]}</p>
                             )}
                           </div>
                         )}
@@ -368,9 +370,9 @@ export function AccountContent({
                   })}
                 </div>
               ) : (
-                <div className="mt-6 rounded-md bg-stone-50 p-8 text-center">
-                  <p className="text-sm text-stone-600">No upcoming bookings</p>
-                  <p className="mt-2 text-xs text-stone-500">Book a class to get started</p>
+                <div className="mt-6 rounded-md bg-surface p-8 text-center">
+                  <p className="text-sm text-foreground/70">No upcoming bookings</p>
+                  <p className="mt-2 text-xs text-foreground/60">Book a class to get started</p>
                 </div>
               )}
 
@@ -378,15 +380,15 @@ export function AccountContent({
 
             {/* Change Password Section */}
             <div className="rounded-md border border-border bg-background p-6">
-              <h2 className="text-xl font-semibold text-stone-950">Change password</h2>
-              <p className="mt-1 text-sm text-stone-600">
+              <h2 className="text-xl font-semibold text-foreground">Change password</h2>
+              <p className="mt-1 text-sm text-foreground/70">
                 Update the password you use to sign in with email and password.
               </p>
 
               {password_success && (
                 <div
                   aria-live="polite"
-                  className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
+                  className="mt-4 rounded-md border border-success-border bg-success-surface p-4 text-sm text-success"
                   role="status"
                 >
                   Your password has been updated.
@@ -396,7 +398,7 @@ export function AccountContent({
               {password_error && (
                 <div
                   aria-live="polite"
-                  className="mt-4 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+                  className="mt-4 rounded-md border border-destructive-border bg-destructive-surface p-4 text-sm text-destructive"
                   role="alert"
                 >
                   {password_error}
@@ -405,13 +407,13 @@ export function AccountContent({
 
               <form className="mt-6 space-y-4" noValidate onSubmit={handle_change_password}>
                 <div>
-                  <label className="block text-sm font-medium text-stone-950" htmlFor="new-password">
+                  <label className="block text-sm font-medium text-foreground" htmlFor="new-password">
                     New password
                   </label>
                   <div className="relative mt-2">
                     <input
                       autoComplete="new-password"
-                      className={`pr-14 ${password_input_cls(!!password_error)}`}
+                      className={`pr-14 ${marketingInputClass(!!password_error)}`}
                       disabled={password_loading}
                       id="new-password"
                       minLength={8}
@@ -422,7 +424,7 @@ export function AccountContent({
                     />
                     <button
                       aria-label={show_new_password ? 'Hide password' : 'Show password'}
-                      className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-stone-500 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+                      className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-foreground/60 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                       type="button"
                       onClick={() => set_show_new_password((prev) => !prev)}
                     >
@@ -433,14 +435,14 @@ export function AccountContent({
 
                 <div>
                   <label
-                    className="block text-sm font-medium text-stone-950"
+                    className="block text-sm font-medium text-foreground"
                     htmlFor="confirm-password"
                   >
                     Confirm new password
                   </label>
                   <input
                     autoComplete="new-password"
-                    className={`mt-2 ${password_input_cls(!!password_error)}`}
+                    className={`mt-2 ${marketingInputClass(!!password_error)}`}
                     disabled={password_loading}
                     id="confirm-password"
                     minLength={8}
@@ -459,8 +461,8 @@ export function AccountContent({
 
             {/* Sign Out Section */}
             <div className="rounded-md border border-border bg-background p-6">
-              <h2 className="text-xl font-semibold text-stone-950">Account Actions</h2>
-              <p className="mt-1 text-sm text-stone-600">Manage your session</p>
+              <h2 className="text-xl font-semibold text-foreground">Account Actions</h2>
+              <p className="mt-1 text-sm text-foreground/70">Manage your session</p>
 
               <div className="mt-6">
                 <Button disabled={is_pending} variant="secondary" onClick={handle_sign_out}>

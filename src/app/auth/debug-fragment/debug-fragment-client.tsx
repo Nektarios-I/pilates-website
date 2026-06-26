@@ -32,11 +32,11 @@ export function DebugFragmentClient() {
   });
 
   if (!snapshot) {
-    return <p className="text-sm text-stone-600">Reading browser-visible URL payload...</p>;
+    return <p className="text-sm text-foreground/70">Reading browser-visible URL payload...</p>;
   }
 
   return (
-    <pre className="overflow-auto rounded-md border border-border bg-stone-950 p-4 text-left text-xs leading-5 text-stone-50">
+    <pre className="overflow-auto rounded-md border border-border bg-inverse p-4 text-left text-xs leading-5 text-primary-foreground">
       {JSON.stringify(snapshot, null, 2)}
     </pre>
   );

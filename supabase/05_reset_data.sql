@@ -31,6 +31,7 @@ truncate table
   public.staff_invites,
   public.studio_day_schedule,
   public.session_cards,
+  public.contact_messages,
   public.user_roles,
   public.profiles,
   public.packages

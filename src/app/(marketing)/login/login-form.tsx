@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { marketingInputClass } from '@/components/ui/marketing-field-styles';
 import {
   authDebugError,
   authDebugLog,
@@ -59,20 +60,6 @@ function resolve_initial_state(
   if (message === 'password_updated') return { success: HINT_MESSAGES.password_updated };
   if (message) return { success: message };
   return {};
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Shared style helpers
-// ─────────────────────────────────────────────────────────────────────────────
-
-function input_cls(has_error?: boolean): string {
-  return [
-    'block w-full rounded-md border px-4 py-3 text-base text-stone-950 placeholder-stone-400 shadow-sm',
-    'transition-colors focus:outline-none focus:ring-1',
-    has_error
-      ? 'border-red-300 bg-white focus:border-red-500 focus:ring-red-500'
-      : 'border-stone-300 bg-white focus:border-stone-950 focus:ring-stone-950',
-  ].join(' ');
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -390,7 +377,7 @@ export function LoginForm({
       {error && (
         <div
           aria-live="polite"
-          className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          className="mb-5 rounded-md border border-destructive-border bg-destructive-surface p-4 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -399,7 +386,7 @@ export function LoginForm({
       {success && (
         <div
           aria-live="polite"
-          className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800"
+          className="mb-5 rounded-md border border-success/30 bg-success-surface p-4 text-sm text-success"
           role="status"
         >
           {success}
@@ -416,15 +403,15 @@ export function LoginForm({
     return (
       <div>
         {status_block}
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-sm font-semibold text-emerald-800">Reset link sent</p>
-          <p className="mt-1 text-sm text-emerald-700">
+        <div className="rounded-md border border-success/30 bg-success-surface p-5">
+          <p className="text-sm font-semibold text-success">Reset link sent</p>
+          <p className="mt-1 text-sm text-success/90">
             If an account with that email exists, a password reset link has been sent. Check your
             inbox and spam folder.
           </p>
         </div>
         <button
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-foreground/80 underline underline-offset-4 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           type="button"
           onClick={() => {
             set_forgot_step('idle');
@@ -441,18 +428,18 @@ export function LoginForm({
     return (
       <div>
         {status_block}
-        <p className="mb-4 text-sm text-stone-700">
+        <p className="mb-4 text-sm text-foreground/80">
           Enter your email and we&apos;ll send a link to reset your password.
         </p>
         <form noValidate onSubmit={handle_forgot_submit}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="forgot-email">
+              <label className="block text-sm font-medium text-foreground" htmlFor="forgot-email">
                 Email address
               </label>
               <input
                 autoComplete="email"
-                className={`mt-2 ${input_cls()}`}
+                className={`mt-2 ${marketingInputClass()}`}
                 disabled={is_loading}
                 id="forgot-email"
                 placeholder="you@example.com"
@@ -467,7 +454,7 @@ export function LoginForm({
           </div>
         </form>
         <button
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-foreground/70 underline underline-offset-4 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           type="button"
           onClick={() => {
             set_forgot_step('idle');
@@ -488,18 +475,18 @@ export function LoginForm({
     return (
       <div>
         {status_block}
-        <p className="mb-4 text-sm text-stone-700">
+        <p className="mb-4 text-sm text-foreground/80">
           A 6-digit code was sent to <strong>{otp_email}</strong>. Enter it below.
         </p>
         <form noValidate onSubmit={handle_otp_verify}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="otp-code">
+              <label className="block text-sm font-medium text-foreground" htmlFor="otp-code">
                 Sign-in code
               </label>
               <input
                 autoComplete="one-time-code"
-                className={`mt-2 ${input_cls()}`}
+                className={`mt-2 ${marketingInputClass()}`}
                 disabled={is_loading}
                 id="otp-code"
                 inputMode="numeric"
@@ -517,7 +504,7 @@ export function LoginForm({
           </div>
         </form>
         <button
-          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+          className="mt-4 inline-flex min-h-11 items-center text-sm font-medium text-foreground/70 underline underline-offset-4 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           type="button"
           onClick={() => {
             set_otp_step('email');
@@ -544,12 +531,12 @@ export function LoginForm({
         <form noValidate onSubmit={handle_password_sign_in}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="identifier">
+              <label className="block text-sm font-medium text-foreground" htmlFor="identifier">
                 Email or name
               </label>
               <input
                 autoComplete="username"
-                className={`mt-2 ${input_cls()}`}
+                className={`mt-2 ${marketingInputClass()}`}
                 disabled={is_loading}
                 id="identifier"
                 name="identifier"
@@ -558,19 +545,19 @@ export function LoginForm({
                 value={identifier}
                 onChange={(e) => set_identifier(e.target.value)}
               />
-              <p className="mt-2 text-xs text-stone-500">
+              <p className="mt-2 text-xs text-foreground/60">
                 For name sign-in use ALL CAPS: NAME SURNAME (as on your account).
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="password">
+              <label className="block text-sm font-medium text-foreground" htmlFor="password">
                 Password
               </label>
               <div className="relative mt-2">
                 <input
                   autoComplete="current-password"
-                  className={`pr-14 ${input_cls()}`}
+                  className={`pr-14 ${marketingInputClass()}`}
                   disabled={is_loading}
                   id="password"
                   name="password"
@@ -581,7 +568,7 @@ export function LoginForm({
                 />
                 <button
                   aria-label={show_password ? 'Hide password' : 'Show password'}
-                  className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-stone-500 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+                  className="absolute right-0 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center text-foreground/60 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   type="button"
                   onClick={() => set_show_password((p) => !p)}
                 >
@@ -600,12 +587,12 @@ export function LoginForm({
         <form noValidate onSubmit={handle_otp_request}>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-stone-950" htmlFor="otp-email">
+              <label className="block text-sm font-medium text-foreground" htmlFor="otp-email">
                 Email address
               </label>
               <input
                 autoComplete="email"
-                className={`mt-2 ${input_cls()}`}
+                className={`mt-2 ${marketingInputClass()}`}
                 disabled={is_loading}
                 id="otp-email"
                 placeholder="you@example.com"
@@ -625,7 +612,7 @@ export function LoginForm({
       {mode === 'password' && (
         <div className="mt-3 text-right">
           <button
-            className="inline-flex min-h-11 items-center text-sm text-stone-600 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+            className="inline-flex min-h-11 items-center text-sm text-foreground/70 underline underline-offset-4 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             type="button"
             onClick={open_forgot_password}
           >
@@ -637,7 +624,7 @@ export function LoginForm({
       {/* Mode toggle */}
       <div className="mt-5">
         <button
-          className="inline-flex min-h-11 w-full items-center justify-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950"
+          className="inline-flex min-h-11 w-full items-center justify-center text-sm font-medium text-foreground/80 underline underline-offset-4 hover:text-foreground focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           type="button"
           onClick={() => {
             set_mode((m) => (m === 'password' ? 'otp' : 'password'));
@@ -652,17 +639,17 @@ export function LoginForm({
       {/* Divider */}
       <div className="relative my-6">
         <div aria-hidden="true" className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-stone-200" />
+          <div className="w-full border-t border-border" />
         </div>
         <div className="relative flex justify-center">
-          <span className="bg-white px-3 text-xs text-stone-500">or continue with</span>
+          <span className="bg-background px-3 text-xs text-foreground/60">or continue with</span>
         </div>
       </div>
 
       {/* Social sign-in */}
       <div className="flex flex-col gap-3">
         <button
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-stone-300 bg-white px-4 py-2.5 text-sm font-medium text-stone-950 transition-colors hover:border-stone-500 hover:bg-stone-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md border border-border bg-background px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:border-accent hover:bg-surface focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-60"
           disabled={is_loading}
           type="button"
           onClick={handle_google}
@@ -673,7 +660,7 @@ export function LoginForm({
       </div>
 
       {/* Privacy note */}
-      <p className="mt-6 text-xs leading-5 text-stone-500">
+      <p className="mt-6 text-xs leading-5 text-foreground/60">
         By signing in, you agree to our terms of service and privacy policy. After your first
         sign-in this site will remember you automatically until you sign out.
       </p>

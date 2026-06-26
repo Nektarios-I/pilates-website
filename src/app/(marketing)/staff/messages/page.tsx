@@ -1,0 +1,74 @@
+import Link from 'next/link';
+import { redirect } from 'next/navigation';
+
+import { Container } from '@/components/ui/container';
+import { createPageMetadata } from '@/lib/metadata';
+import { createClient } from '@/lib/supabase/server';
+
+import { list_contact_messages } from './actions';
+import { MessagesPanel } from './messages-panel';
+
+export const metadata = createPageMetadata({
+  title: 'Contact Messages',
+  description: 'View and manage inbound contact form submissions.',
+  path: '/staff/messages',
+});
+
+async function is_admin_or_owner(): Promise<boolean> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return false;
+
+  const { data: roles } = await supabase
+    .from('user_roles')
+    .select('role')
+    .eq('user_id', user.id);
+
+  return (roles ?? []).some((row) => row.role === 'owner' || row.role === 'admin');
+}
+
+export default async function ContactMessagesPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) redirect('/login');
+  if (!(await is_admin_or_owner())) redirect('/account');
+
+  const messages = await list_contact_messages();
+
+  return (
+    <Container>
+      <div className="py-8 sm:py-12">
+        <div className="mb-6">
+          <Link
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground"
+            href="/account"
+          >
+            Back to account
+          </Link>
+        </div>
+
+        <div className="mb-8 max-w-xl">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
+            Owner / Admin
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
+            Contact messages
+          </h1>
+          <p className="mt-3 text-base leading-7 text-foreground/70">
+            Messages submitted through the public contact form. Reach out by email or phone
+            manually, then delete when handled.
+          </p>
+        </div>
+
+        <div className="rounded-md border border-border bg-surface p-6 sm:p-8">
+          <MessagesPanel messages={messages} />
+        </div>
+      </div>
+    </Container>
+  );
+}

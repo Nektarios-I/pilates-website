@@ -98,37 +98,37 @@ function BookingCard({ booking }: { booking: BookingRow }) {
     <article className="rounded-lg border border-border bg-surface p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-medium uppercase tracking-[0.16em] text-stone-500">
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-foreground/60">
             {format_date(session.starts_at)}
           </p>
-          <h2 className="mt-2 text-xl font-semibold text-stone-950">{session.title}</h2>
-          <p className="mt-1 text-sm text-stone-600">
+          <h2 className="mt-2 text-xl font-semibold text-foreground">{session.title}</h2>
+          <p className="mt-1 text-sm text-foreground/70">
             {format_session_type(session.session_type)} · {format_time(session.starts_at)} -{' '}
             {format_time(session.ends_at)}
           </p>
         </div>
-        <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-700">
+        <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-foreground/80">
           {booking.status}
         </span>
       </div>
 
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-3">
         <div>
-          <dt className="text-stone-500">Credits</dt>
-          <dd className="mt-1 font-medium text-stone-950">{credit_summary(booking, session)}</dd>
+          <dt className="text-foreground/60">Credits</dt>
+          <dd className="mt-1 font-medium text-foreground">{credit_summary(booking, session)}</dd>
         </div>
         <div>
-          <dt className="text-stone-500">Booked</dt>
-          <dd className="mt-1 font-medium text-stone-950">{format_date(booking.booked_at)}</dd>
+          <dt className="text-foreground/60">Booked</dt>
+          <dd className="mt-1 font-medium text-foreground">{format_date(booking.booked_at)}</dd>
         </div>
         <div>
-          <dt className="text-stone-500">Location</dt>
-          <dd className="mt-1 font-medium text-stone-950">{session.location ?? 'Studio'}</dd>
+          <dt className="text-foreground/60">Location</dt>
+          <dd className="mt-1 font-medium text-foreground">{session.location ?? 'Studio'}</dd>
         </div>
       </dl>
 
       {booking.cancelled_at ? (
-        <p className="mt-4 rounded-md bg-stone-50 p-3 text-sm text-stone-600">
+        <p className="mt-4 rounded-md bg-surface p-3 text-sm text-foreground/70">
           Cancelled {format_date(booking.cancelled_at)}
           {booking.cancellation_reason ? ` · ${booking.cancellation_reason}` : ''}
         </p>
@@ -205,19 +205,19 @@ export default async function AccountBookingsPage() {
       <Section className="bg-background">
         <Container>
           <Link
-            className="inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-foreground/70 underline underline-offset-4 hover:text-foreground"
             href="/account"
           >
             Back to account
           </Link>
           <div className="mt-8 max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
+            <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
               Account
             </p>
-            <h1 className="mt-4 text-4xl font-semibold text-stone-950 sm:text-5xl">
+            <h1 className="mt-4 text-4xl font-semibold text-foreground sm:text-5xl">
               My bookings
             </h1>
-            <p className="mt-5 text-lg leading-8 text-stone-700">
+            <p className="mt-5 text-lg leading-8 text-foreground/80">
               A clear overview of your scheduled classes and booking history.
             </p>
           </div>
@@ -232,12 +232,12 @@ export default async function AccountBookingsPage() {
                 <div className="flex flex-wrap items-end justify-between gap-3">
                   <div>
                     <h2
-                      className="text-2xl font-semibold text-stone-950"
+                      className="text-2xl font-semibold text-foreground"
                       id="upcoming-bookings-heading"
                     >
                       Upcoming
                     </h2>
-                    <p className="mt-1 text-sm text-stone-600">
+                    <p className="mt-1 text-sm text-foreground/70">
                       Your next confirmed and waitlisted classes.
                     </p>
                   </div>
@@ -251,17 +251,17 @@ export default async function AccountBookingsPage() {
                     upcoming.map((booking) => <BookingCard booking={booking} key={booking.id} />)
                   ) : (
                     <div className="rounded-lg border border-border bg-surface p-8 text-center">
-                      <p className="text-sm text-stone-600">No upcoming bookings.</p>
+                      <p className="text-sm text-foreground/70">No upcoming bookings.</p>
                     </div>
                   )}
                 </div>
               </section>
 
               <section aria-labelledby="booking-history-heading">
-                <h2 className="text-2xl font-semibold text-stone-950" id="booking-history-heading">
+                <h2 className="text-2xl font-semibold text-foreground" id="booking-history-heading">
                   History
                 </h2>
-                <p className="mt-1 text-sm text-stone-600">
+                <p className="mt-1 text-sm text-foreground/70">
                   Past, cancelled, attended, and waitlisted records.
                 </p>
 
@@ -270,7 +270,7 @@ export default async function AccountBookingsPage() {
                     history.map((booking) => <BookingCard booking={booking} key={booking.id} />)
                   ) : (
                     <div className="rounded-lg border border-border bg-surface p-8 text-center">
-                      <p className="text-sm text-stone-600">No booking history yet.</p>
+                      <p className="text-sm text-foreground/70">No booking history yet.</p>
                     </div>
                   )}
                 </div>
@@ -278,15 +278,15 @@ export default async function AccountBookingsPage() {
             </div>
 
             <aside className="h-fit rounded-lg border border-border bg-surface p-5">
-              <h2 className="text-sm font-semibold text-stone-950">At a glance</h2>
+              <h2 className="text-sm font-semibold text-foreground">At a glance</h2>
               <dl className="mt-4 space-y-3 text-sm">
                 <div className="flex items-center justify-between gap-4">
-                  <dt className="text-stone-500">Upcoming</dt>
-                  <dd className="font-medium text-stone-950">{upcoming.length}</dd>
+                  <dt className="text-foreground/60">Upcoming</dt>
+                  <dd className="font-medium text-foreground">{upcoming.length}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-4">
-                  <dt className="text-stone-500">Total records</dt>
-                  <dd className="font-medium text-stone-950">{bookings.length}</dd>
+                  <dt className="text-foreground/60">Total records</dt>
+                  <dd className="font-medium text-foreground">{bookings.length}</dd>
                 </div>
               </dl>
             </aside>

@@ -22,6 +22,7 @@ alter table public.bookings            disable row level security;
 alter table public.booking_credit_charges disable row level security;
 alter table public.staff_invites       disable row level security;
 alter table public.studio_day_schedule disable row level security;
+alter table public.contact_messages    disable row level security;
 
 select tablename, rowsecurity as rls_enabled
 from pg_tables
@@ -29,6 +30,6 @@ where schemaname = 'public'
   and tablename in (
     'profiles', 'user_roles', 'packages', 'session_cards', 'user_packages', 'sessions', 'bookings',
     'booking_credit_charges',
-    'staff_invites', 'studio_day_schedule'
+    'staff_invites', 'studio_day_schedule', 'contact_messages'
   )
 order by tablename;

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { site_content } from "@/config/site_content";
 import { siteConfig } from "@/config/site";
 
 type PageMetadataInput = {
@@ -24,6 +25,14 @@ export const siteMetadata: Metadata = {
     siteName: siteConfig.name,
     type: "website",
     url: absoluteUrl("/"),
+    images: [
+      {
+        url: site_content.seo.og_image,
+        width: 1200,
+        height: 630,
+        alt: site_content.hero_content.image_alt,
+      },
+    ],
   },
 };
 

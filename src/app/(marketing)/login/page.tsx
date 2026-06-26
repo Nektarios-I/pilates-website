@@ -1,5 +1,10 @@
 import { redirect } from 'next/navigation';
 
+import {
+  marketingEyebrowClass,
+  marketingPageIntroClass,
+  marketingPageTitleClass,
+} from '@/components/ui/marketing-field-styles';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { authDebugEnabled } from '@/lib/auth/debug';
@@ -35,16 +40,11 @@ export default async function LoginPage({
         <Container>
           <div className="mx-auto max-w-md">
             <div className="text-center">
-              <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-                Account
-              </p>
-              <h1
-                className="mt-4 text-4xl font-semibold tracking-normal text-stone-950 sm:text-5xl"
-                id="login-page-heading"
-              >
+              <p className={marketingEyebrowClass}>Account</p>
+              <h1 className={marketingPageTitleClass} id="login-page-heading">
                 Sign in
               </h1>
-              <p className="mt-5 text-base leading-7 text-stone-700">
+              <p className={marketingPageIntroClass}>
                 Sign in with your email and password, a one-time code, or Google.
               </p>
             </div>
@@ -59,13 +59,13 @@ export default async function LoginPage({
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-stone-600">
+              <p className="text-sm text-foreground/70">
                 Don&apos;t have an account?{' '}
-                <span className="font-medium text-stone-950">
+                <span className="font-medium text-foreground">
                   Contact the studio to get started.
                 </span>
               </p>
-              <p className="mt-2 text-xs text-stone-500">
+              <p className="mt-2 text-xs text-foreground/60">
                 This studio uses invite-only accounts for member security.
               </p>
             </div>

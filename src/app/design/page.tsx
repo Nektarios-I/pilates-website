@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 
+import { ThemeTokenSwatches } from '@/components/design/theme-token-swatches';
+
 type Swatch = {
   token: string;
   value: string;
@@ -13,141 +15,21 @@ type SampleLabel = {
   value: string;
 };
 
-const neutralSwatches: Swatch[] = [
-  {
-    token: 'color-neutral-0',
-    value: '#ffffff',
-    note: 'Pure white; use sparingly',
-    className: 'bg-white text-stone-950',
-  },
-  {
-    token: 'color-neutral-50',
-    value: '#fffaf5',
-    note: 'Off-white base; page background',
-    className: 'bg-[#fffaf5] text-stone-950',
-  },
-  {
-    token: 'color-neutral-100',
-    value: '#fef9f3',
-    note: 'Warm off-white; card background',
-    className: 'bg-[#fef9f3] text-stone-950',
-  },
-  {
-    token: 'color-neutral-200',
-    value: '#f8f4f0',
-    note: 'Light surface; hover states',
-    className: 'bg-[#f8f4f0] text-stone-950',
-  },
-  {
-    token: 'color-neutral-300',
-    value: '#e8e2da',
-    note: 'Divider, border',
-    className: 'bg-[#e8e2da] text-stone-950',
-  },
-  {
-    token: 'color-neutral-400',
-    value: '#d4cfc6',
-    note: 'Disabled text, subtle accent',
-    className: 'bg-[#d4cfc6] text-stone-950',
-  },
-  {
-    token: 'color-neutral-500',
-    value: '#a89080',
-    note: 'Secondary text, muted elements',
-    className: 'bg-[#a89080] text-white',
-  },
-  {
-    token: 'color-neutral-600',
-    value: '#8b7d76',
-    note: 'Body text variant',
-    className: 'bg-[#8b7d76] text-white',
-  },
-  {
-    token: 'color-neutral-700',
-    value: '#6b6360',
-    note: 'Strong secondary text',
-    className: 'bg-[#6b6360] text-white',
-  },
-  {
-    token: 'color-neutral-800',
-    value: '#3d3a35',
-    note: 'Near-black; text on light backgrounds',
-    className: 'bg-[#3d3a35] text-white',
-  },
-  {
-    token: 'color-neutral-900',
-    value: '#2a2420',
-    note: 'True dark; headings, high-contrast text',
-    className: 'bg-[#2a2420] text-white',
-  },
-];
-
-const accentSwatches: Swatch[] = [
-  {
-    token: 'color-accent-50',
-    value: '#fef4ed',
-    note: 'Very light accent background',
-    className: 'bg-[#fef4ed] text-stone-950',
-  },
-  {
-    token: 'color-accent-100',
-    value: '#fadec8',
-    note: 'Light accent background',
-    className: 'bg-[#fadec8] text-stone-950',
-  },
-  {
-    token: 'color-accent-200',
-    value: '#f4c9a8',
-    note: 'Softest accent',
-    className: 'bg-[#f4c9a8] text-stone-950',
-  },
-  {
-    token: 'color-accent-300',
-    value: '#daa968',
-    note: 'Warm accent; hover state for secondary elements',
-    className: 'bg-[#daa968] text-stone-950',
-  },
-  {
-    token: 'color-accent-400',
-    value: '#c9a878',
-    note: 'Primary accent; secondary CTAs, badges',
-    className: 'bg-[#c9a878] text-stone-950',
-  },
-  {
-    token: 'color-accent-500',
-    value: '#b8945a',
-    note: 'Slightly darker accent',
-    className: 'bg-[#b8945a] text-white',
-  },
-  {
-    token: 'color-accent-600',
-    value: '#a39079',
-    note: 'Muted accent; icons and subtle emphasis',
-    className: 'bg-[#a39079] text-white',
-  },
-];
-
 const semanticSwatches: Array<{ name: string; items: Swatch[] }> = [
   {
     name: 'Success',
     items: [
       {
-        token: 'color-success-light',
-        value: '#e8f5e9',
+        token: 'success-surface',
+        value: 'globals.css',
         note: 'Success background',
-        className: 'bg-[#e8f5e9] text-stone-950',
+        className: 'bg-success-surface text-success',
       },
       {
-        token: 'color-success-main',
-        value: '#66bb6a',
-        note: 'Success indicator',
-        className: 'bg-[#66bb6a] text-white',
-      },
-      {
-        token: 'color-success-dark',
-        value: '#43a047',
+        token: 'success',
+        value: 'globals.css',
         note: 'Success text',
-        className: 'bg-[#43a047] text-white',
+        className: 'bg-success text-primary-foreground',
       },
     ],
   },
@@ -155,22 +37,16 @@ const semanticSwatches: Array<{ name: string; items: Swatch[] }> = [
     name: 'Warning',
     items: [
       {
-        token: 'color-warning-light',
-        value: '#fff3e0',
+        token: 'warning-surface',
+        value: 'globals.css',
         note: 'Warning background',
-        className: 'bg-[#fff3e0] text-stone-950',
+        className: 'bg-warning-surface text-warning-foreground border border-warning-border',
       },
       {
-        token: 'color-warning-main',
-        value: '#ffa726',
-        note: 'Warning indicator',
-        className: 'bg-[#ffa726] text-stone-950',
-      },
-      {
-        token: 'color-warning-dark',
-        value: '#f57c00',
-        note: 'Warning text',
-        className: 'bg-[#f57c00] text-white',
+        token: 'warning',
+        value: 'globals.css',
+        note: 'Warning emphasis',
+        className: 'bg-warning text-primary-foreground',
       },
     ],
   },
@@ -178,22 +54,16 @@ const semanticSwatches: Array<{ name: string; items: Swatch[] }> = [
     name: 'Error',
     items: [
       {
-        token: 'color-error-light',
-        value: '#ffebee',
+        token: 'destructive-surface',
+        value: 'globals.css',
         note: 'Error background',
-        className: 'bg-[#ffebee] text-stone-950',
+        className: 'bg-destructive-surface text-destructive border border-destructive-border',
       },
       {
-        token: 'color-error-main',
-        value: '#ef5350',
-        note: 'Error indicator',
-        className: 'bg-[#ef5350] text-white',
-      },
-      {
-        token: 'color-error-dark',
-        value: '#c62828',
-        note: 'Error text',
-        className: 'bg-[#c62828] text-white',
+        token: 'destructive',
+        value: 'globals.css',
+        note: 'Error emphasis',
+        className: 'bg-destructive text-destructive-foreground',
       },
     ],
   },
@@ -201,22 +71,16 @@ const semanticSwatches: Array<{ name: string; items: Swatch[] }> = [
     name: 'Info',
     items: [
       {
-        token: 'color-info-light',
-        value: '#e3f2fd',
+        token: 'info-surface',
+        value: 'globals.css',
         note: 'Info background',
-        className: 'bg-[#e3f2fd] text-stone-950',
+        className: 'bg-info-surface text-info',
       },
       {
-        token: 'color-info-main',
-        value: '#42a5f5',
-        note: 'Info indicator',
-        className: 'bg-[#42a5f5] text-white',
-      },
-      {
-        token: 'color-info-dark',
-        value: '#1565c0',
-        note: 'Info text',
-        className: 'bg-[#1565c0] text-white',
+        token: 'info',
+        value: 'globals.css',
+        note: 'Info emphasis',
+        className: 'bg-info text-primary-foreground',
       },
     ],
   },
@@ -241,27 +105,27 @@ const surfaceSamples = [
   {
     title: 'Surface default',
     note: 'Base card surface with a border and subtle structure.',
-    className: 'border-stone-300 bg-[#fef9f3]',
+    className: 'border-border bg-surface',
   },
   {
     title: 'Surface elevated',
     note: 'Slightly lifted surface for featured content.',
-    className: 'border-transparent bg-white shadow-sm',
+    className: 'border-transparent bg-background shadow-sm',
   },
   {
     title: 'Surface overlay',
     note: 'Overlay or modal-like treatment with stronger elevation.',
-    className: 'border-stone-300 bg-white shadow-lg',
+    className: 'border-border bg-background shadow-lg',
   },
   {
     title: 'Surface accent',
     note: 'Highlighted surface for tonal emphasis.',
-    className: 'border-[#f4c9a8] bg-[#fef4ed]',
+    className: 'border-accent bg-muted',
   },
   {
     title: 'Surface disabled',
     note: 'Muted surface for non-interactive states.',
-    className: 'border-stone-200 bg-stone-100 opacity-70',
+    className: 'border-border bg-muted opacity-70',
   },
 ] as const;
 
@@ -269,23 +133,23 @@ const buttonSamples = [
   {
     title: 'Primary',
     note: 'Filled CTA with strong contrast.',
-    className: 'border-stone-950 bg-stone-950 text-white',
+    className: 'border-0 bg-primary text-primary-foreground',
   },
   {
     title: 'Secondary',
     note: 'Outlined or softer CTA.',
-    className: 'border-stone-300 bg-white text-stone-950',
+    className: 'border border-border bg-transparent text-foreground',
   },
   {
     title: 'Ghost',
     note: 'Minimal emphasis for lower-priority actions.',
     className:
-      'border-transparent bg-transparent text-stone-950 underline-offset-4 hover:underline',
+      'border-transparent bg-transparent text-foreground border-b border-accent underline-offset-4 hover:underline',
   },
   {
     title: 'Disabled',
     note: 'Muted and non-interactive.',
-    className: 'border-stone-200 bg-stone-100 text-stone-400',
+    className: 'border-border bg-muted text-foreground/50',
   },
 ] as const;
 
@@ -293,26 +157,26 @@ const cardSamples = [
   {
     title: 'Default card',
     note: 'Standard content container with clear hierarchy.',
-    className: 'border-stone-300 bg-[#fef9f3]',
+    className: 'border-border bg-surface',
   },
   {
     title: 'Elevated card',
     note: 'Used when the surface needs extra emphasis.',
-    className: 'border-transparent bg-white shadow-md',
+    className: 'border-transparent bg-background shadow-md',
   },
   {
     title: 'Accent card',
     note: 'Tonal treatment for a highlighted block.',
-    className: 'border-[#f4c9a8] bg-[#fef4ed]',
+    className: 'border-accent bg-muted',
   },
 ] as const;
 
 const badgeSamples = [
-  { title: 'Default', className: 'bg-[#fef4ed] text-[#8b7d76]' },
-  { title: 'Success', className: 'bg-[#e8f5e9] text-[#43a047]' },
-  { title: 'Warning', className: 'bg-[#fff3e0] text-[#f57c00]' },
-  { title: 'Error', className: 'bg-[#ffebee] text-[#c62828]' },
-  { title: 'Info', className: 'bg-[#e3f2fd] text-[#1565c0]' },
+  { title: 'Default', className: 'bg-muted text-foreground/80' },
+  { title: 'Success', className: 'bg-success-surface text-success' },
+  { title: 'Warning', className: 'bg-warning-surface text-warning-foreground' },
+  { title: 'Error', className: 'bg-destructive-surface text-destructive' },
+  { title: 'Info', className: 'bg-info-surface text-info' },
 ] as const;
 
 const spacingScale = [
@@ -370,74 +234,52 @@ function SectionHeading({
 }) {
   return (
     <div className="max-w-3xl space-y-3">
-      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-stone-500">{eyebrow}</p>
-      <h2 className="text-2xl font-semibold tracking-tight text-stone-950 sm:text-3xl">{title}</h2>
-      <p className="text-sm leading-7 text-stone-600 sm:text-base">{description}</p>
-    </div>
-  );
-}
-
-function SwatchGrid({ items }: { items: Swatch[] }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-      {items.map((item) => (
-        <article
-          key={item.token}
-          className="overflow-hidden rounded-2xl border border-stone-200 bg-white"
-        >
-          <div className={`flex min-h-28 items-end justify-between p-4 ${item.className}`}>
-            <span className="text-xs font-semibold uppercase tracking-[0.2em]">{item.token}</span>
-            <span className="text-xs font-medium">{item.value}</span>
-          </div>
-          <div className="space-y-1 p-4">
-            <p className="text-sm font-semibold text-stone-950">{item.token}</p>
-            <p className="text-sm text-stone-600">{item.note}</p>
-          </div>
-        </article>
-      ))}
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-foreground/60">{eyebrow}</p>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">{title}</h2>
+      <p className="text-sm leading-7 text-foreground/70 sm:text-base">{description}</p>
     </div>
   );
 }
 
 export default function DesignShowcasePage() {
   return (
-    <main className="relative overflow-hidden bg-[radial-gradient(circle_at_top_left,_rgba(254,249,243,0.95),_rgba(255,255,255,1)_55%,_rgba(248,244,240,1))] text-stone-950">
+    <main className="relative overflow-hidden bg-background text-foreground">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 bg-[linear-gradient(to_bottom_right,rgba(201,168,120,0.08),transparent_35%,rgba(139,125,118,0.05)_75%,transparent)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-accent/10 via-transparent to-foreground/5"
       />
 
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-12 px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-        <section className="overflow-hidden rounded-[2rem] border border-stone-200 bg-white/85 shadow-sm backdrop-blur-sm">
+        <section className="overflow-hidden rounded-[2rem] border border-border bg-background/85 shadow-sm backdrop-blur-sm">
           <div className="grid gap-8 p-8 lg:grid-cols-[minmax(0,1.3fr)_minmax(280px,0.7fr)] lg:p-10">
             <div className="space-y-6">
-              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-stone-500">
-                <span className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1">
+              <div className="flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-foreground/60">
+                <span className="rounded-full border border-border bg-surface px-3 py-1">
                   Internal sandbox
                 </span>
-                <span className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1">
+                <span className="rounded-full border border-border bg-surface px-3 py-1">
                   Noindex
                 </span>
-                <span className="rounded-full border border-stone-200 bg-stone-50 px-3 py-1">
+                <span className="rounded-full border border-border bg-surface px-3 py-1">
                   Theme-ready
                 </span>
               </div>
               <div className="space-y-4">
-                <p className="text-sm font-medium uppercase tracking-[0.22em] text-stone-500">
+                <p className="text-sm font-medium uppercase tracking-[0.22em] text-foreground/60">
                   Design System Showcase
                 </p>
-                <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-stone-950 sm:text-5xl lg:text-6xl">
+                <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
                   Corehouse Pilates Studio token and component sandbox
                 </h1>
-                <p className="max-w-2xl text-base leading-8 text-stone-600 sm:text-lg">
+                <p className="max-w-2xl text-base leading-8 text-foreground/70 sm:text-lg">
                   This internal page validates the current token model, theme readiness, and core
                   component patterns before the design system is rolled into the rest of the site.
                 </p>
               </div>
             </div>
 
-            <aside className="grid gap-3 rounded-[1.5rem] border border-stone-200 bg-stone-50 p-5 text-sm text-stone-700">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+            <aside className="grid gap-3 rounded-[1.5rem] border border-border bg-surface p-5 text-sm text-foreground/80">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">
                 Review notes
               </p>
               <p>
@@ -460,22 +302,22 @@ export default function DesignShowcasePage() {
             description="Show each text style at its actual scale so spacing, weight, and hierarchy can be reviewed without context switching."
           />
 
-          <div className="grid gap-4 rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm lg:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 rounded-[1.5rem] border border-border bg-background p-6 shadow-sm lg:grid-cols-2 xl:grid-cols-3">
             {typographySamples.map((sample) => (
               <div
                 key={sample.label}
-                className="rounded-2xl border border-stone-200 bg-stone-50 p-4"
+                className="rounded-2xl border border-border bg-surface p-4"
               >
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">
                   {sample.label} · {sample.token}
                 </p>
                 <p
-                  className="mt-3 text-stone-950"
+                  className="mt-3 text-foreground"
                   style={{ fontSize: sample.value.split(' /')[0] }}
                 >
                   Sample text for {sample.label}
                 </p>
-                <p className="mt-2 text-xs text-stone-600">{sample.value}</p>
+                <p className="mt-2 text-xs text-foreground/70">{sample.value}</p>
               </div>
             ))}
           </div>
@@ -488,24 +330,24 @@ export default function DesignShowcasePage() {
             description="Display the current candidate palette, semantic aliases, and a clear note that theme structure is ready even if only light is rendered first."
           />
 
-          <div className="space-y-8 rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="space-y-8 rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-stone-950">Neutral foundation</h3>
-              <SwatchGrid items={neutralSwatches} />
+              <h3 className="text-lg font-semibold text-foreground">Active site tokens</h3>
+              <p className="text-sm text-foreground/70">
+                Values are read live from <code className="font-mono">src/app/globals.css</code>.
+                Edit the CSS variables there to preview palette changes across the marketing site.
+              </p>
+              <ThemeTokenSwatches />
             </div>
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-stone-950">Accent foundation</h3>
-              <SwatchGrid items={accentSwatches} />
-            </div>
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-stone-950">Semantic states</h3>
+              <h3 className="text-lg font-semibold text-foreground">Semantic states</h3>
               <div className="grid gap-4 lg:grid-cols-2">
                 {semanticSwatches.map((group) => (
                   <article
                     key={group.name}
-                    className="rounded-2xl border border-stone-200 bg-stone-50 p-4"
+                    className="rounded-2xl border border-border bg-surface p-4"
                   >
-                    <p className="text-sm font-semibold text-stone-950">{group.name}</p>
+                    <p className="text-sm font-semibold text-foreground">{group.name}</p>
                     <div className="mt-3 grid gap-2 sm:grid-cols-3">
                       {group.items.map((item) => (
                         <div key={item.token} className={`rounded-xl px-3 py-4 ${item.className}`}>
@@ -520,8 +362,8 @@ export default function DesignShowcasePage() {
                 ))}
               </div>
             </div>
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4 text-sm text-stone-700">
-              <p className="font-semibold text-stone-950">Theme readiness</p>
+            <div className="rounded-2xl border border-border bg-surface p-4 text-sm text-foreground/80">
+              <p className="font-semibold text-foreground">Theme readiness</p>
               <p className="mt-2">
                 Semantic token names stay stable across light and future dark mappings. This page
                 should help verify that structure rather than forcing a final visual mode decision.
@@ -543,8 +385,8 @@ export default function DesignShowcasePage() {
                 key={surface.title}
                 className={`rounded-[1.5rem] border p-5 shadow-sm ${surface.className}`}
               >
-                <p className="text-sm font-semibold text-stone-950">{surface.title}</p>
-                <p className="mt-2 text-sm leading-6 text-stone-600">{surface.note}</p>
+                <p className="text-sm font-semibold text-foreground">{surface.title}</p>
+                <p className="mt-2 text-sm leading-6 text-foreground/70">{surface.note}</p>
               </article>
             ))}
           </div>
@@ -557,26 +399,26 @@ export default function DesignShowcasePage() {
             description="Show the primary, secondary, and ghost action tokens in a form that makes hierarchy and contrast easy to compare."
           />
 
-          <div className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
             <div className="flex flex-wrap gap-3">
               {buttonSamples.map((button) => (
                 <button
                   key={button.title}
                   type="button"
-                  className={`rounded-md border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-950 ${button.className}`}
+                  className={`rounded-md border px-5 py-2.5 text-sm font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${button.className}`}
                   disabled={button.title === 'Disabled'}
                 >
                   {button.title}
                 </button>
               ))}
             </div>
-            <div className="mt-4 grid gap-3 text-sm text-stone-600 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-4 grid gap-3 text-sm text-foreground/70 sm:grid-cols-2 lg:grid-cols-4">
               {buttonSamples.map((button) => (
                 <div
                   key={`${button.title}-note`}
-                  className="rounded-2xl border border-stone-200 bg-stone-50 p-4"
+                  className="rounded-2xl border border-border bg-surface p-4"
                 >
-                  <p className="font-semibold text-stone-950">{button.title}</p>
+                  <p className="font-semibold text-foreground">{button.title}</p>
                   <p className="mt-1">{button.note}</p>
                 </div>
               ))}
@@ -591,36 +433,36 @@ export default function DesignShowcasePage() {
             description="Display a small, reusable input pattern and keep validation light until the form inventory is finalized."
           />
 
-          <div className="grid gap-4 rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm lg:grid-cols-2">
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
+          <div className="grid gap-4 rounded-[1.5rem] border border-border bg-background p-6 shadow-sm lg:grid-cols-2">
+            <div className="rounded-2xl border border-border bg-surface p-4">
               <label
-                className="block text-xs font-semibold uppercase tracking-[0.2em] text-stone-500"
+                className="block text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60"
                 htmlFor="design-email"
               >
                 Email address
               </label>
               <input
                 id="design-email"
-                className="mt-3 w-full rounded-md border border-stone-300 bg-white px-4 py-3 text-stone-950 shadow-sm outline-none transition focus:border-stone-950 focus:ring-2 focus:ring-stone-950/10"
+                className="mt-3 w-full rounded-md border border-border bg-background px-4 py-3 text-foreground shadow-sm outline-none transition focus:border-accent focus:ring-2 focus:ring-accent/10"
                 placeholder="hello@example.com"
                 type="email"
               />
-              <p className="mt-2 text-sm text-stone-600">
+              <p className="mt-2 text-sm text-foreground/70">
                 Helper text uses the caption scale and remains intentionally plain.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-4">
-              <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-stone-500">
+            <div className="rounded-2xl border border-border bg-surface p-4">
+              <label className="block text-xs font-semibold uppercase tracking-[0.2em] text-foreground/60">
                 Disabled example
               </label>
               <input
-                className="mt-3 w-full rounded-md border border-stone-200 bg-stone-100 px-4 py-3 text-stone-400"
+                className="mt-3 w-full rounded-md border border-border bg-muted px-4 py-3 text-foreground/50"
                 disabled
                 placeholder="Disabled state"
                 type="text"
               />
-              <p className="mt-2 text-sm text-stone-600">
+              <p className="mt-2 text-sm text-foreground/70">
                 Use the disabled state as a non-interactive reference only.
               </p>
             </div>
@@ -640,11 +482,11 @@ export default function DesignShowcasePage() {
                 key={card.title}
                 className={`rounded-[1.5rem] border p-5 shadow-sm ${card.className}`}
               >
-                <h3 className="text-lg font-semibold text-stone-950">{card.title}</h3>
-                <p className="mt-2 text-sm leading-6 text-stone-600">{card.note}</p>
+                <h3 className="text-lg font-semibold text-foreground">{card.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-foreground/70">{card.note}</p>
                 <button
                   type="button"
-                  className="mt-4 text-sm font-medium text-stone-950 underline decoration-stone-300 underline-offset-4"
+                  className="mt-4 text-sm font-medium text-foreground underline decoration-border underline-offset-4"
                 >
                   Sample link
                 </button>
@@ -660,7 +502,7 @@ export default function DesignShowcasePage() {
             description="Display the small pill styles used for status, labels, and optional semantic signaling."
           />
 
-          <div className="flex flex-wrap gap-3 rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
+          <div className="flex flex-wrap gap-3 rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
             {badgeSamples.map((badge) => (
               <span
                 key={badge.title}
@@ -680,48 +522,48 @@ export default function DesignShowcasePage() {
           />
 
           <div className="grid gap-4 lg:grid-cols-3">
-            <article className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-stone-950">Spacing scale</h3>
+            <article className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground">Spacing scale</h3>
               <div className="mt-4 space-y-3">
                 {spacingScale.map(([token, value]) => (
                   <div
                     key={token}
-                    className="flex items-center justify-between rounded-xl bg-stone-50 px-4 py-3 text-sm"
+                    className="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-sm"
                   >
-                    <span className="font-medium text-stone-950">spacing-{token}</span>
-                    <span className="text-stone-600">{value}</span>
+                    <span className="font-medium text-foreground">spacing-{token}</span>
+                    <span className="text-foreground/70">{value}</span>
                   </div>
                 ))}
               </div>
             </article>
 
-            <article className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-stone-950">Radius scale</h3>
+            <article className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground">Radius scale</h3>
               <div className="mt-4 space-y-3">
                 {radiusScale.map(([token, value]) => (
                   <div
                     key={token}
-                    className="flex items-center gap-3 rounded-xl bg-stone-50 px-4 py-3 text-sm"
+                    className="flex items-center gap-3 rounded-xl bg-surface px-4 py-3 text-sm"
                   >
                     <span
-                      className={`h-8 w-12 border border-stone-300 bg-white ${token === 'full' ? 'rounded-full' : token === '2xl' ? 'rounded-[24px]' : token === 'xl' ? 'rounded-2xl' : token === 'lg' ? 'rounded-lg' : token === 'md' ? 'rounded-md' : token === 'sm' ? 'rounded-sm' : 'rounded-none'}`}
+                      className={`h-8 w-12 border border-border bg-background ${token === 'full' ? 'rounded-full' : token === '2xl' ? 'rounded-[24px]' : token === 'xl' ? 'rounded-2xl' : token === 'lg' ? 'rounded-lg' : token === 'md' ? 'rounded-md' : token === 'sm' ? 'rounded-sm' : 'rounded-none'}`}
                     />
                     <div>
-                      <p className="font-medium text-stone-950">radius-{token}</p>
-                      <p className="text-stone-600">{value}</p>
+                      <p className="font-medium text-foreground">radius-{token}</p>
+                      <p className="text-foreground/70">{value}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </article>
 
-            <article className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-stone-950">Motion scale</h3>
+            <article className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground">Motion scale</h3>
               <div className="mt-4 space-y-3">
                 {motionScale.map(([token, value]) => (
-                  <div key={token} className="rounded-xl bg-stone-50 px-4 py-3 text-sm">
-                    <p className="font-medium text-stone-950">transition-{token}</p>
-                    <p className="text-stone-600">{value}</p>
+                  <div key={token} className="rounded-xl bg-surface px-4 py-3 text-sm">
+                    <p className="font-medium text-foreground">transition-{token}</p>
+                    <p className="text-foreground/70">{value}</p>
                   </div>
                 ))}
               </div>
@@ -737,9 +579,9 @@ export default function DesignShowcasePage() {
           />
 
           <div className="grid gap-4 lg:grid-cols-2">
-            <article className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-stone-950">Accessibility spot-checks</h3>
-              <ul className="mt-4 space-y-2 text-sm leading-6 text-stone-600">
+            <article className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground">Accessibility spot-checks</h3>
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/70">
                 <li>• Heading hierarchy is visible and sequential.</li>
                 <li>• Focus states are visible on interactive elements.</li>
                 <li>• Body text remains legible on the light foundation.</li>
@@ -747,9 +589,9 @@ export default function DesignShowcasePage() {
               </ul>
             </article>
 
-            <article className="rounded-[1.5rem] border border-stone-200 bg-white p-6 shadow-sm">
-              <h3 className="text-lg font-semibold text-stone-950">Theme readiness notes</h3>
-              <ul className="mt-4 space-y-2 text-sm leading-6 text-stone-600">
+            <article className="rounded-[1.5rem] border border-border bg-background p-6 shadow-sm">
+              <h3 className="text-lg font-semibold text-foreground">Theme readiness notes</h3>
+              <ul className="mt-4 space-y-2 text-sm leading-6 text-foreground/70">
                 <li>• Light theme is shown first, but semantic names stay theme-neutral.</li>
                 <li>• Dark theme mapping can be added later without renaming the core system.</li>
                 <li>

@@ -32,7 +32,7 @@ export default async function ManageMembershipPage() {
       <div className="py-8 sm:py-12">
         <div className="mb-6">
           <Link
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground"
             href="/account"
           >
             <svg
@@ -54,13 +54,13 @@ export default async function ManageMembershipPage() {
         </div>
 
         <div className="mb-8 max-w-xl">
-          <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
             Staff portal
           </p>
-          <h1 className="mt-2 text-3xl font-semibold text-stone-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
             Manage membership
           </h1>
-          <p className="mt-3 text-base leading-7 text-stone-600">
+          <p className="mt-3 text-base leading-7 text-foreground/70">
             Apply a package to a client account, deactivate a membership, or adjust remaining
             credits.
           </p>

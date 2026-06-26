@@ -1,3 +1,5 @@
+import { site_images } from '@/config/site_images';
+
 export const site_content = {
   studio_info: {
     studio_name: 'corehouse Pilates Studio',
@@ -41,8 +43,8 @@ export const site_content = {
     primary_cta_href: '/book',
     secondary_cta_label: 'View Classes',
     secondary_cta_href: '/classes',
-    image_src: '/images/placeholders/hero-placeholder.jpg',
-    image_alt: 'Pilates reformer class at corehouse studio',
+    image_src: site_images.home.hero.src,
+    image_alt: site_images.home.hero.alt,
   },
 
   studio_overview: {
@@ -69,6 +71,8 @@ export const site_content = {
         duration: '55 min',
         level: 'All levels',
         capacity: 'Small group',
+        image_src: site_images.classes.reformer.src,
+        image_alt: site_images.classes.reformer.alt,
       },
       {
         name: 'Mat',
@@ -76,6 +80,8 @@ export const site_content = {
         duration: '50 min',
         level: 'All levels',
         capacity: 'Small group',
+        image_src: site_images.classes.mat.src,
+        image_alt: site_images.classes.mat.alt,
       },
     ],
   },
@@ -180,25 +186,10 @@ export const site_content = {
   instructors_preview: {
     section_label: 'Instructors',
     heading: 'The team',
-    intro_text: 'Experienced teachers on a fixed weekly schedule.',
+    intro_text: 'Attentive, experienced teachers in a calm studio setting.',
     cta_label: 'View Instructors',
     cta_href: '/instructors',
-    items: [
-      {
-        name: 'Panayiota',
-        role: 'Instructor',
-        bio: 'Monday and Tuesday mornings (6:00–12:00).',
-        image_src: '/images/placeholders/instructor-1.jpg',
-        image_alt: 'Panayiota, Pilates instructor at corehouse',
-      },
-      {
-        name: 'Irene',
-        role: 'Instructor',
-        bio: 'Monday to Wednesday afternoons (15:00–20:00).',
-        image_src: '/images/placeholders/instructor-2.jpg',
-        image_alt: 'Irene, Pilates instructor at corehouse',
-      },
-    ],
+    items: [{ name: 'Panayiota' }, { name: 'Irene' }],
   },
 
   contact_preview: {
@@ -283,7 +274,7 @@ export const site_content = {
     site_title: 'corehouse Pilates Studio',
     site_description:
       'Reformer and mat Pilates in Cyprus. View classes, pricing, instructors, and studio hours.',
-    og_image: '/images/placeholders/hero-placeholder.jpg',
+    og_image: site_images.seo.og_image,
     canonical_url: '',
   },
 } as const;

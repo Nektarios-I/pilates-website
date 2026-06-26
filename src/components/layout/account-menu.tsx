@@ -13,7 +13,7 @@ type AccountMenuProps = {
 };
 
 const link_class =
-  'flex min-h-11 items-center rounded-sm px-3 py-2 font-sans text-sm text-[#2D3A1F] transition-colors duration-200 hover:bg-[#E8E2D0] hover:text-[#2D3A1F]';
+  'flex min-h-11 items-center rounded-sm px-3 py-2 font-sans text-sm text-foreground transition-colors duration-200 hover:bg-surface hover:text-foreground';
 const button_class = `${link_class} w-full text-left`;
 
 export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: AccountMenuProps) {
@@ -53,7 +53,7 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
         aria-controls={menu_id}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="inline-flex min-h-11 items-center gap-1 rounded-md px-3 py-2 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678]"
+        className="inline-flex min-h-11 items-center gap-1 rounded-md px-3 py-2 font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
         onClick={() => set_open((value) => !value)}
         type="button"
       >
@@ -71,12 +71,12 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
 
       {open ? (
         <div
-          className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-2xl bg-[#F4F1E8] py-1"
+          className="absolute right-0 z-50 mt-2 min-w-[11rem] rounded-2xl bg-background py-1"
           id={menu_id}
           role="menu"
         >
           {display_name ? (
-            <p className="border-b border-[#CDD2C9] px-3 py-2 font-sans text-xs text-[#2D3A1F] opacity-70">
+            <p className="border-b border-border px-3 py-2 font-sans text-xs text-foreground opacity-70">
               Signed in as {display_name}
             </p>
           ) : null}
@@ -87,6 +87,14 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
 
           {is_admin_or_owner ? (
             <>
+              <Link
+                className={link_class}
+                href="/staff/messages"
+                onClick={close_menu}
+                role="menuitem"
+              >
+                Contact messages
+              </Link>
               <Link
                 className={link_class}
                 href="/staff/schedule"

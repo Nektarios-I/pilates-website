@@ -4,23 +4,21 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { AccountMenu } from '@/components/layout/account-menu';
+import { useHeaderAuth } from '@/components/layout/use-header-auth';
 import { SiteNavigation } from '@/components/layout/site-navigation';
 import { StudioLogo } from '@/components/layout/studio-logo';
 import { ButtonLink } from '@/components/ui/button-link';
 import { site_content } from '@/config/site_content';
+import type { HeaderAuth } from '@/lib/auth/header-auth';
 
-export type HeaderAuth = {
-  is_signed_in: boolean;
-  is_staff: boolean;
-  is_admin_or_owner: boolean;
-  display_name: string | null;
-};
+export type { HeaderAuth };
 
 type SiteHeaderViewProps = {
   auth: HeaderAuth;
 };
 
-export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
+export function SiteHeaderView({ auth: server_auth }: SiteHeaderViewProps) {
+  const auth = useHeaderAuth(server_auth);
   const { is_signed_in, is_staff, is_admin_or_owner, display_name } = auth;
   const [mobile_menu_open, set_mobile_menu_open] = useState(false);
   const menu_button_ref = useRef<HTMLButtonElement>(null);
@@ -53,7 +51,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
     />
   ) : (
     <Link
-      className="inline-flex min-h-11 items-center font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678]"
+      className="inline-flex min-h-11 items-center font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       href="/login"
     >
       Sign in
@@ -61,7 +59,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-[#F4F1E8] flex items-center justify-between px-4 md:px-8 py-6 transition-colors relative">
+    <header className="sticky top-0 z-50 w-full bg-background flex items-center justify-between px-4 md:px-8 py-5 transition-colors relative">
       <StudioLogo className="shrink-0" />
 
       <SiteNavigation label="Primary navigation" />
@@ -77,7 +75,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
           ref={menu_button_ref}
           aria-controls="mobile-site-menu"
           aria-expanded={mobile_menu_open}
-          className="inline-flex min-h-11 min-w-11 items-center justify-center text-[#2D3A1F] bg-transparent border-0 hover:opacity-80 transition-opacity duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678] md:hidden"
+          className="inline-flex min-h-11 min-w-11 items-center justify-center text-foreground bg-transparent border-0 hover:opacity-80 transition-opacity duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
           type="button"
           onClick={() => set_mobile_menu_open((open) => !open)}
         >
@@ -103,7 +101,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
 
       {mobile_menu_open ? (
         <div
-          className="absolute left-0 right-0 top-full w-full bg-[#F4F1E8] flex flex-col gap-6 px-4 py-8 border-t border-[#CDD2C9] md:hidden"
+          className="absolute left-0 right-0 top-full w-full bg-background flex flex-col gap-6 px-4 py-8 border-t border-border md:hidden"
           id="mobile-site-menu"
         >
           <nav aria-label="Mobile navigation">
@@ -112,7 +110,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
                 <li key={item.href}>
                   <Link
                     ref={index === 0 ? first_mobile_link_ref : undefined}
-                    className="flex min-h-11 items-center font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678]"
+                    className="flex min-h-11 items-center font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     href={item.href}
                     onClick={close_mobile_menu}
                   >

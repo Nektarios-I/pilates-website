@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ROLE_BADGE_CLASS } from '@/components/ui/marketing-field-styles';
 import { remove_user, type RemovableUser } from './actions';
 
 const ROLE_LABELS: Record<string, string> = {
@@ -11,13 +12,6 @@ const ROLE_LABELS: Record<string, string> = {
   owner: 'Owner',
   instructor: 'Instructor',
   client: 'Client',
-};
-
-const ROLE_BADGE: Record<string, string> = {
-  admin: 'bg-red-50 text-red-700 ring-1 ring-red-200',
-  owner: 'bg-amber-50 text-amber-700 ring-1 ring-amber-200',
-  instructor: 'bg-blue-50 text-blue-700 ring-1 ring-blue-200',
-  client: 'bg-stone-100 text-stone-600 ring-1 ring-stone-200',
 };
 
 type ConfirmState = {
@@ -53,7 +47,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
 
   if (visible.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-stone-500">
+      <p className="py-8 text-center text-sm text-foreground/60">
         No accounts available to remove with your current role.
       </p>
     );
@@ -65,7 +59,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
         const is_confirming = confirm?.user_id === user.id;
         const is_removing = removing_id === user.id;
         const display_name = user.full_name ?? user.email;
-        const badge = ROLE_BADGE[user.role] ?? ROLE_BADGE.client;
+        const badge = ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.client;
         const role_label = ROLE_LABELS[user.role] ?? user.role;
 
         return (
@@ -75,16 +69,16 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
           >
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-medium text-stone-950">{display_name}</span>
+                <span className="text-sm font-medium text-foreground">{display_name}</span>
                 <span
                   className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${badge}`}
                 >
                   {role_label}
                 </span>
               </div>
-              <p className="mt-0.5 truncate text-xs text-stone-500">{user.email}</p>
+              <p className="mt-0.5 truncate text-xs text-foreground/60">{user.email}</p>
               {errors[user.id] && (
-                <p className="mt-2 text-xs text-red-600">{errors[user.id]}</p>
+                <p className="mt-2 text-xs text-destructive">{errors[user.id]}</p>
               )}
             </div>
 
@@ -101,7 +95,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
                 </Button>
               ) : (
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                  <p className="text-xs text-stone-600">Remove {display_name}?</p>
+                  <p className="text-xs text-foreground/70">Remove {display_name}?</p>
                   <Button
                     className="w-full sm:w-auto"
                     disabled={is_removing}
@@ -112,7 +106,7 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
                     {is_removing ? 'Removing…' : 'Confirm'}
                   </Button>
                   <button
-                    className="inline-flex min-h-11 items-center justify-center text-xs text-stone-500 hover:text-stone-800"
+                    className="inline-flex min-h-11 items-center justify-center text-xs text-foreground/60 hover:text-foreground/90"
                     disabled={is_removing}
                     type="button"
                     onClick={() => set_confirm(null)}

@@ -6,6 +6,18 @@ import { primaryNavigation } from "@/config/navigation";
 import { SiteHeaderView } from "./site-header-view";
 import { PageShell } from "./page-shell";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => "/",
+}));
+
+vi.mock("@/components/layout/use-header-auth", () => ({
+  useHeaderAuth: (auth: unknown) => auth,
+}));
+
 vi.mock("./site-header", () => ({
   SiteHeader: () => (
     <SiteHeaderView

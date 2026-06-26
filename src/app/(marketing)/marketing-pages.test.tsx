@@ -21,7 +21,7 @@ const marketingPages = [
   {
     name: "about",
     Page: AboutPage,
-    heading: "Studio story placeholder",
+    heading: "A calm place to practice",
     metadata: aboutMetadata,
     expectedTitle: "About",
   },

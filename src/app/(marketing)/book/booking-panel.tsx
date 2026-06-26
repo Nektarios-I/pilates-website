@@ -50,11 +50,11 @@ const SESSION_TYPE_LABELS: Record<string, string> = {
 };
 
 const select_class =
-  'mt-2 block w-full rounded-xl bg-[#F4F1E8] p-4 font-sans text-[17px] text-[#2D3A1F] focus:outline-none focus:ring-2 focus:ring-[#B8A678] transition-all';
+  'mt-2 block w-full rounded-xl bg-background p-4 font-sans text-[17px] text-foreground focus:outline-none focus:ring-2 focus:ring-accent transition-all';
 const field_label_class =
-  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]';
+  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground';
 const text_link_class =
-  'inline-flex min-h-11 items-center font-sans font-medium text-[#2D3A1F] border-b border-[#B8A678] pb-0.5 transition-colors duration-200 hover:text-[#B8A678]';
+  'inline-flex min-h-11 items-center font-sans font-medium text-foreground border-b border-accent pb-0.5 transition-colors duration-200 hover:text-accent';
 
 function format_date(iso: string) {
   return new Date(iso).toLocaleDateString('en-GB', {
@@ -100,8 +100,8 @@ function SessionCard({
       className={[
         'rounded-2xl p-5 md:p-6 transition-colors duration-200',
         is_selected
-          ? 'bg-[#2D3A1F] text-[#F4F1E8]'
-          : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9]',
+          ? 'bg-inverse text-primary-foreground'
+          : 'bg-surface text-foreground hover:bg-surface-2',
       ].join(' ')}
     >
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -110,13 +110,13 @@ function SessionCard({
             <span
               className={[
                 'inline-flex items-center rounded-full px-2.5 py-0.5 font-sans text-xs font-medium',
-                is_selected ? 'bg-[#F4F1E8]/20 text-[#F4F1E8]' : 'bg-[#F4F1E8] text-[#2D3A1F]',
+                is_selected ? 'bg-background/20 text-primary-foreground' : 'bg-background text-foreground',
               ].join(' ')}
             >
               {SESSION_TYPE_LABELS[session.session_type] ?? session.session_type}
             </span>
             {is_full && (
-              <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 font-sans text-xs font-medium text-amber-700">
+              <span className="inline-flex items-center rounded-full bg-warning-surface px-2.5 py-0.5 font-sans text-xs font-medium text-warning-foreground">
                 Waitlist
               </span>
             )}
@@ -124,7 +124,7 @@ function SessionCard({
           <h3
             className={[
               'mt-2 font-serif font-medium text-xl leading-normal',
-              is_selected ? 'text-[#F4F1E8]' : 'text-[#2D3A1F]',
+              is_selected ? 'text-primary-foreground' : 'text-foreground',
             ].join(' ')}
           >
             {session.title}
@@ -133,7 +133,7 @@ function SessionCard({
             <p
               className={[
                 'mt-1 font-sans text-sm leading-5',
-                is_selected ? 'text-[#F4F1E8] opacity-80' : 'text-[#2D3A1F] opacity-80',
+                is_selected ? 'text-primary-foreground opacity-80' : 'text-foreground opacity-80',
               ].join(' ')}
             >
               {session.description}
@@ -142,7 +142,7 @@ function SessionCard({
           <div
             className={[
               'mt-3 flex flex-wrap gap-x-4 gap-y-1 font-sans text-xs',
-              is_selected ? 'text-[#F4F1E8] opacity-70' : 'text-[#2D3A1F] opacity-70',
+              is_selected ? 'text-primary-foreground opacity-70' : 'text-foreground opacity-70',
             ].join(' ')}
           >
             <span>{format_date(session.starts_at)}</span>
@@ -216,19 +216,19 @@ function ConfirmBooking({
   }
 
   return (
-    <div className="mt-4 rounded-3xl bg-[#E8E2D0] p-8">
-      <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+    <div className="mt-4 rounded-3xl bg-surface p-8">
+      <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground">
         Confirm booking
       </h3>
-      <p className="mt-2 font-sans text-[17px] leading-relaxed text-[#2D3A1F] opacity-80">
+      <p className="mt-2 font-sans text-[17px] leading-relaxed text-foreground opacity-80">
         <strong className="font-medium">{session.title}</strong> · {format_date(session.starts_at)} ·{' '}
         {format_time(session.starts_at)} – {format_time(session.ends_at)}
       </p>
 
       {eligible_packages.length === 0 ? (
-        <div className="mt-4 rounded-2xl bg-amber-50 p-4">
-          <p className="font-sans text-sm font-medium text-amber-800">No eligible package</p>
-          <p className="mt-1 font-sans text-sm text-amber-700">
+        <div className="mt-4 rounded-2xl bg-warning-surface p-4">
+          <p className="font-sans text-sm font-medium text-warning-foreground">No eligible package</p>
+          <p className="mt-1 font-sans text-sm text-warning-foreground/90">
             This session requires {session.credits_required} credit
             {session.credits_required !== 1 ? 's' : ''}. None of your active packages have
             sufficient credits. Contact the studio to purchase a package.
@@ -258,7 +258,7 @@ function ConfirmBooking({
       {error && (
         <div
           aria-live="polite"
-          className="mt-3 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+          className="mt-3 rounded-md border border-destructive-border bg-destructive-surface p-3 text-sm text-destructive"
           role="alert"
         >
           {error}
@@ -310,13 +310,13 @@ function BookingConfirmed({
   return (
     <div
       aria-live="polite"
-      className="rounded-md border border-emerald-200 bg-emerald-50 p-6"
+      className="rounded-md border border-success-border bg-success-surface p-6"
       role="status"
     >
       <div className="flex items-start gap-3">
         <svg
           aria-hidden="true"
-          className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600"
+          className="mt-0.5 h-5 w-5 shrink-0 text-success"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -329,15 +329,15 @@ function BookingConfirmed({
           />
         </svg>
         <div>
-          <p className="text-sm font-semibold text-emerald-800">
+          <p className="text-sm font-semibold text-success">
             {status === 'waitlisted' ? 'Added to waitlist' : 'Booking confirmed'}
           </p>
-          <p className="mt-1 text-sm text-emerald-700">
+          <p className="mt-1 text-sm text-success">
             {status === 'waitlisted'
               ? `You are on the waitlist for ${session_title}. You will be moved to confirmed if a spot opens.`
               : `Your spot in ${session_title} is confirmed. Check your account for details.`}
           </p>
-          <p className="mt-1 text-xs text-emerald-600">Booking ID: {booking_id}</p>
+          <p className="mt-1 text-xs text-success">Booking ID: {booking_id}</p>
           <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:gap-3">
             <a className={text_link_class} href="/account">
               View my bookings
@@ -384,9 +384,9 @@ export function BookingPanel({ sessions, packages }: BookingPanelProps) {
   // ── No packages — can't book anything ──────────────────────────────────
   if (packages.length === 0) {
     return (
-      <div className="rounded-md border border-amber-100 bg-amber-50 p-6">
-        <p className="text-sm font-semibold text-amber-800">No active packages</p>
-        <p className="mt-1 text-sm text-amber-700">
+      <div className="rounded-md border border-warning-border bg-warning-surface p-6">
+        <p className="text-sm font-semibold text-warning-foreground">No active packages</p>
+        <p className="mt-1 text-sm text-warning-foreground/90">
           You need an active package with available credits to book a class. Contact the studio to
           purchase one.
         </p>
@@ -402,9 +402,9 @@ export function BookingPanel({ sessions, packages }: BookingPanelProps) {
   // ── No upcoming sessions ────────────────────────────────────────────────
   if (sessions.length === 0) {
     return (
-      <div className="rounded-2xl bg-[#E8E2D0] p-8 text-center">
-        <p className="font-serif font-medium text-xl text-[#2D3A1F]">No sessions scheduled</p>
-        <p className="mt-2 font-sans text-sm leading-normal text-[#2D3A1F] opacity-80">
+      <div className="rounded-2xl bg-surface p-8 text-center">
+        <p className="font-serif font-medium text-xl text-foreground">No sessions scheduled</p>
+        <p className="mt-2 font-sans text-sm leading-normal text-foreground opacity-80">
           There are no upcoming sessions available right now. Check back soon or contact the studio.
         </p>
       </div>

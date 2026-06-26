@@ -10,6 +10,11 @@ describe("SiteFooter", () => {
     const footer = screen.getByRole("contentinfo");
 
     expect(within(footer).getByLabelText("corehouse Pilates Studio home")).toBeInTheDocument();
+    expect(within(footer).queryByText(/Where movement comes home/i)).not.toBeInTheDocument();
+    expect(within(footer).getByRole("link", { name: "Instagram" })).toHaveAttribute(
+      "href",
+      "https://www.instagram.com/corehouse.pilates.s/",
+    );
     expect(within(footer).getByRole("link", { name: "Classes" })).toHaveAttribute(
       "href",
       "/classes",

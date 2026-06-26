@@ -1,6 +1,11 @@
 import { redirect } from 'next/navigation';
 
 import { ButtonLink } from '@/components/ui/button-link';
+import {
+  marketingEyebrowClass,
+  marketingPageIntroClass,
+  marketingPageTitleClass,
+} from '@/components/ui/marketing-field-styles';
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { createPageMetadata } from '@/lib/metadata';
@@ -96,16 +101,11 @@ export default async function AccountPage() {
       <Section aria-labelledby="account-page-heading" className="bg-background">
         <Container>
           <div className="max-w-3xl">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
-              Account
-            </p>
-            <h1
-              className="mt-4 text-4xl font-semibold tracking-normal text-stone-950 sm:text-5xl"
-              id="account-page-heading"
-            >
+            <p className={marketingEyebrowClass}>Account</p>
+            <h1 className={marketingPageTitleClass} id="account-page-heading">
               Welcome back{profile?.full_name ? `, ${profile.full_name.split(' ')[0]}` : ''}
             </h1>
-            <p className="mt-5 text-lg leading-8 text-stone-700">
+            <p className={`${marketingPageIntroClass} text-lg`}>
               Manage your profile, view your packages, and access your bookings.
             </p>
           </div>

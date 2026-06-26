@@ -117,13 +117,13 @@ values
     'd0000000-0000-0000-0000-000000000001',
     'Reformer Pilates',
     'Small-group equipment class for strength, alignment, and controlled movement.',
-    'reformer', 60, 'Panayiota or Irene', '', 6, 1, 1, 0, 1, true
+    'reformer', 60, 'Panayiota or Irene', '/images/classes/reformer.webp', 6, 1, 1, 0, 1, true
   ),
   (
     'd0000000-0000-0000-0000-000000000002',
     'Mat Pilates',
     'Floor-based Pilates focused on core strength, mobility, and breath.',
-    'mat', 60, 'Panayiota or Irene', '', 10, 1, 0, 1, 2, true
+    'mat', 60, 'Panayiota or Irene', '/images/classes/mat.webp', 10, 1, 0, 1, 2, true
   )
 on conflict (id) do update set
   title = excluded.title,

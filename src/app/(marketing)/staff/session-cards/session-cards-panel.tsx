@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { marketingCompactInputClass } from '@/components/ui/marketing-field-styles';
 
 import {
   create_session_card,
@@ -33,7 +34,7 @@ const empty_card: SessionCardInput = {
 };
 
 function input_class() {
-  return 'mt-1 block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950';
+  return marketingCompactInputClass;
 }
 
 export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
@@ -106,7 +107,7 @@ export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
   return (
     <div className="space-y-8">
       <div className="rounded-md border border-border bg-surface p-6">
-        <h2 className="text-lg font-semibold text-stone-950">Add session card</h2>
+        <h2 className="text-lg font-semibold text-foreground">Add session card</h2>
         <CardFields card={draft} id_prefix="new-card" onChange={update_draft} />
         <div className="mt-4">
           <Button className="w-full sm:w-auto" disabled={is_pending} onClick={handle_create} type="button">
@@ -116,9 +117,9 @@ export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-stone-950">Current session cards</h2>
+        <h2 className="text-lg font-semibold text-foreground">Current session cards</h2>
         {cards.length === 0 ? (
-          <p className="text-sm text-stone-500">No cards yet.</p>
+          <p className="text-sm text-foreground/60">No cards yet.</p>
         ) : (
           cards.map((card) => (
             <div key={card.id} className="rounded-md border border-border bg-background p-6">
@@ -151,8 +152,8 @@ export function SessionCardsPanel({ cards }: SessionCardsPanelProps) {
         )}
       </div>
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
-      {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
+      {success ? <p className="text-sm text-success">{success}</p> : null}
     </div>
   );
 }
@@ -168,7 +169,7 @@ function CardFields({
 }) {
   return (
     <div className="mt-4 grid gap-4 sm:grid-cols-2">
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-title`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-title`}>
         Title
         <input
           className={input_class()}
@@ -178,7 +179,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-type`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-type`}>
         Class type
         <select
           className={input_class()}
@@ -195,7 +196,7 @@ function CardFields({
         </select>
       </label>
 
-      <label className="block text-sm font-medium text-stone-700 sm:col-span-2" htmlFor={`${id_prefix}-description`}>
+      <label className="block text-sm font-medium text-foreground/80 sm:col-span-2" htmlFor={`${id_prefix}-description`}>
         Description
         <textarea
           className={input_class()}
@@ -206,7 +207,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-duration`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-duration`}>
         Duration minutes
         <input
           className={input_class()}
@@ -218,7 +219,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-capacity`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-capacity`}>
         Capacity
         <input
           className={input_class()}
@@ -230,7 +231,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-reformer-credits`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-reformer-credits`}>
         Reformer credits required
         <input
           className={input_class()}
@@ -242,7 +243,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-mat-credits`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-mat-credits`}>
         Mat credits required
         <input
           className={input_class()}
@@ -254,7 +255,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-sort`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-sort`}>
         Sort order
         <input
           className={input_class()}
@@ -265,7 +266,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-instructor`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-instructor`}>
         Instructor
         <input
           className={input_class()}
@@ -275,7 +276,7 @@ function CardFields({
         />
       </label>
 
-      <label className="block text-sm font-medium text-stone-700" htmlFor={`${id_prefix}-image`}>
+      <label className="block text-sm font-medium text-foreground/80" htmlFor={`${id_prefix}-image`}>
         Image URL
         <input
           className={input_class()}
@@ -286,7 +287,7 @@ function CardFields({
         />
       </label>
 
-      <label className="flex items-center gap-2 text-sm font-medium text-stone-700">
+      <label className="flex items-center gap-2 text-sm font-medium text-foreground/80">
         <input
           checked={card.is_active}
           type="checkbox"

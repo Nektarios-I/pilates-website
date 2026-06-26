@@ -130,15 +130,15 @@ export function InviteClient({ debugEnabled }: InviteClientProps) {
 
   if (status === 'error') {
     return (
-      <div className="mx-auto max-w-md rounded-md border border-red-200 bg-red-50 p-6 text-center">
-        <h1 className="text-xl font-semibold text-red-950">Invite link could not be completed</h1>
-        <p className="mt-3 text-sm leading-6 text-red-800">{message}</p>
-        <p className="mt-3 text-sm leading-6 text-red-800">
+      <div className="mx-auto max-w-md rounded-md border border-destructive-border bg-destructive-surface p-6 text-center">
+        <h1 className="text-xl font-semibold text-destructive">Invite link could not be completed</h1>
+        <p className="mt-3 text-sm leading-6 text-destructive">{message}</p>
+        <p className="mt-3 text-sm leading-6 text-destructive">
           Ask the studio to send a fresh invite. If this was opened from a phone email app, try
           opening the link in the same browser where you plan to use the website.
         </p>
         <Link
-          className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-red-900 underline underline-offset-4"
+          className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-destructive underline underline-offset-4"
           href="/login"
         >
           Return to sign in
@@ -149,8 +149,8 @@ export function InviteClient({ debugEnabled }: InviteClientProps) {
 
   return (
     <div className="mx-auto max-w-md rounded-md border border-border bg-surface p-6 text-center">
-      <h1 className="text-xl font-semibold text-stone-950">Opening your invite</h1>
-      <p className="mt-3 text-sm leading-6 text-stone-600">{message}</p>
+      <h1 className="text-xl font-semibold text-foreground">Opening your invite</h1>
+      <p className="mt-3 text-sm leading-6 text-foreground/70">{message}</p>
     </div>
   );
 }

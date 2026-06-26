@@ -1,4 +1,5 @@
 import { site_content } from "@/config/site_content";
+import { site_images } from "@/config/site_images";
 
 export type HomeCta = {
   label: string;
@@ -11,6 +12,16 @@ export type HomeCard = {
   eyebrow?: string;
   meta?: string;
   cta?: HomeCta;
+  imageSrc?: string;
+  imageAlt?: string;
+  graphicCard?: boolean;
+};
+
+export type HomePricingPlan = {
+  title: string;
+  price: string;
+  description: string;
+  featured?: boolean;
 };
 
 export type HomeSection = {
@@ -26,6 +37,8 @@ export const homeContent = {
     eyebrow: site_content.hero_content.eyebrow,
     title: site_content.hero_content.headline,
     description: site_content.hero_content.supporting_text,
+    imageSrc: site_content.hero_content.image_src,
+    imageAlt: site_content.hero_content.image_alt,
     primaryCta: {
       label: site_content.hero_content.primary_cta_label,
       href: site_content.hero_content.primary_cta_href as "/" | `/${string}`,
@@ -56,6 +69,8 @@ export const homeContent = {
       title: item.name,
       description: item.description,
       meta: `${item.duration} • ${item.level} • ${item.capacity}`,
+      imageSrc: item.image_src,
+      imageAlt: item.image_alt,
       cta: {
         label: site_content.classes_preview.cta_label,
         href: site_content.classes_preview.cta_href as "/" | `/${string}`,
@@ -69,15 +84,12 @@ export const homeContent = {
     description: site_content.pricing_preview.intro_text,
     cta_label: site_content.pricing_preview.cta_label,
     cta_href: site_content.pricing_preview.cta_href,
-    items: site_content.pricing_preview.plans.map((plan) => ({
-        title: plan.name,
-        description: plan.description,
-        meta: plan.price,
-        cta: {
-          label: site_content.pricing_preview.cta_label,
-          href: site_content.pricing_preview.cta_href as "/" | `/${string}`,
-        },
-      })),
+    items: site_content.pricing_preview.plans.map((plan, index) => ({
+      title: plan.name,
+      price: plan.price,
+      description: plan.description,
+      featured: index === 1,
+    })),
   },
   instructors: {
     id: "instructors-preview",
@@ -86,15 +98,8 @@ export const homeContent = {
     description: site_content.instructors_preview.intro_text,
     cta_label: site_content.instructors_preview.cta_label,
     cta_href: site_content.instructors_preview.cta_href,
-    items: site_content.instructors_preview.items.map((item) => ({
-      title: item.name,
-      description: item.bio,
-      meta: item.role,
-      cta: {
-        label: site_content.instructors_preview.cta_label,
-        href: site_content.instructors_preview.cta_href as "/" | `/${string}`,
-      },
-    })),
+    feature_image: site_images.instructors.home_feature,
+    names: site_content.instructors_preview.items.map((item) => item.name),
   },
   contact: {
     id: "contact-preview",
@@ -105,12 +110,18 @@ export const homeContent = {
     cta_href: site_content.contact_preview.cta_href,
     items: [
       {
-        title: "Phone",
+        title: "Contact us",
         description: site_content.contact_preview.phone,
+        imageSrc: site_images.contact.contact_us.src,
+        imageAlt: site_images.contact.contact_us.alt,
+        graphicCard: true,
       },
       {
-        title: "Hours",
+        title: "Studio schedule",
         description: `${site_content.contact_preview.hours.weekday} • ${site_content.contact_preview.hours.saturday} • ${site_content.contact_preview.hours.sunday}`,
+        imageSrc: site_images.contact.schedule.src,
+        imageAlt: site_images.contact.schedule.alt,
+        graphicCard: true,
       },
     ],
   },
@@ -121,9 +132,10 @@ export const homeContent = {
     description: site_content.faq_preview.intro_text,
     cta_label: site_content.faq_preview.cta_label,
     cta_href: site_content.faq_preview.cta_href,
+    image: site_images.faq.equipment,
     items: site_content.faq_preview.items.map((item) => ({
-      title: item.question,
-      description: item.answer,
+      question: item.question,
+      answer: item.answer,
     })),
   },
 } as const;

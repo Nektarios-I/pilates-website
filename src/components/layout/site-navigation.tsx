@@ -14,10 +14,10 @@ type SiteNavigationProps = {
 };
 
 const navLinkDefault =
-  'font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80 hover:opacity-100 transition-opacity duration-200';
+  'font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80 hover:opacity-100 transition-opacity duration-200';
 
 const navLinkActive =
-  "font-sans font-semibold text-[13px] uppercase tracking-widest text-[#B8A678] opacity-100 relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-[#B8A678] after:rounded-full";
+  "font-sans font-semibold text-[13px] uppercase tracking-widest text-accent opacity-100 relative after:content-[''] after:absolute after:-bottom-2 after:left-1/2 after:-translate-x-1/2 after:w-1 after:h-1 after:bg-accent after:rounded-full";
 
 export function SiteNavigation({
   label,

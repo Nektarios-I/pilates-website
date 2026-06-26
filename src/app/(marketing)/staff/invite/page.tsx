@@ -44,7 +44,7 @@ export default async function StaffInvitePage() {
         {/* Back navigation */}
         <div className="mb-6">
           <Link
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground"
             href="/account"
           >
             <svg
@@ -67,13 +67,13 @@ export default async function StaffInvitePage() {
 
         {/* Page header */}
         <div className="mb-8">
-          <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
             Staff portal
           </p>
-          <h1 className="mt-2 text-3xl font-semibold text-stone-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
             Create account invitation
           </h1>
-          <p className="mt-3 max-w-xl text-base leading-7 text-stone-600">
+          <p className="mt-3 max-w-xl text-base leading-7 text-foreground/70">
             Invite a team member or client to join the studio platform. Choose their role and how
             they will receive their invitation.
           </p>
@@ -89,15 +89,15 @@ export default async function StaffInvitePage() {
           {/* Info side panel */}
           <aside className="space-y-6">
             <div className="rounded-md border border-border bg-muted p-6">
-              <h2 className="text-sm font-semibold text-stone-950">Who can invite whom</h2>
+              <h2 className="text-sm font-semibold text-foreground">Who can invite whom</h2>
               <ul className="mt-4 space-y-3">
                 {[
                   { role: 'Instructor', can: 'Can invite clients only.' },
                   { role: 'Owner', can: 'Can invite clients and instructors.' },
                   { role: 'Admin', can: 'Can invite all account types.' },
                 ].map(({ role, can }) => (
-                  <li key={role} className="text-sm text-stone-600">
-                    <span className="font-medium text-stone-950">{role}</span>{' '}
+                  <li key={role} className="text-sm text-foreground/70">
+                    <span className="font-medium text-foreground">{role}</span>{' '}
                     <span>{can}</span>
                   </li>
                 ))}
@@ -105,7 +105,7 @@ export default async function StaffInvitePage() {
             </div>
 
             <div className="rounded-md border border-border bg-muted p-6">
-              <h2 className="text-sm font-semibold text-stone-950">Invitation methods</h2>
+              <h2 className="text-sm font-semibold text-foreground">Invitation methods</h2>
               <ul className="mt-4 space-y-4">
                 {[
                   {
@@ -117,8 +117,8 @@ export default async function StaffInvitePage() {
                     desc: 'Staff creates the account immediately with a temporary password. No email flow is sent.',
                   },
                 ].map(({ method, desc }) => (
-                  <li key={method} className="text-sm text-stone-600">
-                    <p className="font-medium text-stone-950">{method}</p>
+                  <li key={method} className="text-sm text-foreground/70">
+                    <p className="font-medium text-foreground">{method}</p>
                     <p className="mt-0.5 leading-5">{desc}</p>
                   </li>
                 ))}

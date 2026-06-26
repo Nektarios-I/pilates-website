@@ -19,13 +19,13 @@ export default function AuthDebugFragmentPage() {
     <Section className="bg-background">
       <Container>
         <div className="mx-auto max-w-2xl py-12">
-          <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
             Auth debug
           </p>
-          <h1 className="mt-3 text-3xl font-semibold text-stone-950">
+          <h1 className="mt-3 text-3xl font-semibold text-foreground">
             Browser-visible auth payload
           </h1>
-          <p className="mt-3 text-sm leading-6 text-stone-600">
+          <p className="mt-3 text-sm leading-6 text-foreground/70">
             This page is inert unless AUTH_DEBUG is enabled. It is useful when Supabase sends
             tokens in a URL fragment because fragments are invisible to server Route Handlers.
           </p>

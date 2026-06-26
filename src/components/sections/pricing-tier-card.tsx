@@ -21,21 +21,21 @@ export function PricingTierCard({
 }: PricingTierCardProps) {
   if (featured) {
     return (
-      <article className="bg-[#2D3A1F] rounded-3xl p-8 md:p-10 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1">
+      <article className="bg-inverse rounded-3xl p-8 md:p-10 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1">
         {meta ? (
-          <p className="font-sans font-medium text-xs tracking-wide text-[#B8A678]">{meta}</p>
+          <p className="font-sans font-medium text-xs tracking-wide text-accent">{meta}</p>
         ) : null}
-        <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#F4F1E8]">
+        <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-primary-foreground">
           {title}
         </h3>
-        <p className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#F4F1E8] my-4">
+        <p className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-primary-foreground my-4">
           {price}
         </p>
         <ul className="flex flex-col gap-3 mb-8 flex-grow">
-          <li className="font-sans text-[17px] leading-relaxed text-[#F4F1E8]">{description}</li>
+          <li className="font-sans text-[17px] leading-relaxed text-primary-foreground">{description}</li>
         </ul>
         <ButtonLink
-          className="border-0 bg-[#B8A678] text-[#2D3A1F] hover:bg-[#F4F1E8] w-full justify-center"
+          className="border-0 bg-accent text-primary hover:bg-primary-foreground w-full justify-center"
           href={ctaHref}
         >
           {ctaLabel}
@@ -45,18 +45,18 @@ export function PricingTierCard({
   }
 
   return (
-    <article className="bg-[#E8E2D0] rounded-3xl p-8 md:p-10 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1">
+    <article className="bg-surface rounded-3xl p-8 md:p-10 flex flex-col h-full transition-transform duration-300 hover:-translate-y-1">
       {meta ? (
-        <p className="font-sans font-medium text-xs tracking-wide text-[#2D3A1F]">{meta}</p>
+        <p className="font-sans font-medium text-xs tracking-wide text-foreground">{meta}</p>
       ) : null}
-      <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+      <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground">
         {title}
       </h3>
-      <p className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F] my-4">
+      <p className="font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-foreground my-4">
         {price}
       </p>
       <ul className="flex flex-col gap-3 mb-8 flex-grow">
-        <li className="font-sans text-[17px] leading-relaxed text-[#2D3A1F]">{description}</li>
+        <li className="font-sans text-[17px] leading-relaxed text-foreground">{description}</li>
       </ul>
       <ButtonLink className="w-full justify-center" href={ctaHref}>
         {ctaLabel}

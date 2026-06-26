@@ -1700,20 +1700,20 @@ Container: max-w-7xl mx-auto px-4 md:px-8
 
 | Phase | Description              | Status      | Date completed |
 | ----- | ------------------------ | ----------- | -------------- |
-| 0     | Pre-flight verification  | NOT STARTED |                |
-| 1     | Primitive fixes          | NOT STARTED |                |
-| 2     | Navigation header        | NOT STARTED |                |
-| 3     | Homepage                 | NOT STARTED |                |
-| 4a    | Pricing page             | NOT STARTED |                |
-| 4b    | FAQ page                 | NOT STARTED |                |
-| 4c    | Contact page             | NOT STARTED |                |
-| 4d    | About page               | NOT STARTED |                |
-| 4e    | Classes page             | NOT STARTED |                |
-| 4f    | Instructors page         | NOT STARTED |                |
-| 5     | Booking calendar         | NOT STARTED |                |
-| 6     | Full site grep pass      | NOT STARTED |                |
-| 7     | Visual review and polish | NOT STARTED |                |
-| 8     | Production deployment    | NOT STARTED |                |
+| 0     | Pre-flight verification  | COMPLETE    | 2026-06-24     |
+| 1     | Primitive fixes          | COMPLETE    | 2026-06-24     |
+| 2     | Navigation header        | COMPLETE    | 2026-06-24     |
+| 3     | Homepage                 | COMPLETE    | 2026-06-24     |
+| 4a    | Pricing page             | COMPLETE    | 2026-06-24     |
+| 4b    | FAQ page                 | COMPLETE    | 2026-06-24     |
+| 4c    | Contact page             | COMPLETE    | 2026-06-24     |
+| 4d    | About page               | COMPLETE    | 2026-06-24     |
+| 4e    | Classes page             | COMPLETE    | 2026-06-24     |
+| 4f    | Instructors page         | COMPLETE    | 2026-06-24     |
+| 5     | Booking calendar         | COMPLETE    | 2026-06-24     |
+| 6     | Full site grep pass      | COMPLETE    | 2026-06-24     |
+| 7     | Visual review and polish | COMPLETE    | 2026-06-24     |
+| 8     | Production deployment    | IN PROGRESS |                |
 | 9     | Auth/staff (deferred)    | DEFERRED    |                |
 
 ---

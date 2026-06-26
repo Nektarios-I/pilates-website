@@ -5,6 +5,12 @@ import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { FormField } from '@/components/ui/form-field';
+import {
+  INVITE_PERMISSION_BADGE_CLASS,
+  marketingEmptyStateClass,
+  marketingInputClass,
+  marketingTextLinkClass,
+} from '@/components/ui/marketing-field-styles';
 
 import { create_staff_invite } from './actions';
 import type { InviteMethod, InviteRole } from './actions';
@@ -154,11 +160,8 @@ function validate_all(data: InviteFormData, allowed_roles: Role[]): InviteFormEr
 
 function input_classes(error?: string, disabled?: boolean): string {
   return [
-    'block w-full rounded-md border px-4 py-3 text-base text-stone-950 placeholder-stone-400 shadow-sm transition-colors focus:outline-none focus:ring-1',
-    error
-      ? 'border-red-300 bg-white focus:border-red-500 focus:ring-red-500'
-      : 'border-stone-300 bg-white focus:border-stone-950 focus:ring-stone-950',
-    disabled ? 'cursor-not-allowed bg-stone-50 text-stone-500' : '',
+    marketingInputClass(!!error),
+    disabled ? 'cursor-not-allowed bg-muted text-foreground/60' : '',
   ]
     .filter(Boolean)
     .join(' ');
@@ -169,26 +172,19 @@ function input_classes(error?: string, disabled?: boolean): string {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function PermissionBadge({ role }: { role: Role }) {
-  const badge_styles: Record<Role, string> = {
-    client: 'bg-stone-100 text-stone-600',
-    instructor: 'bg-blue-50 text-blue-700 border border-blue-100',
-    owner: 'bg-emerald-50 text-emerald-700 border border-emerald-100',
-    admin: 'bg-amber-50 text-amber-700 border border-amber-100',
-  };
-
   return (
     <div className="mb-6 rounded-md border border-border bg-muted p-4">
       <div className="flex items-start gap-3">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-medium text-stone-950">Acting as</p>
+            <p className="text-sm font-medium text-foreground">Acting as</p>
             <span
-              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge_styles[role]}`}
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${INVITE_PERMISSION_BADGE_CLASS[role]}`}
             >
               {ROLE_LABELS[role]}
             </span>
           </div>
-          <p className="mt-1 text-sm text-stone-600">{PERMISSION_DESCRIPTIONS[role]}</p>
+          <p className="mt-1 text-sm text-foreground/70">{PERMISSION_DESCRIPTIONS[role]}</p>
         </div>
       </div>
     </div>
@@ -197,11 +193,11 @@ function PermissionBadge({ role }: { role: Role }) {
 
 function AccessDeniedState() {
   return (
-    <div className="rounded-md border border-stone-200 bg-stone-50 p-8 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-stone-100">
+    <div className={marketingEmptyStateClass}>
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
         <svg
           aria-hidden="true"
-          className="h-6 w-6 text-stone-500"
+          className="h-6 w-6 text-foreground/60"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -214,14 +210,14 @@ function AccessDeniedState() {
           />
         </svg>
       </div>
-      <h2 className="text-base font-semibold text-stone-950">Access restricted</h2>
-      <p className="mt-2 text-sm leading-6 text-stone-600">
+      <h2 className="text-base font-semibold text-foreground">Access restricted</h2>
+      <p className="mt-2 text-sm leading-6 text-foreground/70">
         Your account does not have permission to create invitations. Contact your studio admin if
         you need access.
       </p>
       <div className="mt-6">
         <Link
-          className="inline-flex min-h-11 items-center text-sm font-medium text-stone-700 underline underline-offset-4 hover:text-stone-950"
+          className="inline-flex min-h-11 items-center text-sm font-medium text-foreground/80 underline underline-offset-4 hover:text-foreground"
           href="/account"
         >
           Return to account
@@ -246,13 +242,13 @@ function SuccessBanner({
   return (
     <div
       aria-live="polite"
-      className="rounded-md border border-emerald-200 bg-emerald-50 p-6"
+      className="rounded-md border border-success-border bg-success-surface p-6"
       role="status"
     >
       <div className="flex items-start gap-3">
         <svg
           aria-hidden="true"
-          className="mt-0.5 h-5 w-5 flex-shrink-0 text-emerald-600"
+          className="mt-0.5 h-5 w-5 flex-shrink-0 text-success"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -265,44 +261,44 @@ function SuccessBanner({
           />
         </svg>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-emerald-800">
+          <p className="text-sm font-semibold text-success">
             {method === 'email_password' ? 'Invite email sent' : 'Account created'}
           </p>
-          <p className="mt-1 text-sm text-emerald-700">
+          <p className="mt-1 text-sm text-success">
             {method === 'email_password'
               ? `An invite email has been sent to ${data.email.trim()}. They will click the link and set their own password.`
               : `The account for ${data.email.trim()} was created immediately. Share the temporary password securely and ask them to change it after signing in.`}
           </p>
 
-          <div className="mt-4 rounded-md border border-emerald-200 bg-white p-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-emerald-700">
+          <div className="mt-4 rounded-md border border-success-border bg-success-surface p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-success">
               Account summary
             </p>
             <dl className="grid gap-3 text-sm sm:grid-cols-2">
               <div>
-                <dt className="font-medium text-stone-700">Full name</dt>
-                <dd className="mt-0.5 text-stone-950">{data.full_name.trim()}</dd>
+                <dt className="font-medium text-foreground/80">Full name</dt>
+                <dd className="mt-0.5 text-foreground">{data.full_name.trim()}</dd>
               </div>
               <div>
-                <dt className="font-medium text-stone-700">Email</dt>
-                <dd className="mt-0.5 break-all text-stone-950">{data.email.trim()}</dd>
+                <dt className="font-medium text-foreground/80">Email</dt>
+                <dd className="mt-0.5 break-all text-foreground">{data.email.trim()}</dd>
               </div>
               <div>
-                <dt className="font-medium text-stone-700">Phone</dt>
-                <dd className="mt-0.5 text-stone-950">{data.phone.trim()}</dd>
+                <dt className="font-medium text-foreground/80">Phone</dt>
+                <dd className="mt-0.5 text-foreground">{data.phone.trim()}</dd>
               </div>
               <div>
-                <dt className="font-medium text-stone-700">Role</dt>
-                <dd className="mt-0.5 text-stone-950">{role_label}</dd>
+                <dt className="font-medium text-foreground/80">Role</dt>
+                <dd className="mt-0.5 text-foreground">{role_label}</dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="font-medium text-stone-700">Invitation method</dt>
-                <dd className="mt-0.5 text-stone-950">{method_label}</dd>
+                <dt className="font-medium text-foreground/80">Invitation method</dt>
+                <dd className="mt-0.5 text-foreground">{method_label}</dd>
               </div>
               {method === 'manual_account' && (
                 <div className="sm:col-span-2">
-                  <dt className="font-medium text-stone-700">Temporary password</dt>
-                  <dd className="mt-0.5 text-stone-950">
+                  <dt className="font-medium text-foreground/80">Temporary password</dt>
+                  <dd className="mt-0.5 text-foreground">
                     Created by staff. Share it privately with the user.
                   </dd>
                 </div>
@@ -312,7 +308,7 @@ function SuccessBanner({
 
           <div className="mt-5">
             <button
-              className="inline-flex min-h-11 items-center text-sm font-medium text-emerald-700 underline underline-offset-4 hover:text-emerald-900"
+              className={`${marketingTextLinkClass} text-success hover:text-success/80`}
               onClick={on_create_another}
               type="button"
             >
@@ -454,7 +450,7 @@ export function InviteForm({ currentRole }: InviteFormProps) {
       {submit_error && (
         <div
           aria-live="polite"
-          className="mb-6 rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800"
+          className="mb-6 rounded-md border border-destructive-border bg-destructive-surface p-4 text-sm text-destructive"
           role="alert"
         >
           {submit_error}
@@ -479,7 +475,7 @@ export function InviteForm({ currentRole }: InviteFormProps) {
               onBlur={() => handle_blur('full_name')}
               onChange={(e) => handle_change('full_name', e.target.value.toUpperCase())}
             />
-            <p className="mt-2 text-xs text-stone-500" id="full_name-hint">
+            <p className="mt-2 text-xs text-foreground/60" id="full_name-hint">
               Enter ALL CAPS as NAME SURNAME. Clients can sign in with this name or their email.
             </p>
           </FormField>
@@ -552,9 +548,9 @@ export function InviteForm({ currentRole }: InviteFormProps) {
 
           {/* Invitation method */}
           <div>
-            <p className="block text-sm font-medium text-stone-950" id="method-label">
+            <p className="block text-sm font-medium text-foreground" id="method-label">
               Invitation method
-              <span aria-hidden="true" className="ml-1 text-red-500">
+              <span aria-hidden="true" className="ml-1 text-destructive">
                 *
               </span>
             </p>
@@ -567,8 +563,8 @@ export function InviteForm({ currentRole }: InviteFormProps) {
                     className={[
                       'flex cursor-pointer items-start gap-3 rounded-md border p-4 transition-colors',
                       is_checked
-                        ? 'border-stone-950 bg-stone-50'
-                        : 'border-stone-200 bg-white hover:border-stone-400',
+                        ? 'border-primary bg-surface'
+                        : 'border-border bg-background hover:border-accent',
                       is_disabled ? 'cursor-not-allowed opacity-60' : '',
                     ]
                       .filter(Boolean)
@@ -576,7 +572,7 @@ export function InviteForm({ currentRole }: InviteFormProps) {
                   >
                     <input
                       checked={is_checked}
-                      className="mt-0.5 h-4 w-4 cursor-pointer accent-stone-950"
+                      className="mt-0.5 h-4 w-4 cursor-pointer accent-primary"
                       disabled={is_disabled}
                       name="method"
                       type="radio"
@@ -585,15 +581,15 @@ export function InviteForm({ currentRole }: InviteFormProps) {
                       onChange={() => handle_change('method', m.value)}
                     />
                     <div>
-                      <p className="text-sm font-medium text-stone-950">{m.label}</p>
-                      <p className="mt-0.5 text-sm leading-5 text-stone-500">{m.description}</p>
+                      <p className="text-sm font-medium text-foreground">{m.label}</p>
+                      <p className="mt-0.5 text-sm leading-5 text-foreground/60">{m.description}</p>
                     </div>
                   </label>
                 );
               })}
             </div>
             {errors.method && (
-              <p className="mt-1.5 text-xs leading-5 text-red-600" id="method-error" role="alert">
+              <p className="mt-1.5 text-xs leading-5 text-destructive" id="method-error" role="alert">
                 {errors.method}
               </p>
             )}
@@ -626,9 +622,9 @@ export function InviteForm({ currentRole }: InviteFormProps) {
         </div>
 
         {/* Actions */}
-        <div className="mt-8 flex flex-col-reverse items-start gap-3 border-t border-stone-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-8 flex flex-col-reverse items-start gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-between">
           <Link
-            className="inline-flex min-h-11 items-center text-sm font-medium text-stone-600 underline underline-offset-4 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center text-sm font-medium text-foreground/70 underline underline-offset-4 hover:text-foreground"
             href="/account"
           >
             Cancel

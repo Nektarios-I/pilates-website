@@ -116,7 +116,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
 
   if (clients.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-stone-500">
+      <p className="py-8 text-center text-sm text-foreground/60">
         No client accounts are available to manage.
       </p>
     );
@@ -125,11 +125,11 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
   return (
     <div className="space-y-6">
       <div>
-        <label className="block text-sm font-medium text-stone-950" htmlFor="membership-client">
+        <label className="block text-sm font-medium text-foreground" htmlFor="membership-client">
           Client account
         </label>
         <select
-          className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950"
+          className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
           id="membership-client"
           onChange={(event) => handle_client_change(event.target.value)}
           value={selected_user_id}
@@ -146,14 +146,14 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
       {selected_user_id ? (
         <>
           <div className="rounded-md border border-border bg-background p-5">
-            <h3 className="text-sm font-semibold text-stone-950">Apply membership</h3>
+            <h3 className="text-sm font-semibold text-foreground">Apply membership</h3>
             <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
               <div className="flex-1">
-                <label className="block text-sm font-medium text-stone-700" htmlFor="membership-package">
+                <label className="block text-sm font-medium text-foreground/80" htmlFor="membership-package">
                   Package
                 </label>
                 <select
-                  className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950"
+                  className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                   id="membership-package"
                   onChange={(event) => set_selected_package_id(event.target.value)}
                   value={selected_package_id}
@@ -178,11 +178,11 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
           </div>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-stone-950">Current memberships</h3>
+            <h3 className="text-sm font-semibold text-foreground">Current memberships</h3>
             {loading_memberships ? (
-              <p className="text-sm text-stone-500">Loading memberships…</p>
+              <p className="text-sm text-foreground/60">Loading memberships…</p>
             ) : memberships.length === 0 ? (
-              <p className="text-sm text-stone-500">No memberships for this account.</p>
+              <p className="text-sm text-foreground/60">No memberships for this account.</p>
             ) : (
               memberships.map((membership) => (
                 <div
@@ -191,11 +191,11 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                 >
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-medium text-stone-950">{membership.package_name}</p>
-                      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-stone-500">
+                      <p className="text-sm font-medium text-foreground">{membership.package_name}</p>
+                      <p className="mt-1 text-xs font-medium uppercase tracking-wide text-foreground/60">
                         {membership.class_type} credits
                       </p>
-                      <p className="mt-1 text-xs text-stone-500">
+                      <p className="mt-1 text-xs text-foreground/60">
                         Status: {membership.status}
                         {membership.expires_at
                           ? ` • Expires ${new Date(membership.expires_at).toLocaleDateString()}`
@@ -218,13 +218,13 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                   <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
                     <div className="flex-1">
                       <label
-                        className="block text-sm font-medium text-stone-700"
+                        className="block text-sm font-medium text-foreground/80"
                         htmlFor={`credits-${membership.id}`}
                       >
                         Remaining {membership.class_type} credits
                       </label>
                       <input
-                        className="mt-2 block w-full rounded-md border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950"
+                        className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
                         id={`credits-${membership.id}`}
                         onChange={(event) =>
                           set_credit_inputs((prev) => ({
@@ -253,7 +253,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
         </>
       ) : null}
 
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      {error ? <p className="text-sm text-destructive">{error}</p> : null}
     </div>
   );
 }

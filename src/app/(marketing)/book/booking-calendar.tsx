@@ -3,6 +3,7 @@
 import { useMemo, useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { ContentImage } from '@/components/ui/content-image';
 import { ImagePlaceholder } from '@/components/ui/image-placeholder';
 import type { DaySchedule } from '@/lib/schedule/studio-hours';
 import {
@@ -30,9 +31,9 @@ import {
 type CalendarView = 'week' | 'month';
 
 const select_class =
-  'mt-2 block w-full rounded-xl bg-[#F4F1E8] p-4 font-sans text-[17px] text-[#2D3A1F] focus:outline-none focus:ring-2 focus:ring-[#B8A678] transition-all';
+  'mt-2 block w-full rounded-xl bg-background p-4 font-sans text-[17px] text-foreground focus:outline-none focus:ring-2 focus:ring-accent transition-all';
 const field_label_class =
-  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]';
+  'block font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground';
 
 type BookingCalendarProps = {
   packages: PackageItem[];
@@ -234,9 +235,9 @@ export function BookingCalendar({
 
   if (session_cards.length === 0) {
     return (
-      <div className="rounded-md border border-amber-100 bg-amber-50 p-6">
-        <p className="text-sm font-semibold text-amber-800">No bookable classes</p>
-        <p className="mt-1 text-sm text-amber-700">
+      <div className="rounded-md border border-warning-border bg-warning-surface p-6">
+        <p className="text-sm font-semibold text-warning-foreground">No bookable classes</p>
+        <p className="mt-1 text-sm text-warning-foreground/90">
           Ask an owner or admin to add a session card before clients can book online.
         </p>
       </div>
@@ -246,7 +247,7 @@ export function BookingCalendar({
   return (
     <div className="w-full space-y-6">
       <div>
-        <h2 className="font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F] mb-8">
+        <h2 className="font-serif font-medium text-2xl md:text-4xl leading-snug text-foreground mb-8">
           Choose a class
         </h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -258,8 +259,8 @@ export function BookingCalendar({
                 className={[
                   'overflow-hidden rounded-2xl text-left transition-colors duration-200',
                   is_selected
-                    ? 'bg-[#2D3A1F] text-[#F4F1E8]'
-                    : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9]',
+                    ? 'bg-inverse text-primary-foreground'
+                    : 'bg-surface text-foreground hover:bg-surface-2',
                 ]
                   .filter(Boolean)
                   .join(' ')}
@@ -267,8 +268,13 @@ export function BookingCalendar({
                 type="button"
               >
                 {card.image_src ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img alt="" className="h-32 w-full object-cover" src={card.image_src} />
+                  <div className="relative h-32 w-full">
+                    <ContentImage
+                      alt={`${card.title} class`}
+                      sizes="320px"
+                      src={card.image_src}
+                    />
+                  </div>
                 ) : (
                   <div className="h-32 w-full overflow-hidden">
                     <ImagePlaceholder className="h-full rounded-none rounded-t-2xl" />
@@ -278,7 +284,7 @@ export function BookingCalendar({
                   <p
                     className={[
                       'font-serif font-medium text-xl leading-normal',
-                      is_selected ? 'text-[#F4F1E8]' : 'text-[#2D3A1F]',
+                      is_selected ? 'text-primary-foreground' : 'text-foreground',
                     ].join(' ')}
                   >
                     {card.title}
@@ -286,7 +292,7 @@ export function BookingCalendar({
                   <p
                     className={[
                       'mt-1 font-sans text-sm leading-normal',
-                      is_selected ? 'text-[#F4F1E8] opacity-80' : 'text-[#2D3A1F] opacity-80',
+                      is_selected ? 'text-primary-foreground opacity-80' : 'text-foreground opacity-80',
                     ].join(' ')}
                   >
                     {card.description}
@@ -294,7 +300,7 @@ export function BookingCalendar({
                   <div
                     className={[
                       'mt-3 flex flex-wrap gap-2 font-sans text-xs',
-                      is_selected ? 'text-[#F4F1E8] opacity-70' : 'text-[#2D3A1F] opacity-70',
+                      is_selected ? 'text-primary-foreground opacity-70' : 'text-foreground opacity-70',
                     ].join(' ')}
                   >
                     <span>{card.duration_minutes} min</span>
@@ -312,17 +318,17 @@ export function BookingCalendar({
       </div>
 
       {confirmed ? (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-5" role="status">
-          <p className="text-sm font-semibold text-emerald-800">
+        <div className="rounded-md border border-success-border bg-success-surface p-5" role="status">
+          <p className="text-sm font-semibold text-success">
             {confirmed.status === 'waitlisted' ? 'Added to waitlist' : 'Booking confirmed'}
           </p>
-          <p className="mt-1 text-sm text-emerald-700">{confirmed.session_title}</p>
+          <p className="mt-1 text-sm text-success">{confirmed.session_title}</p>
           <div className="mt-3 flex flex-col gap-2 text-sm sm:flex-row sm:gap-4">
-            <a className="inline-flex min-h-11 items-center font-medium text-emerald-700 underline" href="/account">
+            <a className="inline-flex min-h-11 items-center font-medium text-success underline" href="/account">
               View account
             </a>
             <button
-              className="inline-flex min-h-11 items-center font-medium text-emerald-700 underline"
+              className="inline-flex min-h-11 items-center font-medium text-success underline"
               onClick={() => set_confirmed(null)}
               type="button"
             >
@@ -359,7 +365,7 @@ export function BookingCalendar({
           <Button onClick={() => shift_anchor(-1)} size="sm" type="button" variant="secondary">
             Prev
           </Button>
-          <p className="min-w-0 flex-1 text-center font-sans font-medium text-sm text-[#2D3A1F] sm:min-w-[10rem] sm:flex-none">
+          <p className="min-w-0 flex-1 text-center font-sans font-medium text-sm text-foreground sm:min-w-[10rem] sm:flex-none">
             {view === 'week'
               ? `${format_day_number(week_days[0])} – ${format_day_number(week_days[6])} ${format_month_year(anchor)}`
               : format_month_year(anchor)}
@@ -370,7 +376,7 @@ export function BookingCalendar({
         </div>
       </div>
 
-      <p className="mb-3 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+      <p className="mb-3 font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground">
         {view === 'week' ? 'Choose a day this week' : 'Choose a day'}
       </p>
       <div className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
@@ -387,10 +393,10 @@ export function BookingCalendar({
                 className={[
                   'flex flex-col items-center justify-center min-w-[72px] md:min-w-[80px] py-4 px-3 rounded-2xl snap-start shrink-0 transition-colors duration-200',
                   is_past
-                    ? 'opacity-40 cursor-not-allowed pointer-events-none bg-[#E8E2D0] text-[#2D3A1F]'
+                    ? 'opacity-40 cursor-not-allowed pointer-events-none bg-surface text-foreground'
                     : is_selected
-                      ? 'bg-[#2D3A1F] text-[#F4F1E8] shadow-md cursor-pointer'
-                      : 'bg-[#E8E2D0] text-[#2D3A1F] cursor-pointer hover:bg-[#CDD2C9]',
+                      ? 'bg-inverse text-primary-foreground shadow-md cursor-pointer'
+                      : 'bg-surface text-foreground cursor-pointer hover:bg-surface-2',
                   view === 'month' && !in_month && !is_past ? 'opacity-40' : '',
                 ]
                   .filter(Boolean)
@@ -414,14 +420,14 @@ export function BookingCalendar({
       <div>
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground">
               {new Date(selected_date).toLocaleDateString('en-GB', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
               })}
             </h3>
-            <p className="mt-1 font-sans text-sm leading-normal text-[#2D3A1F]">
+            <p className="mt-1 font-sans text-sm leading-normal text-foreground">
               {selected_card?.title ?? 'Selected class'}
             </p>
           </div>
@@ -436,18 +442,18 @@ export function BookingCalendar({
         </div>
 
         {loading_day ? (
-          <p className="mt-4 font-sans text-sm text-[#2D3A1F] opacity-80">Loading available times…</p>
+          <p className="mt-4 font-sans text-sm text-foreground opacity-80">Loading available times…</p>
         ) : day_schedule?.is_closed ? (
-          <p className="mt-4 font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+          <p className="mt-4 font-sans text-[17px] leading-relaxed text-foreground">
             Studio closed on this day.
           </p>
         ) : hourly_slots.length === 0 ? (
-          <p className="mt-4 font-sans text-[17px] leading-relaxed text-[#2D3A1F]">
+          <p className="mt-4 font-sans text-[17px] leading-relaxed text-foreground">
             No sessions available.
           </p>
         ) : (
           <>
-            <p className="mt-10 mb-4 font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+            <p className="mt-10 mb-4 font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground">
               Available times
             </p>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
@@ -470,10 +476,10 @@ export function BookingCalendar({
                   className={[
                     'w-full py-3 rounded-xl text-center font-sans text-[17px] transition-colors',
                     is_unavailable
-                      ? 'opacity-40 cursor-not-allowed bg-[#E8E2D0] text-[#2D3A1F]'
+                      ? 'opacity-40 cursor-not-allowed bg-surface text-foreground'
                       : is_active
-                        ? 'bg-[#2D3A1F] text-[#F4F1E8] cursor-pointer'
-                        : 'bg-[#E8E2D0] text-[#2D3A1F] hover:bg-[#CDD2C9] cursor-pointer transition-colors',
+                        ? 'bg-inverse text-primary-foreground cursor-pointer'
+                        : 'bg-surface text-foreground hover:bg-surface-2 cursor-pointer transition-colors',
                   ]
                     .filter(Boolean)
                     .join(' ')}
@@ -505,12 +511,12 @@ export function BookingCalendar({
       </div>
 
       {selected_slot ? (
-        <div className="mt-10 p-8 bg-[#E8E2D0] rounded-3xl flex flex-col gap-6">
+        <div className="mt-10 p-8 bg-surface rounded-3xl flex flex-col gap-6">
           <div>
-            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-[#2D3A1F]">
+            <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground">
               Confirm booking
             </h3>
-            <p className="mt-2 font-sans text-[17px] leading-relaxed text-[#2D3A1F] opacity-80">
+            <p className="mt-2 font-sans text-[17px] leading-relaxed text-foreground opacity-80">
               {selected_card?.title ?? 'Class'} · {selected_date} · {selected_slot.slot_start} –{' '}
               {selected_slot.slot_end}
             </p>
@@ -536,7 +542,7 @@ export function BookingCalendar({
                   ))}
                 </select>
                 {eligible_reformer_packages.length === 0 ? (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-xs text-destructive">
                     You do not have enough active reformer credits for this class.
                   </p>
                 ) : null}
@@ -562,7 +568,7 @@ export function BookingCalendar({
                   ))}
                 </select>
                 {eligible_mat_packages.length === 0 ? (
-                  <p className="mt-2 text-xs text-red-600">
+                  <p className="mt-2 text-xs text-destructive">
                     You do not have enough active mat credits for this class.
                   </p>
                 ) : null}
@@ -570,7 +576,7 @@ export function BookingCalendar({
             ) : null}
           </div>
 
-          {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+          {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
 
           <div className="mt-4 flex flex-col gap-3 sm:flex-row">
             <Button

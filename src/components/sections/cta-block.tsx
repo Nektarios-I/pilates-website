@@ -22,19 +22,19 @@ export function CtaBlock({
 }: CtaBlockProps) {
   return (
     <section aria-labelledby="home-final-cta-heading" className="w-full px-4 md:px-8 my-24">
-      <div className="max-w-6xl mx-auto bg-[#E8E2D0] rounded-3xl py-24 px-8 md:px-16 flex flex-col items-center text-center">
+      <div className="max-w-6xl mx-auto bg-surface rounded-3xl py-24 px-8 md:px-16 flex flex-col items-center text-center">
         {eyebrow ? (
-          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80">
             {eyebrow}
           </p>
         ) : null}
         <h2
-          className="mt-3 font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-[#2D3A1F] mb-6"
+          className="mt-3 font-serif font-semibold text-3xl md:text-5xl leading-tight tracking-tight text-foreground mb-6"
           id="home-final-cta-heading"
         >
           {title}
         </h2>
-        <p className="font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F] mb-10 max-w-2xl">
+        <p className="font-sans text-lg md:text-xl leading-relaxed text-foreground mb-10 max-w-2xl">
           {description}
         </p>
         <div className="flex flex-col gap-3 sm:flex-row">

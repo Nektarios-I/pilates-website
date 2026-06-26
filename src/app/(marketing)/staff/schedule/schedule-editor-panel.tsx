@@ -109,7 +109,7 @@ export function ScheduleEditorPanel() {
   return (
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-stone-600">{format_month_year(anchor)}</p>
+        <p className="text-sm text-foreground/70">{format_month_year(anchor)}</p>
         <div className="flex gap-2">
           <Button
             onClick={() => {
@@ -150,7 +150,7 @@ export function ScheduleEditorPanel() {
       </div>
 
       <div className="sm:hidden">
-        <p className="mb-2 text-sm font-medium text-stone-700">Choose a schedule day</p>
+        <p className="mb-2 text-sm font-medium text-foreground/80">Choose a schedule day</p>
         <div className="-mx-4 flex snap-x gap-2 overflow-x-auto px-4 pb-2">
           {month_days.map((date) => {
             const date_key = to_date_key(date);
@@ -164,8 +164,8 @@ export function ScheduleEditorPanel() {
                 className={[
                   'min-h-16 min-w-16 snap-start rounded-md border px-3 py-2 text-left text-sm transition-colors',
                   !in_month ? 'opacity-40' : '',
-                  is_selected ? 'border-stone-900 bg-stone-900 text-white' : 'border-border bg-surface',
-                  is_today && !is_selected ? 'ring-2 ring-stone-950 ring-offset-1' : '',
+                  is_selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-surface',
+                  is_today && !is_selected ? 'ring-2 ring-accent ring-offset-1' : '',
                 ]
                   .filter(Boolean)
                   .join(' ')}
@@ -195,8 +195,8 @@ export function ScheduleEditorPanel() {
               className={[
                 'rounded-md border px-2 py-2 text-sm transition-colors',
                 !in_month ? 'opacity-40' : '',
-                is_selected ? 'border-stone-900 bg-stone-900 text-white' : 'border-border bg-surface',
-                is_today && !is_selected ? 'ring-2 ring-stone-950 ring-offset-1' : '',
+                is_selected ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-surface',
+                is_today && !is_selected ? 'ring-2 ring-accent ring-offset-1' : '',
               ]
                 .filter(Boolean)
                 .join(' ')}
@@ -212,7 +212,7 @@ export function ScheduleEditorPanel() {
       <div className="rounded-md border border-border bg-surface p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg font-semibold text-stone-950">
+            <h2 className="text-lg font-semibold text-foreground">
               {parse_date_key(selected_date).toLocaleDateString('en-GB', {
                 weekday: 'long',
                 day: 'numeric',
@@ -220,11 +220,11 @@ export function ScheduleEditorPanel() {
                 year: 'numeric',
               })}
             </h2>
-            <p className="mt-1 text-sm text-stone-500">
+            <p className="mt-1 text-sm text-foreground/60">
               {is_override ? 'Custom hours saved for this day.' : 'Using default weekly hours.'}
             </p>
           </div>
-          <label className="inline-flex items-center gap-2 text-sm text-stone-700">
+          <label className="inline-flex items-center gap-2 text-sm text-foreground/80">
             <input
               checked={is_closed}
               onChange={(event) => set_is_closed(event.target.checked)}
@@ -239,18 +239,18 @@ export function ScheduleEditorPanel() {
             {time_ranges.map((range, index) => (
               <div key={index} className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
                 <div className="min-w-0 flex-1 sm:min-w-32">
-                  <label className="block text-xs font-medium text-stone-600">Opens</label>
+                  <label className="block text-xs font-medium text-foreground/70">Opens</label>
                   <input
-                    className="mt-1 min-h-11 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                    className="mt-1 min-h-11 w-full rounded-md border border-border px-3 py-2 text-sm"
                     onChange={(event) => update_range(index, 'start', event.target.value)}
                     type="time"
                     value={range.start}
                   />
                 </div>
                 <div className="min-w-0 flex-1 sm:min-w-32">
-                  <label className="block text-xs font-medium text-stone-600">Closes</label>
+                  <label className="block text-xs font-medium text-foreground/70">Closes</label>
                   <input
-                    className="mt-1 min-h-11 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+                    className="mt-1 min-h-11 w-full rounded-md border border-border px-3 py-2 text-sm"
                     onChange={(event) => update_range(index, 'end', event.target.value)}
                     type="time"
                     value={range.end}
@@ -276,8 +276,8 @@ export function ScheduleEditorPanel() {
           </div>
         ) : null}
 
-        {error ? <p className="mt-4 text-sm text-red-600">{error}</p> : null}
-        {success ? <p className="mt-4 text-sm text-emerald-700">{success}</p> : null}
+        {error ? <p className="mt-4 text-sm text-destructive">{error}</p> : null}
+        {success ? <p className="mt-4 text-sm text-success">{success}</p> : null}
 
         <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
           <Button className="w-full sm:w-auto" disabled={is_pending} onClick={handle_save} type="button">
@@ -298,7 +298,7 @@ export function ScheduleEditorPanel() {
       </div>
 
       <div className="rounded-md border border-border bg-muted p-4">
-        <p className="text-sm font-medium text-stone-950">This week</p>
+        <p className="text-sm font-medium text-foreground">This week</p>
         <div className="mt-3 grid gap-2 sm:grid-cols-7">
           {week_days.map((date) => (
             <button
@@ -308,7 +308,7 @@ export function ScheduleEditorPanel() {
               type="button"
             >
               <span className="font-medium">{format_weekday_short(date)}</span>
-              <span className="mt-1 block text-stone-500">{format_day_number(date)}</span>
+              <span className="mt-1 block text-foreground/60">{format_day_number(date)}</span>
             </button>
           ))}
         </div>

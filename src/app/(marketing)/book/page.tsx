@@ -24,7 +24,7 @@ function package_has_credits(
 }
 
 const text_link_class =
-  'inline-flex min-h-11 items-center font-sans font-medium text-[#2D3A1F] border-b border-[#B8A678] pb-0.5 transition-colors duration-200 hover:text-[#B8A678]';
+  'inline-flex min-h-11 items-center font-sans font-medium text-foreground border-b border-accent pb-0.5 transition-colors duration-200 hover:text-accent';
 
 export default async function BookPage() {
   const supabase = await createClient();
@@ -34,15 +34,15 @@ export default async function BookPage() {
 
   if (!user) {
     return (
-      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 py-16 md:py-24">
+      <section className="w-full bg-background px-4 md:px-8 py-16 md:py-24">
         <div className="mx-auto max-w-lg text-center">
-          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80">
             Booking
           </p>
-          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F]">
+          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-foreground">
             Book a session
           </h1>
-          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-foreground">
             Sign in to choose a day and reserve your reformer class.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
@@ -93,21 +93,21 @@ export default async function BookPage() {
 
   return (
     <>
-      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 pt-16 pb-8">
+      <section className="w-full bg-background px-4 md:px-8 pt-16 pb-8">
         <div className="max-w-2xl mx-auto">
-          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F] opacity-80">
+          <p className="font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80">
             Booking
           </p>
-          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-[#2D3A1F]">
+          <h1 className="mt-3 font-serif font-medium text-2xl md:text-4xl leading-snug text-foreground">
             Book a session
           </h1>
-          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-[#2D3A1F]">
+          <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-foreground">
             Choose a class, then pick an available slot.
           </p>
         </div>
       </section>
 
-      <section className="w-full bg-[#F4F1E8] px-4 md:px-8 pb-16 md:pb-24">
+      <section className="w-full bg-background px-4 md:px-8 pb-16 md:pb-24">
         <div className="max-w-7xl mx-auto grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <BookingCalendar
             initial_date={today_key}
@@ -118,14 +118,14 @@ export default async function BookPage() {
           />
 
           <aside>
-            <div className="rounded-2xl bg-[#E8E2D0] p-6">
-              <h2 className="font-sans font-semibold text-[13px] uppercase tracking-widest text-[#2D3A1F]">
+            <div className="rounded-2xl bg-surface p-6">
+              <h2 className="font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground">
                 Your packages
               </h2>
 
               {packages.length === 0 ? (
                 <div className="mt-4">
-                  <p className="font-sans text-sm leading-normal text-[#2D3A1F] opacity-80">
+                  <p className="font-sans text-sm leading-normal text-foreground opacity-80">
                     No active packages.
                   </p>
                   <Link className={`mt-3 ${text_link_class}`} href="/pricing">
@@ -135,11 +135,11 @@ export default async function BookPage() {
               ) : (
                 <ul className="mt-4 space-y-3">
                   {packages.map((pkg) => (
-                    <li key={pkg.id} className="rounded-xl bg-[#F4F1E8] p-3">
-                      <p className="font-sans text-sm font-medium text-[#2D3A1F]">
+                    <li key={pkg.id} className="rounded-xl bg-background p-3">
+                      <p className="font-sans text-sm font-medium text-foreground">
                         {pkg.package_name}
                       </p>
-                      <p className="mt-0.5 font-sans text-xs text-[#2D3A1F] opacity-70">
+                      <p className="mt-0.5 font-sans text-xs text-foreground opacity-70">
                         {pkg.package_type === 'unlimited' || pkg.package_type === 'monthly'
                           ? 'Unlimited classes'
                           : `${pkg.credits_remaining ?? 0} credit${pkg.credits_remaining !== 1 ? 's' : ''} remaining`}
@@ -152,7 +152,7 @@ export default async function BookPage() {
                 </ul>
               )}
 
-              <div className="mt-5 border-t border-[#CDD2C9] pt-4">
+              <div className="mt-5 border-t border-border pt-4">
                 <Link className={text_link_class} href="/account">
                   View account
                 </Link>

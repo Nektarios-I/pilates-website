@@ -42,7 +42,7 @@ export default async function StudioSchedulePage() {
       <div className="py-8 sm:py-12">
         <div className="mb-6">
           <Link
-            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-stone-600 hover:text-stone-950"
+            className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground"
             href="/account"
           >
             Back to account
@@ -50,13 +50,13 @@ export default async function StudioSchedulePage() {
         </div>
 
         <div className="mb-8 max-w-xl">
-          <p className="text-sm font-medium uppercase tracking-[0.16em] text-stone-500">
+          <p className="text-sm font-medium uppercase tracking-[0.16em] text-foreground/60">
             Owner / Admin
           </p>
-          <h1 className="mt-2 text-3xl font-semibold text-stone-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
             Studio schedule
           </h1>
-          <p className="mt-3 text-base leading-7 text-stone-600">
+          <p className="mt-3 text-base leading-7 text-foreground/70">
             Choose a day and set open hours and breaks. Defaults are Mon–Fri 6:00–12:00 & 15:00–20:00,
             Sat 7:00–11:00, Sun closed.
           </p>

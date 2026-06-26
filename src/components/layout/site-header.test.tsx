@@ -1,7 +1,19 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import { SiteHeaderView } from "./site-header-view";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => "/",
+}));
+
+vi.mock("@/components/layout/use-header-auth", () => ({
+  useHeaderAuth: (auth: unknown) => auth,
+}));
 
 describe("SiteHeader", () => {
   it("shows the studio identity, primary navigation, and booking action", () => {
@@ -28,6 +40,22 @@ describe("SiteHeader", () => {
       "href",
       "/login",
     );
+  });
+
+  it("shows the Account menu when signed in", () => {
+    render(
+      <SiteHeaderView
+        auth={{
+          is_signed_in: true,
+          is_staff: false,
+          is_admin_or_owner: false,
+          display_name: "Alex",
+        }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: /account/i })).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument();
   });
 
   it("opens an accessible mobile navigation menu", () => {

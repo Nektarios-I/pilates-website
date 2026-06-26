@@ -6,6 +6,18 @@ import MarketingLayout from "./layout";
 import HomePage from "./page";
 import { homeContent } from "@/features/home/home-content";
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    refresh: vi.fn(),
+  }),
+  usePathname: () => "/",
+}));
+
+vi.mock("@/components/layout/use-header-auth", () => ({
+  useHeaderAuth: (auth: unknown) => auth,
+}));
+
 vi.mock("@/components/layout/site-header", () => ({
   SiteHeader: () => (
     <SiteHeaderView
@@ -52,7 +64,8 @@ describe("HomePage", () => {
     }
 
     expect(screen.getByRole("heading", { level: 3, name: "Reformer" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { level: 3, name: "Panayiota" })).toBeInTheDocument();
+    expect(screen.getByText("Panayiota")).toBeInTheDocument();
+    expect(screen.getByText("Irene")).toBeInTheDocument();
   });
 
   it("shows the primary CTA in the main homepage content", () => {

@@ -36,17 +36,17 @@ export default async function InviteErrorPage({
     <Section className="bg-background">
       <Container>
         <div className="mx-auto max-w-md py-12 text-center">
-          <div className="rounded-md border border-red-200 bg-red-50 p-6">
-            <p className="text-sm font-medium uppercase tracking-[0.16em] text-red-700">
+          <div className="rounded-md border border-destructive-border bg-destructive-surface p-6">
+            <p className="text-sm font-medium uppercase tracking-[0.16em] text-destructive">
               Invite error
             </p>
-            <h1 className="mt-3 text-2xl font-semibold text-red-950">
+            <h1 className="mt-3 text-2xl font-semibold text-destructive">
               Invite link could not be completed
             </h1>
-            <p className="mt-4 text-sm leading-6 text-red-800">{message}</p>
+            <p className="mt-4 text-sm leading-6 text-destructive">{message}</p>
             <div className="mt-6">
               <Link
-                className="inline-flex min-h-11 items-center text-sm font-medium text-red-900 underline underline-offset-4"
+                className="inline-flex min-h-11 items-center text-sm font-medium text-destructive underline underline-offset-4"
                 href="/login"
               >
                 Return to sign in
