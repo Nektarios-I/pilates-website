@@ -76,7 +76,7 @@ export default function HomePage() {
               </p>
             </div>
             <Link
-              className="mt-6 md:mt-0 shrink-0 font-sans font-medium text-foreground border-b border-accent pb-0.5 transition-colors duration-200 hover:text-accent"
+              className="mt-6 md:mt-0 inline-flex min-h-11 shrink-0 items-center font-sans font-medium text-foreground border-b border-accent pb-0.5 transition-colors duration-200 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
               href={homeContent.classes.cta_href as "/" | `/${string}`}
             >
               {homeContent.classes.cta_label}
@@ -171,7 +171,7 @@ export default function HomePage() {
           &ldquo;Every session feels intentional — precise instruction in a calm space that makes
           movement feel natural again.&rdquo;
         </blockquote>
-        <p className="font-sans font-medium text-xs tracking-wide text-accent uppercase">
+        <p className="font-sans font-medium text-xs tracking-wide text-primary-foreground/80 uppercase">
           Studio member
         </p>
         <div aria-hidden="true" className="w-px h-16 bg-background/20 mx-auto my-16" />
@@ -179,7 +179,7 @@ export default function HomePage() {
           &ldquo;The reformer classes are small, focused, and welcoming — exactly what I wanted
           from a boutique studio.&rdquo;
         </blockquote>
-        <p className="font-sans font-medium text-xs tracking-wide text-accent uppercase">
+        <p className="font-sans font-medium text-xs tracking-wide text-primary-foreground/80 uppercase">
           Reformer regular
         </p>
       </section>

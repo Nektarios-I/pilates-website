@@ -107,17 +107,19 @@ export default async function BookPage() {
         </div>
       </section>
 
-      <section className="w-full bg-background px-4 md:px-8 pb-16 md:pb-24">
-        <div className="max-w-7xl mx-auto grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
-          <BookingCalendar
+      <section className="w-full min-w-0 bg-background px-4 md:px-8 pb-16 md:pb-24">
+        <div className="mx-auto grid min-w-0 max-w-7xl gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
+          <div className="min-w-0">
+            <BookingCalendar
             initial_date={today_key}
             initial_schedule={initial_schedule}
             initial_slots={initial_slots}
             packages={packages}
             session_cards={session_cards}
           />
+          </div>
 
-          <aside>
+          <aside className="min-w-0">
             <div className="rounded-2xl bg-surface p-6">
               <h2 className="font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground">
                 Your packages

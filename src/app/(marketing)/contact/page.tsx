@@ -37,7 +37,7 @@ export default function ContactPage() {
               </dt>
               <dd>
                 <a
-                  className="font-sans text-[17px] leading-relaxed text-foreground hover:text-accent transition-colors"
+                  className="inline-flex min-h-11 items-center font-sans text-[17px] leading-relaxed text-foreground hover:text-accent transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                   href={`tel:${contact_preview.phone_href}`}
                 >
                   {contact_preview.phone}
@@ -54,7 +54,7 @@ export default function ContactPage() {
               {contact_preview.google_maps_url ? (
                 <dd className="mt-2">
                   <a
-                    className="font-sans text-[17px] leading-relaxed text-foreground hover:text-accent transition-colors underline underline-offset-4"
+                    className="inline-flex min-h-11 items-center font-sans text-[17px] leading-relaxed text-foreground hover:text-accent transition-colors underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
                     href={contact_preview.google_maps_url}
                     rel="noopener noreferrer"
                     target="_blank"

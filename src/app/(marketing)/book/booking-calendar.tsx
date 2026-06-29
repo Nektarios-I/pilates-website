@@ -199,7 +199,6 @@ export function BookingCalendar({
     });
   }
 
-  const visible_days = view === 'week' ? week_days : month_days;
   const hourly_slots = day_schedule
     ? generate_hourly_slots(day_schedule.time_ranges, selected_card?.duration_minutes ?? 60)
     : [];
@@ -244,8 +243,46 @@ export function BookingCalendar({
     );
   }
 
+  function render_day_button(date: Date) {
+    const date_key = to_date_key(date);
+    const is_selected = date_key === selected_date;
+    const is_past = is_past_day(date, today);
+    const in_month = view === 'month' ? date.getMonth() === anchor.getMonth() : true;
+    const is_month_grid = view === 'month';
+
+    return (
+      <button
+        key={date_key}
+        className={[
+          'flex flex-col items-center justify-center rounded-2xl transition-colors duration-200',
+          is_month_grid
+            ? 'min-h-14 w-full px-1 py-2 sm:min-h-16 sm:px-2'
+            : 'min-w-[4.5rem] shrink-0 snap-start px-3 py-4 sm:min-w-20',
+          is_past
+            ? 'pointer-events-none cursor-not-allowed bg-surface text-foreground opacity-40'
+            : is_selected
+              ? 'cursor-pointer bg-inverse text-primary-foreground shadow-md'
+              : 'cursor-pointer bg-surface text-foreground hover:bg-surface-2',
+          view === 'month' && !in_month && !is_past ? 'opacity-40' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        disabled={is_past}
+        onClick={() => select_date(date)}
+        type="button"
+      >
+        <span className="mb-1 font-sans text-[11px] font-semibold uppercase leading-none tracking-widest sm:text-[13px]">
+          {format_weekday_short(date)}
+        </span>
+        <span className="font-serif text-lg font-medium leading-none sm:text-xl">
+          {format_day_number(date)}
+        </span>
+      </button>
+    );
+  }
+
   return (
-    <div className="w-full space-y-6">
+    <div className="min-w-0 w-full max-w-full space-y-6">
       <div>
         <h2 className="font-serif font-medium text-2xl md:text-4xl leading-snug text-foreground mb-8">
           Choose a class
@@ -338,8 +375,8 @@ export function BookingCalendar({
         </div>
       ) : null}
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
-        <div className="flex flex-wrap gap-2">
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+        <div className="flex min-w-0 flex-wrap gap-2">
           <Button
             onClick={() => set_view('week')}
             size="sm"
@@ -361,11 +398,11 @@ export function BookingCalendar({
           </Button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex min-w-0 items-center gap-2">
           <Button onClick={() => shift_anchor(-1)} size="sm" type="button" variant="secondary">
             Prev
           </Button>
-          <p className="min-w-0 flex-1 text-center font-sans font-medium text-sm text-foreground sm:min-w-[10rem] sm:flex-none">
+          <p className="min-w-0 flex-1 text-center font-sans text-sm font-medium text-foreground sm:min-w-[10rem] sm:flex-none">
             {view === 'week'
               ? `${format_day_number(week_days[0])} – ${format_day_number(week_days[6])} ${format_month_year(anchor)}`
               : format_month_year(anchor)}
@@ -379,43 +416,13 @@ export function BookingCalendar({
       <p className="mb-3 font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground">
         {view === 'week' ? 'Choose a day this week' : 'Choose a day'}
       </p>
-      <div className="w-full overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-        <div className="flex gap-3 w-max md:w-full md:justify-start">
-          {visible_days.map((date) => {
-            const date_key = to_date_key(date);
-            const is_selected = date_key === selected_date;
-            const is_past = is_past_day(date, today);
-            const in_month = view === 'month' ? date.getMonth() === anchor.getMonth() : true;
-
-            return (
-              <button
-                key={date_key}
-                className={[
-                  'flex flex-col items-center justify-center min-w-[72px] md:min-w-[80px] py-4 px-3 rounded-2xl snap-start shrink-0 transition-colors duration-200',
-                  is_past
-                    ? 'opacity-40 cursor-not-allowed pointer-events-none bg-surface text-foreground'
-                    : is_selected
-                      ? 'bg-inverse text-primary-foreground shadow-md cursor-pointer'
-                      : 'bg-surface text-foreground cursor-pointer hover:bg-surface-2',
-                  view === 'month' && !in_month && !is_past ? 'opacity-40' : '',
-                ]
-                  .filter(Boolean)
-                  .join(' ')}
-                disabled={is_past}
-                onClick={() => select_date(date)}
-                type="button"
-              >
-                <span className="font-sans font-semibold text-[13px] uppercase tracking-widest leading-none mb-1">
-                  {format_weekday_short(date)}
-                </span>
-                <span className="font-serif font-medium text-xl leading-none">
-                  {format_day_number(date)}
-                </span>
-              </button>
-            );
-          })}
+      {view === 'week' ? (
+        <div className="min-w-0 max-w-full overflow-x-auto scroll-smooth snap-x snap-mandatory pb-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex w-max gap-3 md:w-full md:justify-start">{week_days.map(render_day_button)}</div>
         </div>
-      </div>
+      ) : (
+        <div className="grid min-w-0 grid-cols-7 gap-1.5 sm:gap-2">{month_days.map(render_day_button)}</div>
+      )}
 
       <div>
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -511,7 +518,7 @@ export function BookingCalendar({
       </div>
 
       {selected_slot ? (
-        <div className="mt-10 p-8 bg-surface rounded-3xl flex flex-col gap-6">
+        <div className="mt-10 rounded-3xl bg-surface p-5 sm:p-8 flex flex-col gap-6">
           <div>
             <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground">
               Confirm booking

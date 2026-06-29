@@ -28,9 +28,7 @@ describe("SiteHeader", () => {
       name: "Primary navigation",
     });
 
-    expect(
-      within(header).getByLabelText("corehouse Pilates Studio home"),
-    ).toHaveAttribute("href", "/");
+    expect(within(header).getByRole("link", { name: /core\s*house/i })).toHaveAttribute("href", "/");
     expect(within(primaryNav).getByRole("link", { name: "Classes" })).toHaveAttribute(
       "href",
       "/classes",

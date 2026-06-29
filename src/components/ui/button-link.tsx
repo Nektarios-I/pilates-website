@@ -12,9 +12,9 @@ type ButtonLinkProps = {
 
 const variants: Record<ButtonLinkVariant, string> = {
   primary:
-    "border-0 bg-primary text-primary-foreground px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest transition-all duration-200 hover:bg-accent",
+    "border-0 bg-[#2D3A1F] text-[#F4F1E8] px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest transition-all duration-200 hover:bg-[#B8A678]",
   secondary:
-    "border border-border text-foreground px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest bg-transparent hover:bg-surface transition-all duration-200",
+    "border border-[#CDD2C9] text-[#2D3A1F] px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest bg-transparent hover:bg-[#E8E2D0] transition-all duration-200",
 };
 
 export function ButtonLink({
@@ -28,7 +28,7 @@ export function ButtonLink({
     <Link
       href={href}
       className={[
-        "inline-flex min-h-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "inline-flex min-h-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678]",
         variants[variant],
         className,
       ]

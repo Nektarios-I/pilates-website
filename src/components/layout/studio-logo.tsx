@@ -9,7 +9,6 @@ type StudioLogoProps = {
 export function StudioLogo({ className }: StudioLogoProps) {
   return (
     <Link
-      aria-label="corehouse Pilates Studio home"
       className={['inline-flex min-h-11 items-center text-foreground', className].filter(Boolean).join(' ')}
       href="/"
     >

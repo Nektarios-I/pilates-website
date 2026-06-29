@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Fraunces, Sora } from "next/font/google";
 
 import { siteMetadata } from "@/lib/metadata";
@@ -21,6 +21,11 @@ const sora = Sora({
 
 export const metadata: Metadata = siteMetadata;
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -31,7 +36,7 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${sora.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full min-w-0 w-full max-w-full flex-col overflow-x-hidden">{children}</body>
     </html>
   );
 }

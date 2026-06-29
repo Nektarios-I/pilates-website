@@ -48,9 +48,10 @@ export function ContactForm() {
   }
 
   return (
-    <form className="w-full" noValidate onSubmit={handle_submit}>
+    <form aria-labelledby="contact-page-heading" className="w-full" noValidate onSubmit={handle_submit}>
       {success ? (
         <div
+          aria-live="polite"
           className="mb-6 rounded-xl bg-surface p-4 font-sans text-[17px] leading-relaxed text-foreground"
           role="status"
         >
@@ -59,7 +60,7 @@ export function ContactForm() {
       ) : null}
 
       {form_error ? (
-        <p className="mb-6 font-sans text-sm text-destructive" role="alert">
+        <p aria-live="polite" className="mb-6 font-sans text-sm text-destructive" role="alert">
           {form_error}
         </p>
       ) : null}
@@ -145,7 +146,7 @@ export function ContactForm() {
       </div>
 
       <button
-        className="inline-flex min-h-11 w-full items-center justify-center border-0 bg-primary text-primary-foreground px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest transition-all duration-200 hover:bg-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-11 w-full items-center justify-center border-0 bg-[#2D3A1F] text-[#F4F1E8] px-8 py-4 rounded-full font-sans font-semibold text-[13px] uppercase tracking-widest transition-all duration-200 hover:bg-[#B8A678] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B8A678] cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
         disabled={is_pending}
         type="submit"
       >

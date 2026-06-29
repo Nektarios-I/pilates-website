@@ -68,7 +68,7 @@ export const homeContent = {
     items: site_content.classes_preview.items.map((item) => ({
       title: item.name,
       description: item.description,
-      meta: `${item.duration} • ${item.level} • ${item.capacity}`,
+      meta: `${item.level} • ${item.capacity}`,
       imageSrc: item.image_src,
       imageAlt: item.image_alt,
       cta: {

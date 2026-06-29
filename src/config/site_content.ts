@@ -118,17 +118,17 @@ export const site_content = {
       three_month: [
         {
           name: '2× per week',
-          price: '€285',
+          price: '€265',
           description: '24 classes · 90 days',
         },
         {
           name: '3× per week',
-          price: '€415',
+          price: '€400',
           description: '36 classes · 90 days',
         },
         {
           name: '4× per week',
-          price: '€525',
+          price: '€520',
           description: '48 classes · 90 days',
         },
       ],
@@ -177,7 +177,7 @@ export const site_content = {
     plans: [
       { name: 'Single class', price: '€15', description: '1 reformer class' },
       { name: '1 month · 2×/week', price: '€100', description: '8 classes' },
-      { name: '3 months · 2×/week', price: '€285', description: '24 classes' },
+      { name: '3 months · 2×/week', price: '€265', description: '24 classes' },
     ],
     policies_short:
       'Arrive a few minutes early. Cancel at least 12 hours before class. Grip socks required for reformer.',

@@ -58,7 +58,7 @@ export function PreviewCard({
         ) : (
           <>
             {eyebrow ? (
-              <p className="font-sans font-medium text-xs tracking-wide text-foreground opacity-70">
+              <p className="font-sans font-medium text-xs tracking-wide text-foreground opacity-80">
                 {eyebrow}
               </p>
             ) : null}
@@ -73,7 +73,7 @@ export function PreviewCard({
           </>
         )}
         {meta ? (
-          <p className="font-sans font-medium text-xs tracking-wide text-foreground opacity-70">
+          <p className="font-sans font-medium text-xs tracking-wide text-foreground opacity-80">
             {meta}
           </p>
         ) : null}

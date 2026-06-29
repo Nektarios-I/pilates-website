@@ -31,7 +31,6 @@ export function CorehouseLogo({
       className={['inline-flex flex-col items-start text-current', className].filter(Boolean).join(' ')}
     >
       <span
-        aria-hidden="true"
         className={[
           'inline-flex items-baseline font-serif font-medium leading-none tracking-tight',
           styles.core,

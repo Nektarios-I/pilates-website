@@ -51,12 +51,11 @@ export function SiteFooter() {
   const { footer_content } = site_content;
 
   return (
-    <footer className="w-full bg-inverse text-primary-foreground pt-16 pb-6 px-4 md:px-8 md:pt-20">
+    <footer className="w-full max-w-full bg-inverse text-primary-foreground px-4 pt-16 pb-6 md:px-8 md:pt-20">
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 mb-10">
         <div>
           <Link
-            aria-label="corehouse Pilates Studio home"
-            className="inline-flex min-h-11 items-center text-primary-foreground hover:text-accent transition-colors duration-200"
+            className="inline-flex min-h-11 items-center text-primary-foreground hover:text-primary-foreground/80 transition-colors duration-200"
             href="/"
           >
             <CorehouseLogo showTagline size="md" />

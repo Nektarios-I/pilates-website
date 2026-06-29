@@ -49,7 +49,14 @@ export default function FaqPage() {
               Still have questions?
             </h3>
             <p className="mt-3 font-sans text-[17px] leading-relaxed text-foreground">
-              Call {site_content.contact_preview.phone} for help with booking or memberships.
+              Call{' '}
+              <a
+                className="inline-flex min-h-11 items-center text-foreground underline underline-offset-4 hover:text-accent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                href={`tel:${site_content.contact_preview.phone_href}`}
+              >
+                {site_content.contact_preview.phone}
+              </a>{' '}
+              for help with booking or memberships.
             </p>
           </div>
         </div>

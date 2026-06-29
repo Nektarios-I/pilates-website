@@ -11,7 +11,7 @@ export function PageShell({ children }: PageShellProps) {
   return (
     <>
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 min-w-0 w-full max-w-full overflow-x-hidden">{children}</main>
       <SiteFooter />
     </>
   );

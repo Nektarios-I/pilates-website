@@ -28,40 +28,48 @@
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-surface: var(--surface);
-  --color-surface-2: var(--surface-2);
-  --color-border: var(--border);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-accent: var(--accent);
-  --color-muted: var(--muted);
-  --color-inverse: var(--inverse);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-destructive-surface: var(--destructive-surface);
-  --color-destructive-border: var(--destructive-border);
-  --color-warning: var(--warning);
-  --color-warning-foreground: var(--warning-foreground);
-  --color-warning-surface: var(--warning-surface);
-  --color-warning-border: var(--warning-border);
-  --color-success: var(--success);
-  --color-success-surface: var(--success-surface);
-  --color-success-border: var(--success-border);
-  --color-info: var(--info);
-  --color-info-surface: var(--info-surface);
-  --color-info-border: var(--info-border);
-  --color-text: var(--foreground);
+  --color-background: #f4f1e8;
+  --color-foreground: #2d3a1f;
+  --color-surface: #e8e2d0;
+  --color-surface-2: #cdd2c9;
+  --color-border: #cdd2c9;
+  --color-primary: #2d3a1f;
+  --color-primary-foreground: #f4f1e8;
+  --color-accent: #b8a678;
+  --color-muted: #e8e2d0;
+  --color-inverse: #2d3a1f;
+  --color-destructive: #c62828;
+  --color-destructive-foreground: #ffffff;
+  --color-destructive-surface: #ffebee;
+  --color-destructive-border: #fecaca;
+  --color-warning: #d97706;
+  --color-warning-foreground: #92400e;
+  --color-warning-surface: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-success: #43a047;
+  --color-success-surface: #e8f5e9;
+  --color-success-border: #a5d6a7;
+  --color-info: #1565c0;
+  --color-info-surface: #e3f2fd;
+  --color-info-border: #bfdbfe;
+  --color-text: #2d3a1f;
   --font-sans: var(--font-sans), system-ui, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
   --font-mono: var(--font-geist-mono);
+}
+
+html {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
+  overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 a {
