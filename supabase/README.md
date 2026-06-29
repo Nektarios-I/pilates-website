@@ -16,11 +16,14 @@ Run each file **once**, top to bottom:
 | 2 | `02_rls.sql` | RLS policies + `private` helper functions |
 | 3 | `03_functions.sql` | Booking RPCs (`book_session`, etc.) |
 | 4 | `04_seed.sql` | Reformer + mat package catalog and default session cards |
+| 5 | `14_update_reformer_3month_prices.sql` | Idempotent price sync (owner updates); run after step 4 on existing DBs |
 | 5 | `11_staff_invites.sql` | Optional `staff_invites` table |
 | 6 | `12_studio_schedule.sql` | Studio hours + booking slot helpers |
 | 7 | `09_cron.sql` | Daily `expire_packages()` job (enable **pg_cron** extension first) |
 | 8 | `10_add_admin.sql` | Your initial admin account (edit email inside first) |
 | 9 | `14_contact_messages.sql` | Public contact form storage + admin inbox RLS |
+| 10 | `16_account_safety_mirror.sql` | Account profile safety mirror + backfill (excluded from data reset) |
+| 11 | `17_booking_one_per_time_slot.sql` | One booking per time slot per client (P0013) |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -37,7 +40,9 @@ set app.allow_data_reset = 'true';
 -- then run the full 05_reset_data.sql file
 ```
 
-This clears **all** app tables **and** `auth.users`, then re-seeds packages and default session cards. Re-run `10_add_admin.sql` afterward so you can sign in again.
+This clears application tables and `auth.users`, then re-seeds packages and default session cards. Re-run `10_add_admin.sql` afterward so you can sign in again.
+
+`account_safety_mirror` is **not** truncated by `05_reset_data.sql` (safety mirror).
 
 ---
 

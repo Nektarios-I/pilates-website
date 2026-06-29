@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 
 import { AccountMenu } from '@/components/layout/account-menu';
-import { useHeaderAuth } from '@/components/layout/use-header-auth';
 import { SiteNavigation } from '@/components/layout/site-navigation';
 import { StudioLogo } from '@/components/layout/studio-logo';
 import { ButtonLink } from '@/components/ui/button-link';
@@ -17,8 +16,7 @@ type SiteHeaderViewProps = {
   auth: HeaderAuth;
 };
 
-export function SiteHeaderView({ auth: server_auth }: SiteHeaderViewProps) {
-  const auth = useHeaderAuth(server_auth);
+export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
   const { is_signed_in, is_staff, is_admin_or_owner, display_name } = auth;
   const [mobile_menu_open, set_mobile_menu_open] = useState(false);
   const menu_button_ref = useRef<HTMLButtonElement>(null);

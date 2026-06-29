@@ -76,6 +76,16 @@ export function to_date_key(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+/** Calendar date for the studio timezone (YYYY-MM-DD). */
+export function studio_date_key(now = new Date(), time_zone = STUDIO_TIMEZONE): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: time_zone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(now);
+}
+
 export function parse_date_key(value: string): Date {
   const [year, month, day] = value.split('-').map(Number);
   return new Date(year, month - 1, day);

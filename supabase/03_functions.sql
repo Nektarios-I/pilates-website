@@ -67,6 +67,11 @@ begin
       using errcode = 'P0004';
   end if;
 
+  if private.user_has_active_booking_at_slot(v_user_id, v_session.starts_at, v_session.ends_at) then
+    raise exception 'You already have a booking at this time slot'
+      using errcode = 'P0013';
+  end if;
+
   -- ── 3. Load and validate the user_package ───────────────────────────────
   select * into v_user_package
     from public.user_packages
@@ -210,6 +215,11 @@ begin
   if v_session.starts_at <= now() then
     raise exception 'Cannot book a session that has already started'
       using errcode = 'P0004';
+  end if;
+
+  if private.user_has_active_booking_at_slot(v_user_id, v_session.starts_at, v_session.ends_at) then
+    raise exception 'You already have a booking at this time slot'
+      using errcode = 'P0013';
   end if;
 
   v_reformer_required := coalesce(v_session.reformer_credits_required, 0);

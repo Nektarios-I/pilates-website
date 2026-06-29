@@ -44,5 +44,6 @@ delete from auth.users;
 do $$
 begin
   raise notice '05_reset_data.sql: done. Next run 04_seed.sql, then 10_add_admin.sql or create accounts via Add Account.';
+  raise notice 'account_safety_mirror was NOT truncated (safety mirror).';
 end;
 $$;

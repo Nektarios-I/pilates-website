@@ -94,7 +94,6 @@ export function AccountContent({
   const handle_sign_out = async () => {
     start_transition(async () => {
       await signOut();
-      router.push('/login');
     });
   };
 

@@ -213,10 +213,13 @@ export async function book_slot_action(
     return { success: false, error: ensure_error?.message ?? 'Could not reserve this time slot.' };
   }
 
+  const requires_reformer = (session_card.reformer_credits_required ?? 0) > 0;
+  const requires_mat = (session_card.mat_credits_required ?? 0) > 0;
+
   const result = await book_session_action(
     session_id as string,
-    reformer_package_id,
-    mat_package_id,
+    requires_reformer ? reformer_package_id : null,
+    requires_mat ? (mat_package_id ?? undefined) : undefined,
   );
 
   if (!result.success) {

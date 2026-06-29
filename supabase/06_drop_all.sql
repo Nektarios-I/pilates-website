@@ -24,6 +24,7 @@ drop trigger if exists on_auth_user_created on auth.users;
 
 -- ── 2. Application tables (child-first; CASCADE drops policies/triggers) ───
 drop table if exists public.contact_messages       cascade;
+drop table if exists public.account_safety_mirror cascade;
 drop table if exists public.bookings            cascade;
 drop table if exists public.booking_credit_charges cascade;
 drop table if exists public.user_packages       cascade;

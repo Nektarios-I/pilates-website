@@ -10,6 +10,9 @@ const fraunces = Fraunces({
   variable: "--font-serif",
   display: "swap",
   axes: ["WONK", "opsz"],
+  // Serif is used for headings, often below the fold on /login — skip preload to avoid
+  // "preloaded but not used" warnings when auth handoff redirects before first paint.
+  preload: false,
 });
 
 const sora = Sora({
@@ -17,6 +20,7 @@ const sora = Sora({
   variable: "--font-sans",
   display: "swap",
   weight: ["400", "500", "600", "700"],
+  preload: true,
 });
 
 export const metadata: Metadata = siteMetadata;
@@ -36,7 +40,7 @@ export default function RootLayout({
       lang="en"
       className={`${fraunces.variable} ${sora.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full min-w-0 w-full max-w-full flex-col overflow-x-hidden">{children}</body>
+      <body className={`${sora.className} flex min-h-full min-w-0 w-full max-w-full flex-col overflow-x-hidden`}>{children}</body>
     </html>
   );
 }

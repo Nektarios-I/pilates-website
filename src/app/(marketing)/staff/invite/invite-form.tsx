@@ -57,20 +57,10 @@ const PERMISSION_DESCRIPTIONS: Record<Role, string> = {
   admin: 'Admins can invite all account types, including other admins.',
 };
 
-const INVITE_METHODS: { value: InviteMethod; label: string; description: string }[] = [
-  {
-    value: 'email_password',
-    label: 'Email + Password',
-    description:
-      'An invite email is sent. The invitee clicks the link and sets their own password. Best for staff and regular members.',
-  },
-  {
-    value: 'manual_account',
-    label: 'Manual account',
-    description:
-      'Creates the account immediately with a temporary password. No invite email or OTP email is sent.',
-  },
-];
+const MANUAL_ACCOUNT_METHOD: InviteMethod = 'manual_account';
+
+const MANUAL_ACCOUNT_DESCRIPTION =
+  'Creates the account immediately with a temporary password. No invite email or OTP email is sent.';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Validation
@@ -111,7 +101,9 @@ function validate_role(value: string, allowed_roles: Role[]): string | undefined
 }
 
 function validate_method(value: string): string | undefined {
-  if (!value) return 'Please select an invitation method.';
+  if (!value || value !== MANUAL_ACCOUNT_METHOD) {
+    return 'Manual account creation is required.';
+  }
   return undefined;
 }
 
@@ -229,7 +221,6 @@ function AccessDeniedState() {
 
 function SuccessBanner({
   data,
-  method,
   on_create_another,
 }: {
   data: InviteFormData;
@@ -237,7 +228,6 @@ function SuccessBanner({
   on_create_another: () => void;
 }) {
   const role_label = data.role ? ROLE_LABELS[data.role as Role] : '';
-  const method_label = INVITE_METHODS.find((m) => m.value === method)?.label ?? method;
 
   return (
     <div
@@ -261,13 +251,10 @@ function SuccessBanner({
           />
         </svg>
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-success">
-            {method === 'email_password' ? 'Invite email sent' : 'Account created'}
-          </p>
+          <p className="text-sm font-semibold text-success">Account created</p>
           <p className="mt-1 text-sm text-success">
-            {method === 'email_password'
-              ? `An invite email has been sent to ${data.email.trim()}. They will click the link and set their own password.`
-              : `The account for ${data.email.trim()} was created immediately. Share the temporary password securely and ask them to change it after signing in.`}
+            The account for {data.email.trim()} was created immediately. Share the temporary
+            password securely and ask them to change it after signing in.
           </p>
 
           <div className="mt-4 rounded-md border border-success-border bg-success-surface p-4">
@@ -292,17 +279,11 @@ function SuccessBanner({
                 <dd className="mt-0.5 text-foreground">{role_label}</dd>
               </div>
               <div className="sm:col-span-2">
-                <dt className="font-medium text-foreground/80">Invitation method</dt>
-                <dd className="mt-0.5 text-foreground">{method_label}</dd>
+                <dt className="font-medium text-foreground/80">Temporary password</dt>
+                <dd className="mt-0.5 text-foreground">
+                  Created by staff. Share it privately with the user.
+                </dd>
               </div>
-              {method === 'manual_account' && (
-                <div className="sm:col-span-2">
-                  <dt className="font-medium text-foreground/80">Temporary password</dt>
-                  <dd className="mt-0.5 text-foreground">
-                    Created by staff. Share it privately with the user.
-                  </dd>
-                </div>
-              )}
             </dl>
           </div>
 
@@ -330,7 +311,7 @@ const EMPTY_FORM: InviteFormData = {
   email: '',
   phone: '',
   role: '',
-  method: '',
+  method: MANUAL_ACCOUNT_METHOD,
   password: '',
 };
 
@@ -403,8 +384,8 @@ export function InviteForm({ currentRole }: InviteFormProps) {
         email: form_data.email.trim(),
         phone: form_data.phone.trim(),
         role: form_data.role as Role,
-        method: form_data.method as InviteMethod,
-    password: form_data.method === 'manual_account' ? form_data.password : undefined,
+        method: MANUAL_ACCOUNT_METHOD,
+        password: form_data.password,
       });
 
       if (result.success) {
@@ -546,57 +527,11 @@ export function InviteForm({ currentRole }: InviteFormProps) {
             </select>
           </FormField>
 
-          {/* Invitation method */}
-          <div>
-            <p className="block text-sm font-medium text-foreground" id="method-label">
-              Invitation method
-              <span aria-hidden="true" className="ml-1 text-destructive">
-                *
-              </span>
-            </p>
-            <div aria-labelledby="method-label" className="mt-2 space-y-3" role="radiogroup">
-              {INVITE_METHODS.map((m) => {
-                const is_checked = form_data.method === m.value;
-                return (
-                  <label
-                    key={m.value}
-                    className={[
-                      'flex cursor-pointer items-start gap-3 rounded-md border p-4 transition-colors',
-                      is_checked
-                        ? 'border-primary bg-surface'
-                        : 'border-border bg-background hover:border-accent',
-                      is_disabled ? 'cursor-not-allowed opacity-60' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                  >
-                    <input
-                      checked={is_checked}
-                      className="mt-0.5 h-4 w-4 cursor-pointer accent-primary"
-                      disabled={is_disabled}
-                      name="method"
-                      type="radio"
-                      value={m.value}
-                      onBlur={() => handle_blur('method')}
-                      onChange={() => handle_change('method', m.value)}
-                    />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">{m.label}</p>
-                      <p className="mt-0.5 text-sm leading-5 text-foreground/60">{m.description}</p>
-                    </div>
-                  </label>
-                );
-              })}
-            </div>
-            {errors.method && (
-              <p className="mt-1.5 text-xs leading-5 text-destructive" id="method-error" role="alert">
-                {errors.method}
-              </p>
-            )}
-          </div>
+          <p className="rounded-md border border-border bg-muted px-4 py-3 text-sm leading-6 text-foreground/70">
+            {MANUAL_ACCOUNT_DESCRIPTION}
+          </p>
 
-          {form_data.method === 'manual_account' && (
-            <FormField
+          <FormField
               error={errors.password}
               hint="Use at least 8 characters. Share this privately and ask the user to change it after first sign-in."
               id="password"
@@ -616,9 +551,8 @@ export function InviteForm({ currentRole }: InviteFormProps) {
                 value={form_data.password}
                 onBlur={() => handle_blur('password')}
                 onChange={(e) => handle_change('password', e.target.value)}
-              />
-            </FormField>
-          )}
+            />
+          </FormField>
         </div>
 
         {/* Actions */}

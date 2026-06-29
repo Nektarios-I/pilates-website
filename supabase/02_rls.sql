@@ -83,6 +83,29 @@ as $$
   );
 $$;
 
+-- True when the user already has a booked/waitlisted session at the same time slot
+create or replace function private.user_has_active_booking_at_slot(
+  p_user_id   uuid,
+  p_starts_at timestamptz,
+  p_ends_at   timestamptz
+)
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1
+      from public.bookings b
+      join public.sessions s on s.id = b.session_id
+     where b.user_id = p_user_id
+       and b.status in ('booked', 'waitlisted')
+       and s.starts_at = p_starts_at
+       and s.ends_at = p_ends_at
+  );
+$$;
+
 -- =============================================================================
 -- ENABLE RLS on all public tables
 -- =============================================================================
@@ -311,18 +334,13 @@ create policy "bookings: client reads own"
   to authenticated
   using ( (select auth.uid()) = user_id );
 
--- Instructors can view the roster for sessions they teach
+-- Staff (instructor, owner, admin) can view all bookings for operational rosters
 drop policy if exists "bookings: instructor reads assigned sessions" on public.bookings;
-create policy "bookings: instructor reads assigned sessions"
+drop policy if exists "bookings: staff reads all" on public.bookings;
+create policy "bookings: staff reads all"
   on public.bookings for select
   to authenticated
-  using (
-    (select private.is_instructor())
-    and session_id in (
-      select id from public.sessions
-      where instructor_id = (select auth.uid())
-    )
-  );
+  using ( (select private.is_staff()) );
 
 -- Admins / owners can view all bookings
 drop policy if exists "bookings: admin reads all" on public.bookings;

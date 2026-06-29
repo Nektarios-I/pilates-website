@@ -14,10 +14,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
-vi.mock("@/components/layout/use-header-auth", () => ({
-  useHeaderAuth: (auth: unknown) => auth,
-}));
-
 vi.mock("./site-header", () => ({
   SiteHeader: () => (
     <SiteHeaderView

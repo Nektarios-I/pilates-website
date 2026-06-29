@@ -11,13 +11,13 @@ export function getSupabaseUrl(): string {
 }
 
 export function getSupabasePublishableKey(): string {
-  const key =
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const publishable_key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (publishable_key) return publishable_key;
 
+  const anon_key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
   return requireEnv(
     'NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (or NEXT_PUBLIC_SUPABASE_ANON_KEY)',
-    key,
+    anon_key,
   );
 }
 

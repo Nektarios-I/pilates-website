@@ -55,6 +55,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 md:gap-10 mb-10">
         <div>
           <Link
+            aria-label="corehouse Pilates Studio home"
             className="inline-flex min-h-11 items-center text-primary-foreground hover:text-primary-foreground/80 transition-colors duration-200"
             href="/"
           >

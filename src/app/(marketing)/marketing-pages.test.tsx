@@ -1,5 +1,23 @@
 import { render, screen } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+
+vi.mock("@/lib/packages/get-public-catalog", () => ({
+  get_public_pricing_catalog: vi.fn().mockResolvedValue({
+    reformer: {
+      single: [{ title: "Single class", price: "€15", description: "1 class" }],
+      one_month: [{ title: "2× per week", price: "€100", description: "8 classes · 30 days", featured: true }],
+      three_month: [{ title: "2× per week", price: "€265", description: "24 classes · 90 days" }],
+    },
+    mat: {
+      single: [{ title: "Single class", price: "€10", description: "1 mat class" }],
+      one_month: [{ title: "2× per week", price: "€70", description: "8 classes · 30 days", featured: true }],
+      three_month: [{ title: "2× per week", price: "€195", description: "24 classes · 90 days" }],
+    },
+  }),
+  get_homepage_pricing_items: vi.fn().mockResolvedValue([
+    { title: "Single class", price: "€15", description: "1 class" },
+  ]),
+}));
 
 import AboutPage, { metadata as aboutMetadata } from "./about/page";
 import BlogPage, { metadata as blogMetadata } from "./blog/page";
@@ -72,8 +90,8 @@ const marketingPages = [
 describe("marketing routes", () => {
   it.each(marketingPages)(
     "renders the $name page with a page heading",
-    ({ Page, heading }) => {
-      render(<Page />);
+    async ({ Page, heading }) => {
+      render(await Page());
 
       expect(screen.getByRole("heading", { level: 1, name: heading })).toBeInTheDocument();
     },

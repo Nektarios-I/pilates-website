@@ -1,6 +1,8 @@
 import { PricingTierCard } from '@/components/sections/pricing-tier-card';
 import { ButtonLink } from '@/components/ui/button-link';
 import { site_content } from '@/config/site_content';
+import { get_public_pricing_catalog } from '@/lib/packages/get-public-catalog';
+import type { PricingPlanCard } from '@/lib/packages/types';
 import { createPageMetadata } from '@/lib/metadata';
 
 export const metadata = createPageMetadata({
@@ -9,42 +11,45 @@ export const metadata = createPageMetadata({
   path: '/pricing',
 });
 
-type Plan = {
-  name: string;
-  price: string;
-  description: string;
-};
-
-function plan_cards(plans: readonly Plan[], meta?: string) {
-  return plans.map((plan, index) => ({
-    title: plan.name,
+function plan_cards(plans: PricingPlanCard[], meta?: string) {
+  return plans.map((plan) => ({
+    title: plan.title,
     price: plan.price,
     description: plan.description,
     meta,
-    featured: plans.length > 1 && index === 1,
+    featured: plan.featured,
   }));
 }
 
-export default function PricingPage() {
-  const { mat, reformer } = site_content.pricing_preview;
+export default async function PricingPage() {
+  const catalog = await get_public_pricing_catalog();
 
   const pricing_groups = [
     {
       title: 'Reformer Pilates',
       description: 'Equipment-based classes with small-group capacity and precise spring resistance.',
       sections: [
-        { title: 'Single class', items: plan_cards([reformer.single], 'Reformer drop-in') },
-        { title: '1 month packages', items: plan_cards(reformer.one_month, 'Reformer · 30 days') },
-        { title: '3 month packages', items: plan_cards(reformer.three_month, 'Reformer · 90 days') },
+        { title: 'Single class', items: plan_cards(catalog.reformer.single, 'Reformer drop-in') },
+        {
+          title: '1 month packages',
+          items: plan_cards(catalog.reformer.one_month, 'Reformer · 30 days'),
+        },
+        {
+          title: '3 month packages',
+          items: plan_cards(catalog.reformer.three_month, 'Reformer · 90 days'),
+        },
       ],
     },
     {
       title: 'Mat Pilates',
       description: 'Floor-based classes for core strength, mobility, and breath-led control.',
       sections: [
-        { title: 'Single class', items: plan_cards([mat.single], 'Mat drop-in') },
-        { title: '1 month packages', items: plan_cards(mat.one_month, 'Mat · 30 days') },
-        { title: '3 month packages', items: plan_cards(mat.three_month, 'Mat · 90 days') },
+        { title: 'Single class', items: plan_cards(catalog.mat.single, 'Mat drop-in') },
+        { title: '1 month packages', items: plan_cards(catalog.mat.one_month, 'Mat · 30 days') },
+        {
+          title: '3 month packages',
+          items: plan_cards(catalog.mat.three_month, 'Mat · 90 days'),
+        },
       ],
     },
   ];
@@ -83,20 +88,24 @@ export default function PricingPage() {
                   <h3 className="font-serif font-medium text-xl md:text-2xl leading-normal text-foreground mb-8">
                     {section.title}
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
-                    {section.items.map((item) => (
-                      <PricingTierCard
-                        key={`${item.title}-${item.price}`}
-                        ctaHref={site_content.primary_cta.href}
-                        ctaLabel={site_content.primary_cta.label}
-                        description={item.description}
-                        featured={item.featured}
-                        meta={item.meta}
-                        price={item.price}
-                        title={item.title}
-                      />
-                    ))}
-                  </div>
+                  {section.items.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8">
+                      {section.items.map((item) => (
+                        <PricingTierCard
+                          key={`${item.title}-${item.price}`}
+                          ctaHref={site_content.primary_cta.href}
+                          ctaLabel={site_content.primary_cta.label}
+                          description={item.description}
+                          featured={item.featured}
+                          meta={item.meta}
+                          price={item.price}
+                          title={item.title}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="font-sans text-sm text-foreground/70">No packages in this group yet.</p>
+                  )}
                 </div>
               ))}
             </div>

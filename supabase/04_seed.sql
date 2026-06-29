@@ -47,19 +47,19 @@ values
     'b0000000-0000-0000-0000-000000000005',
     'Reformer · 3 Months · 2×/week',
     '24 reformer classes within 90 days.',
-    'reformer', 'credit_pack', 24, 90, 285.00, null, 5, true
+    'reformer', 'credit_pack', 24, 90, 265.00, null, 5, true
   ),
   (
     'b0000000-0000-0000-0000-000000000006',
     'Reformer · 3 Months · 3×/week',
     '36 reformer classes within 90 days.',
-    'reformer', 'credit_pack', 36, 90, 415.00, null, 6, true
+    'reformer', 'credit_pack', 36, 90, 400.00, null, 6, true
   ),
   (
     'b0000000-0000-0000-0000-000000000007',
     'Reformer · 3 Months · 4×/week',
     '48 reformer classes within 90 days.',
-    'reformer', 'credit_pack', 48, 90, 525.00, null, 7, true
+    'reformer', 'credit_pack', 48, 90, 520.00, null, 7, true
   ),
   (
     'c0000000-0000-0000-0000-000000000001',

@@ -11,10 +11,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
-vi.mock("@/components/layout/use-header-auth", () => ({
-  useHeaderAuth: (auth: unknown) => auth,
-}));
-
 describe("SiteHeader", () => {
   it("shows the studio identity, primary navigation, and booking action", () => {
     render(

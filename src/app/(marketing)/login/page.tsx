@@ -8,6 +8,7 @@ import {
 import { Container } from '@/components/ui/container';
 import { Section } from '@/components/ui/section';
 import { authDebugEnabled } from '@/lib/auth/debug';
+import { safe_auth_next_path } from '@/lib/auth/safe-auth-redirect';
 import { createPageMetadata } from '@/lib/metadata';
 import { createClient } from '@/lib/supabase/server';
 import { LoginForm } from './login-form';
@@ -21,7 +22,7 @@ export const metadata = createPageMetadata({
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ error?: string; message?: string; hint?: string }>;
+  searchParams: Promise<{ error?: string; message?: string; hint?: string; next?: string }>;
 }) {
   const params = await searchParams;
   const supabase = await createClient();
@@ -29,9 +30,9 @@ export default async function LoginPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  // If already logged in, redirect to account
+  // Session handoff after client sign-in — see docs/auth-sign-in-flow.md
   if (user) {
-    redirect('/account');
+    redirect(safe_auth_next_path(params.next));
   }
 
   return (
@@ -45,7 +46,7 @@ export default async function LoginPage({
                 Sign in
               </h1>
               <p className={marketingPageIntroClass}>
-                Sign in with your email and password, a one-time code, or Google.
+                Sign in with your email and password, or a one-time code.
               </p>
             </div>
 

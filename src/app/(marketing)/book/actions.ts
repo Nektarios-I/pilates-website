@@ -43,17 +43,18 @@ export async function book_session_action(
 ): Promise<BookResult> {
   const supabase = await createClient();
 
-  const { data, error } =
-    mat_package_id !== undefined
-      ? await supabase.rpc('book_session_with_credits', {
-          p_session_id: session_id,
-          p_reformer_user_package_id: reformer_package_id,
-          p_mat_user_package_id: mat_package_id,
-        })
-      : await supabase.rpc('book_session', {
-          p_session_id: session_id,
-          p_user_package_id: reformer_package_id,
-        });
+  const use_split_packages = mat_package_id !== undefined;
+
+  const { data, error } = use_split_packages
+    ? await supabase.rpc('book_session_with_credits', {
+        p_session_id: session_id,
+        p_reformer_user_package_id: reformer_package_id,
+        p_mat_user_package_id: mat_package_id,
+      })
+    : await supabase.rpc('book_session', {
+        p_session_id: session_id,
+        p_user_package_id: reformer_package_id,
+      });
 
   if (error) {
     // Map known Postgres error codes to friendly messages.
@@ -67,6 +68,7 @@ export async function book_session_action(
       P0007: 'The selected package has expired.',
       P0008: 'You do not have enough credits in this package for this session.',
       P0009: 'The selected package is for a different class type.',
+      P0013: 'You already have a booking at this time. You can book other sessions the same day, but not two classes at the same time.',
     };
 
     // Supabase wraps Postgres exceptions; check the detail/message for the code

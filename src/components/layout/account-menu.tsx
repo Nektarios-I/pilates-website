@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useId, useRef, useState, useTransition } from 'react';
 
 import { signOut } from '@/app/(marketing)/login/actions';
@@ -17,7 +16,6 @@ const link_class =
 const button_class = `${link_class} w-full text-left`;
 
 export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: AccountMenuProps) {
-  const router = useRouter();
   const [open, set_open] = useState(false);
   const [is_pending, start_transition] = useTransition();
   const menu_ref = useRef<HTMLDivElement>(null);
@@ -42,8 +40,6 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
     start_transition(async () => {
       close_menu();
       await signOut();
-      router.push('/login');
-      router.refresh();
     });
   }
 
@@ -89,11 +85,27 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
             <>
               <Link
                 className={link_class}
+                href="/staff/pricing"
+                onClick={close_menu}
+                role="menuitem"
+              >
+                Manage pricing
+              </Link>
+              <Link
+                className={link_class}
                 href="/staff/messages"
                 onClick={close_menu}
                 role="menuitem"
               >
                 Contact messages
+              </Link>
+              <Link
+                className={link_class}
+                href="/staff/bookings"
+                onClick={close_menu}
+                role="menuitem"
+              >
+                Booking history
               </Link>
               <Link
                 className={link_class}
@@ -116,6 +128,14 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
 
           {is_staff ? (
             <>
+              <Link
+                className={link_class}
+                href="/staff/day-bookings"
+                onClick={close_menu}
+                role="menuitem"
+              >
+                Day bookings
+              </Link>
               <Link
                 className={link_class}
                 href="/staff/invite"

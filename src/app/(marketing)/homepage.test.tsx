@@ -14,10 +14,6 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/",
 }));
 
-vi.mock("@/components/layout/use-header-auth", () => ({
-  useHeaderAuth: (auth: unknown) => auth,
-}));
-
 vi.mock("@/components/layout/site-header", () => ({
   SiteHeader: () => (
     <SiteHeaderView
@@ -26,11 +22,19 @@ vi.mock("@/components/layout/site-header", () => ({
   ),
 }));
 
+vi.mock("@/lib/packages/get-public-catalog", () => ({
+  get_homepage_pricing_items: vi.fn().mockResolvedValue([
+    { title: "Single class", price: "€15", description: "1 reformer class" },
+    { title: "1 month · 2×/week", price: "€100", description: "8 classes", featured: true },
+    { title: "3 months · 2×/week", price: "€265", description: "24 classes" },
+  ]),
+}));
+
 describe("HomePage", () => {
-  it("renders inside the shared marketing landmarks", () => {
+  it("renders inside the shared marketing landmarks", async () => {
     render(
       <MarketingLayout>
-        <HomePage />
+        {await HomePage()}
       </MarketingLayout>,
     );
 
@@ -39,8 +43,8 @@ describe("HomePage", () => {
     expect(screen.getByRole("contentinfo")).toBeInTheDocument();
   });
 
-  it("renders the homepage shell sections with a clear heading structure", () => {
-    render(<HomePage />);
+  it("renders the homepage shell sections with a clear heading structure", async () => {
+    render(await HomePage());
 
     expect(screen.getAllByRole("heading", { level: 1 })).toHaveLength(1);
     expect(
@@ -68,10 +72,10 @@ describe("HomePage", () => {
     expect(screen.getByText("Irene")).toBeInTheDocument();
   });
 
-  it("shows the primary CTA in the main homepage content", () => {
+  it("shows the primary CTA in the main homepage content", async () => {
     render(
       <MarketingLayout>
-        <HomePage />
+        {await HomePage()}
       </MarketingLayout>,
     );
 

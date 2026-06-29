@@ -9,6 +9,8 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { ContentImage } from "@/components/ui/content-image";
 import { site_content } from "@/config/site_content";
 import { homeContent } from "@/features/home/home-content";
+import { get_homepage_pricing_items } from '@/lib/packages/get-public-catalog';
+import type { PricingPlanCard } from '@/lib/packages/types';
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
@@ -16,7 +18,9 @@ export const metadata = createPageMetadata({
   description: site_content.seo.site_description,
 });
 
-export default function HomePage() {
+export default async function HomePage() {
+  const pricing_items = await get_homepage_pricing_items();
+
   return (
     <>
       <PageHero {...homeContent.hero} />
@@ -93,7 +97,7 @@ export default function HomePage() {
         title={homeContent.pricing.title}
       >
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {homeContent.pricing.items.map((plan) => (
+          {pricing_items.map((plan: PricingPlanCard) => (
             <PricingTierCard
               key={plan.title}
               ctaHref={homeContent.pricing.cta_href}

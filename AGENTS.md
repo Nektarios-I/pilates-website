@@ -39,6 +39,7 @@ Before making non-trivial changes, read these files:
 - `docs/ui-architecture.md`
 - `docs/responsive-strategy.md`
 - `docs/engineering-principles.md`
+- `docs/auth-sign-in-flow.md` (required before changing login, logout, or header auth)
 - `docs/project-ledger.md`
 - `docs/decision-log.md`
 
