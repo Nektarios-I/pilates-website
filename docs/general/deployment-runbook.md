@@ -100,7 +100,7 @@ Promotion gate from preview to production:
 
 Goal: promote validated code to live domain safely.
 
-**Branch and promotion policy**: Define and document this per repository owners' workflow (e.g., merge to `main`, require approvals, enforce CI gates). This runbook assumes a standard feature-branch-to-main flow; adjust steps per your actual promotion strategy.
+**Branch and promotion policy**: Production deploys from the `master` branch. Merge feature work into `master`, then push to trigger Vercel production.
 
 1. Merge approved PR to production branch per documented promotion policy.
 2. Trigger production deployment through normal Vercel integration (automated or manual per your setup).
@@ -121,6 +121,23 @@ Production go/no-go criteria:
 ## 5) Domain and DNS checklist
 
 Apply this checklist before first production launch or when changing domains.
+
+### Corehouse production domain (locked)
+
+| Role | Host |
+|------|------|
+| Canonical production URL (`NEXT_PUBLIC_SITE_URL`) | `https://corehousepilatescy.com` |
+| www alias (redirect only — configure in Vercel Domains) | `https://www.corehousepilatescy.com` |
+| Vercel default hostname (redirect to custom domain in Vercel) | `pilates-website-orpin.vercel.app` |
+
+Code reads the canonical base URL from `NEXT_PUBLIC_SITE_URL` via `src/config/site.ts`. That value drives:
+
+- `metadataBase` and page canonical/Open Graph URLs (`src/lib/metadata.ts`)
+- `/robots.txt` sitemap pointer (`src/app/robots.ts`)
+- `/sitemap.xml` absolute URLs (`src/app/sitemap.ts`)
+- Staff invite email redirect targets (`src/app/(marketing)/staff/invite/actions.ts`)
+
+Do **not** set `NEXT_PUBLIC_SITE_URL` to the `www` host or the `*.vercel.app` host in production.
 
 1. Domain is connected to hosting project.
 2. DNS records point to the expected hosting provider targets.

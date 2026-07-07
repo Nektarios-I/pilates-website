@@ -27,7 +27,7 @@ export const site_images = {
   },
   contact: {
     contact_us: {
-      src: '/images/Contact/ContactUs.jfif',
+      src: '/images/Contact/contact-us.jpg',
       alt: 'Contact corehouse Pilates studio',
     },
     schedule: {

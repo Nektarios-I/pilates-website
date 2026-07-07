@@ -16,10 +16,10 @@ Primary sources used:
 
 Audit result summary:
 
-- All environment variable reads are centralized in `src/config/site.ts`.
-- All currently used env vars are `NEXT_PUBLIC_*` variables (public at build/runtime).
-- `.env.example` includes all variables currently used by config.
-- No server-only env variables are currently implemented in runtime config.
+- Public site config env access is centralized in `src/config/site.ts`.
+- Supabase env access is centralized in `src/lib/supabase/env.ts`.
+- `.env.example` documents all required variables (tracked in git).
+- Production canonical URL must be `https://corehousepilatescy.com` via `NEXT_PUBLIC_SITE_URL`.
 
 ---
 
@@ -52,8 +52,10 @@ Audit result summary:
 
 ### Production
 
-- Same variable set should be provided in production environment.
-- `NEXT_PUBLIC_SITE_URL` should be explicitly set to the production domain.
+- Set `NEXT_PUBLIC_SITE_URL=https://corehousepilatescy.com` (apex, no trailing slash).
+- Configure `www.corehousepilatescy.com` as a redirect to the apex in Vercel Domains (not in `NEXT_PUBLIC_SITE_URL`).
+- Set Supabase keys (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) in Vercel Production environment.
+- Add both `https://corehousepilatescy.com/**` and `https://www.corehousepilatescy.com/**` to Supabase Auth redirect allow list if using www.
 
 ---
 
