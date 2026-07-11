@@ -106,7 +106,7 @@ describe('cancel_booking_action', () => {
     vi.clearAllMocks();
   });
 
-  it('maps the 2-hour cancellation cutoff error', async () => {
+  it('maps the 4-hour cancellation cutoff error', async () => {
     create_client_mock.mockResolvedValue({
       rpc: vi.fn(async () => ({
         data: null,
@@ -119,7 +119,7 @@ describe('cancel_booking_action', () => {
     expect(result).toEqual({
       success: false,
       error:
-        'Online cancellation closes 2 hours before class. Your session credit is kept for this booking.',
+        'Online cancellation closes 4 hours before class. Your session credit is kept for this booking.',
     });
   });
 });

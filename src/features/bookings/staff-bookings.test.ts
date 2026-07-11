@@ -16,7 +16,7 @@ const sample_row = {
   cancelled_at: null,
   cancellation_reason: null,
   credits_used: 1,
-  profiles: { full_name: 'Maria Papadou', email: 'maria@example.com' },
+  profiles: { full_name: 'Maria Papadou', email: 'maria@example.com', phone: '+357 99 000000' },
   sessions: {
     title: 'Morning Reformer',
     starts_at: '2026-06-25T08:00:00.000Z',
@@ -43,6 +43,7 @@ describe('staff booking helpers', () => {
       credits_used: 1,
       client_name: 'Maria Papadou',
       client_email: 'maria@example.com',
+      client_phone: '+357 99 000000',
       session_title: 'Morning Reformer',
       session_starts_at: '2026-06-25T08:00:00.000Z',
       session_ends_at: '2026-06-25T09:00:00.000Z',
@@ -80,13 +81,24 @@ describe('staff booking helpers', () => {
     expect(sorted.map((row) => row.id)).toEqual(['later', 'earlier']);
   });
 
-  it('filter_staff_bookings_by_search matches client name or email', () => {
+  it('filter_staff_bookings_by_search matches client name, email, or phone', () => {
     const mapped = map_staff_booking(sample_row)!;
 
     expect(filter_staff_bookings_by_search([mapped], 'maria')).toHaveLength(1);
     expect(filter_staff_bookings_by_search([mapped], 'papadou')).toHaveLength(1);
     expect(filter_staff_bookings_by_search([mapped], 'example.com')).toHaveLength(1);
+    expect(filter_staff_bookings_by_search([mapped], '99000000')).toHaveLength(1);
     expect(filter_staff_bookings_by_search([mapped], 'unknown')).toHaveLength(0);
+  });
+
+  it('map_staff_booking keeps rows when email is missing but phone is present', () => {
+    const mapped = map_staff_booking({
+      ...sample_row,
+      profiles: { full_name: 'MARIA PAPADOPOULOU', email: null, phone: '+357 99 123 456' },
+    });
+
+    expect(mapped?.client_email).toBeNull();
+    expect(mapped?.client_phone).toBe('+357 99 123 456');
   });
 
   it('format_booking_status humanizes values', () => {

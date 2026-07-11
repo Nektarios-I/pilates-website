@@ -53,7 +53,8 @@ const BOOKINGS_WITH_SESSION_SELECT = `
   session_id,
   profiles!inner (
     full_name,
-    email
+    email,
+    phone
   ),
   sessions!inner (
     id,

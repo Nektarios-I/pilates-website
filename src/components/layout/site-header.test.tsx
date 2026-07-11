@@ -30,7 +30,7 @@ describe("SiteHeader", () => {
       "/classes",
     );
     expect(within(header).getByRole("link", { name: "Book Now" })).toHaveAttribute("href", "/book");
-    expect(within(header).getByRole("link", { name: "Sign in" })).toHaveAttribute(
+    expect(within(header).getByRole("link", { name: "Login" })).toHaveAttribute(
       "href",
       "/login",
     );
@@ -49,7 +49,7 @@ describe("SiteHeader", () => {
     );
 
     expect(screen.getByRole("button", { name: /account/i })).toBeInTheDocument();
-    expect(screen.queryByRole("link", { name: "Sign in" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Login" })).not.toBeInTheDocument();
   });
 
   it("opens an accessible mobile navigation menu", () => {

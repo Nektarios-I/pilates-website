@@ -43,10 +43,10 @@ export default async function BookPage() {
             Book a session
           </h1>
           <p className="mt-4 font-sans text-lg md:text-xl leading-relaxed text-foreground">
-            Sign in to choose a day and reserve your reformer class.
+            Login to choose a day and reserve your reformer class.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
-            <ButtonLink href="/login">Sign in to book</ButtonLink>
+            <ButtonLink href="/login">Login to book</ButtonLink>
             <ButtonLink href="/pricing" variant="secondary">
               View pricing
             </ButtonLink>

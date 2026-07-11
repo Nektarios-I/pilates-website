@@ -44,6 +44,7 @@ describe('day booking helpers', () => {
       status: 'booked',
       client_name: 'Maria Papadou',
       client_email: 'maria@example.com',
+      client_phone: null,
       booked_at: '2026-06-20T09:00:00.000Z',
       cancelled_at: null,
     });

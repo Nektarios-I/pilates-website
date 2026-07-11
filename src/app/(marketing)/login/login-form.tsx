@@ -31,13 +31,13 @@ interface LoginFormProps {
 
 const HINT_MESSAGES: Record<string, string> = {
   link_expired:
-    'That sign-in link has expired or was already used. Magic links are single-use and valid for about 1 hour. Request a fresh one below.',
+    'That login link has expired or was already used. Magic links are single-use and valid for about 1 hour. Request a fresh one below.',
   link_expired_or_invalid:
-    'The sign-in link is invalid or has expired. Request a new link and open it in the same browser you used to request it.',
+    'The login link is invalid or has expired. Request a new link and open it in the same browser you used to request it.',
   pkce_browser_mismatch:
-    'Open the sign-in link in the same browser where you entered your email — not in an email app or different browser.',
-  auth_failed: 'Sign-in could not be completed. Please try again.',
-  password_updated: 'Your password has been updated. Sign in below.',
+    'Open the login link in the same browser where you entered your email — not in an email app or different browser.',
+  auth_failed: 'Login could not be completed. Please try again.',
+  password_updated: 'Your password has been updated. Login below.',
 };
 
 function resolve_initial_state(
@@ -49,7 +49,7 @@ function resolve_initial_state(
   if (error === 'auth_callback_error')
     return {
       error:
-        'The sign-in link could not be verified. It may have expired or already been used. Request a new one below.',
+        'The login link could not be verified. It may have expired or already been used. Request a new one below.',
     };
   if (error) return { error };
   if (message === 'password_updated') return { success: HINT_MESSAGES.password_updated };
@@ -305,7 +305,7 @@ export function LoginForm({
             clear_status();
           }}
         >
-          Back to sign in
+          Back to login
         </button>
       </div>
     );
@@ -348,7 +348,7 @@ export function LoginForm({
             clear_status();
           }}
         >
-          Back to sign in
+          Back to login
         </button>
       </div>
     );
@@ -369,7 +369,7 @@ export function LoginForm({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground" htmlFor="otp-code">
-                Sign-in code
+                Login code
               </label>
               <input
                 autoComplete="one-time-code"
@@ -419,7 +419,7 @@ export function LoginForm({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground" htmlFor="identifier">
-                Email or name
+                Name, email, or phone
               </label>
               <input
                 autoComplete="username"
@@ -427,13 +427,13 @@ export function LoginForm({
                 disabled={is_loading}
                 id="identifier"
                 name="identifier"
-                placeholder="NAME SURNAME or you@example.com"
+                placeholder="NAME SURNAME, you@example.com, or +357 99 000000"
                 type="text"
                 value={identifier}
                 onChange={(e) => set_identifier(e.target.value)}
               />
               <p className="mt-2 text-xs text-foreground/60">
-                For name sign-in use ALL CAPS: NAME SURNAME (as on your account).
+                For name login use ALL CAPS: NAME SURNAME (as on your account).
               </p>
             </div>
 
@@ -465,7 +465,7 @@ export function LoginForm({
             </div>
 
             <Button className="w-full" disabled={is_loading} size="lg" type="submit">
-              {is_loading ? 'Signing in…' : 'Sign in'}
+              {is_loading ? 'Logging in…' : 'Login'}
             </Button>
           </div>
         </form>
@@ -519,14 +519,14 @@ export function LoginForm({
             clear_status();
           }}
         >
-          {mode === 'password' ? 'Sign in without password' : 'Use password instead'}
+          {mode === 'password' ? 'Login without password' : 'Use password instead'}
         </button>
       </div>
 
       {/* Privacy note */}
       <p className="mt-6 text-xs leading-5 text-foreground/60">
-        By signing in, you agree to our terms of service and privacy policy. After your first
-        sign-in this site will remember you automatically until you sign out.
+        By logging in, you agree to our terms of service and privacy policy. After your first
+        login this site will remember you automatically until you sign out.
       </p>
     </div>
   );

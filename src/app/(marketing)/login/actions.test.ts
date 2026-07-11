@@ -60,7 +60,7 @@ describe('login actions', () => {
 
     expect(result).toEqual({
       success: false,
-      error: 'Incorrect email/name or password. Check your details and try again.',
+      error: 'Incorrect login details or password. Check your details and try again.',
     });
   });
 

@@ -36,6 +36,14 @@ Run each file **once**, top to bottom:
 | 21 | `27_booking_horizon_recurring_priority_forecast.sql` | 14-day horizon, recurring gate, token forecast |
 | 22 | `28_staff_client_materialization.sql` | Client-scoped materialization + exclusion dialog RPCs |
 | 23 | `29_fix_recurring_forecast_volatility.sql` | Fix forecast STABLE + temp table error |
+| 24 | `30_cancel_booking_recurring_sync.sql` | Cancel clears stale materialization logs; forecast/gates ignore cancelled bookings |
+| 25 | `31_materialize_selection_atomic.sql` | Atomic per-client selection materialize + live-booking skip guard |
+| 26 | `32_materialize_selection_schedule_line.sql` | `schedule_line_id` matching in selection payload |
+| 27 | `33_optional_profile_contact.sql` | Optional profile email; unique phone index; internal auth emails |
+| 28 | `34_fix_duplicate_profile_phones.sql` | Dedupe duplicate phones if migration 33 index fails (conditional) |
+| 29 | `35_cron_materialize_live_booking_check.sql` | Align daily cron skip guard with live-booking check (run after 34) |
+| 30 | `36_client_cancel_four_hour_cutoff.sql` | Client self-cancel cutoff 4 hours (P0029) |
+| 31 | `37_profiles_rls_staff_directory.sql` | Restrict profile reads: staff see all; clients see staff directory + own row |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -57,6 +65,14 @@ Run each file **once**, top to bottom:
 | Scripts 01–26 | `27_booking_horizon_recurring_priority_forecast.sql` |
 | Scripts 01–27 | `28_staff_client_materialization.sql` |
 | Scripts 01–28 | `29_fix_recurring_forecast_volatility.sql` |
+| Scripts 01–29 | `30_cancel_booking_recurring_sync.sql` |
+| Scripts 01–30 | `31_materialize_selection_atomic.sql` → verify with `supabase/tests/materialize_selection_regression.sql` |
+| Scripts 01–31 | `32_materialize_selection_schedule_line.sql` |
+| Scripts 01–32 | `33_optional_profile_contact.sql` |
+| Scripts 01–33 (phone index failed) | `34_fix_duplicate_profile_phones.sql` then finish 33 if needed |
+| Scripts 01–34 | `35_cron_materialize_live_booking_check.sql` |
+| Scripts 01–35 | `36_client_cancel_four_hour_cutoff.sql` |
+| Scripts 01–36 | `37_profiles_rls_staff_directory.sql` |
 
 After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
 
@@ -68,7 +84,7 @@ Public `book_session` wrappers fail on full capacity (no waitlist). Public and s
 
 **Migration 27 re-run:** If you see `cannot change return type of existing function` for `get_recurring_prebook_forecast`, the script now includes `DROP FUNCTION` before recreating it. Re-run the full `27_booking_horizon_recurring_priority_forecast.sql` file (safe to re-run).
 
-**Cancellation policy (migration 24):** client self-cancel blocked within 2 hours of class start (P0029); staff may cancel anytime.
+**Cancellation policy (migration 36):** client self-cancel blocked within 4 hours of class start (P0029); staff may cancel anytime.
 
 ---
 

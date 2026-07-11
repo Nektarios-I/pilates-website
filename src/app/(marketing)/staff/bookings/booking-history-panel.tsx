@@ -54,9 +54,13 @@ function BookingRow({ booking }: { booking: StaffBookingRecord }) {
               {booking.client_name ?? 'Unnamed client'}
             </p>
             <p className="mt-1 text-sm text-foreground/70">
-              <a className="hover:text-foreground" href={`mailto:${booking.client_email}`}>
-                {booking.client_email}
-              </a>
+              {booking.client_email ? (
+                <a className="hover:text-foreground" href={`mailto:${booking.client_email}`}>
+                  {booking.client_email}
+                </a>
+              ) : (
+                booking.client_phone ?? 'Contact details not provided'
+              )}
             </p>
           </div>
 
@@ -182,7 +186,7 @@ export function BookingHistoryPanel({
           <span className="font-medium text-foreground">Client search</span>
           <input
             className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
-            placeholder="Name or email"
+            placeholder="Name, email, or phone"
             type="search"
             value={draft_filters.search}
             onChange={(event) =>

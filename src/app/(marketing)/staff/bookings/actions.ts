@@ -26,7 +26,8 @@ const BOOKINGS_SELECT = `
   credits_used,
   profiles!inner (
     full_name,
-    email
+    email,
+    phone
   ),
   sessions!inner (
     title,

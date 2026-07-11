@@ -190,7 +190,7 @@ describe('BookingCalendar', () => {
 
     expect(
       screen.getByText(
-        'You can cancel online more than 2 hours before class. Inside 2 hours, the session credit is kept.',
+        'You can cancel online more than 4 hours before class. Inside 4 hours, the session credit is kept.',
       ),
     ).toBeInTheDocument();
   });

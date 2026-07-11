@@ -82,7 +82,7 @@ export async function book_session_action(
 //
 // Calls the cancel_booking() Postgres function which:
 //   • Verifies the booking exists and belongs to the caller (or caller is admin/owner)
-//   • Client self-cancel blocked within 2 hours of session start (P0029)
+//   • Client self-cancel blocked within 4 hours of session start (P0029)
 //   • Refunds credits to the package (for 'booked' status only)
 //   • Re-activates the package if it was used_up
 //   • Marks the booking as 'cancelled'
@@ -105,7 +105,7 @@ export async function cancel_booking_action(
       P0011: 'You are not authorised to cancel this booking.',
       P0012: 'This booking cannot be cancelled in its current state.',
       P0029:
-        'Online cancellation closes 2 hours before class. Your session credit is kept for this booking.',
+        'Online cancellation closes 4 hours before class. Your session credit is kept for this booking.',
     };
 
     const raw = error.message ?? '';

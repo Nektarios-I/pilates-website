@@ -46,9 +46,13 @@ function AttendeeRow({
           {booking.client_name ?? 'Unnamed client'}
         </p>
         <p className="mt-0.5 text-sm text-foreground/70">
-          <a className="hover:text-foreground" href={`mailto:${booking.client_email}`}>
-            {booking.client_email}
-          </a>
+          {booking.client_email ? (
+            <a className="hover:text-foreground" href={`mailto:${booking.client_email}`}>
+              {booking.client_email}
+            </a>
+          ) : (
+            booking.client_phone ?? 'Contact details not provided'
+          )}
         </p>
       </div>
       <p className="text-xs font-medium uppercase tracking-wide text-foreground/60">

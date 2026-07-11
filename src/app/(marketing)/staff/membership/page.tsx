@@ -61,7 +61,7 @@ export default async function ManageMembershipPage() {
             Manage membership
           </h1>
           <p className="mt-3 text-base leading-7 text-foreground/70">
-            Apply a package to a client account, deactivate a membership, or adjust remaining
+            Apply a package to a client account, deactivate or remove a membership, or adjust remaining
             credits.
           </p>
         </div>

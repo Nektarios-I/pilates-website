@@ -19,13 +19,14 @@ import {
   CANCELLATION_POLICY_SHORT,
   client_may_cancel_online,
 } from '@/lib/booking/cancellation-policy';
+import { display_profile_email } from '@/lib/auth/account-identifiers';
 import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
 
 
 interface Profile {
   id: string;
-  email: string;
+  email: string | null;
   full_name: string | null;
   phone: string | null;
   status: string;
@@ -206,7 +207,9 @@ export function AccountContent({
 
                 <div>
                   <dt className="font-medium text-foreground">Email</dt>
-                  <dd className="mt-1 text-foreground/80">{user.email}</dd>
+                  <dd className="mt-1 text-foreground/80">
+                    {display_profile_email(profile?.email, user.email) ?? 'Not provided yet'}
+                  </dd>
                 </div>
 
                 <div>
@@ -397,7 +400,7 @@ export function AccountContent({
             <div className="rounded-md border border-border bg-background p-6">
               <h2 className="text-xl font-semibold text-foreground">Change password</h2>
               <p className="mt-1 text-sm text-foreground/70">
-                Update the password you use to sign in with email and password.
+                Update the password you use to login with email and password.
               </p>
 
               {password_success && (

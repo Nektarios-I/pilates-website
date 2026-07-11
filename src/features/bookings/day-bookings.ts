@@ -45,7 +45,8 @@ export type DayBookingAttendee = {
   id: string;
   status: BookingStatus;
   client_name: string | null;
-  client_email: string;
+  client_email: string | null;
+  client_phone: string | null;
   booked_at: string;
   cancelled_at: string | null;
 };
@@ -114,12 +115,15 @@ type RawDayBookingRow = {
   booked_at: string;
   cancelled_at: string | null;
   session_id: string;
-  profiles: { full_name: string | null; email: string } | { full_name: string | null; email: string }[];
+  profiles:
+    | { full_name: string | null; email: string | null; phone: string | null }
+    | { full_name: string | null; email: string | null; phone: string | null }[];
 };
 
 export function map_day_booking_attendee(row: RawDayBookingRow): DayBookingAttendee | null {
   const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
-  if (!profile?.email) return null;
+  if (!profile) return null;
+  if (!profile.email && !profile.phone && !profile.full_name) return null;
 
   const status = row.status as BookingStatus;
   if (!is_active_booking_status(status) && !is_cancelled_booking_status(status)) return null;
@@ -129,6 +133,7 @@ export function map_day_booking_attendee(row: RawDayBookingRow): DayBookingAtten
     status,
     client_name: profile.full_name,
     client_email: profile.email,
+    client_phone: profile.phone ?? null,
     booked_at: row.booked_at,
     cancelled_at: row.cancelled_at,
   };

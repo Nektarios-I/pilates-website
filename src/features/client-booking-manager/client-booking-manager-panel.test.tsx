@@ -44,8 +44,8 @@ vi.mock('@/features/client-booking-manager/actions', () => ({
 import { ClientBookingManagerPanel } from '@/features/client-booking-manager/client-booking-manager-panel';
 
 const clients = [
-  { id: 'client-1', full_name: 'Alex Client', email: 'alex@example.com' },
-  { id: 'client-2', full_name: 'Sam Client', email: 'sam@example.com' },
+  { id: 'client-1', full_name: 'Alex Client', email: 'alex@example.com', phone: '+357 99 111111' },
+  { id: 'client-2', full_name: 'Sam Client', email: null, phone: '+357 99 222222' },
 ];
 
 const session_cards = [

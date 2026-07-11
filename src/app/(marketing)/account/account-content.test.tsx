@@ -28,9 +28,9 @@ const base_user = {
 } as never;
 
 describe('AccountContent cancellation policy', () => {
-  it('shows policy text and hides cancel inside the 2-hour window', () => {
+  it('shows policy text and hides cancel inside the 4-hour window', () => {
     const inside_cutoff = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-    const outside_cutoff = new Date(Date.now() + 4 * 60 * 60 * 1000).toISOString();
+    const outside_cutoff = new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString();
 
     render(
       <AccountContent
@@ -75,10 +75,10 @@ describe('AccountContent cancellation policy', () => {
 
     expect(screen.getByText(CANCELLATION_POLICY_SHORT)).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Online cancellation closes 2 hours before class. Your session credit is kept for this booking.',
-      ),
-    ).toBeInTheDocument();
+      screen.getAllByText(
+        'Online cancellation closes 4 hours before class. Your session credit is kept for this booking.',
+      ).length,
+    ).toBeGreaterThan(0);
     expect(screen.getAllByRole('button', { name: 'Cancel booking' })).toHaveLength(1);
   });
 

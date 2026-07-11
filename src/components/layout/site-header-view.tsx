@@ -52,7 +52,7 @@ export function SiteHeaderView({ auth }: SiteHeaderViewProps) {
       className="inline-flex min-h-11 items-center font-sans font-semibold text-[13px] uppercase tracking-widest text-foreground opacity-80 transition-opacity duration-200 hover:opacity-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       href="/login"
     >
-      Sign in
+      Login
     </Link>
   );
 

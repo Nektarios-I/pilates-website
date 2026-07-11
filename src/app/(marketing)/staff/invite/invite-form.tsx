@@ -71,21 +71,21 @@ function validate_full_name(value: string): string | undefined {
   if (!trimmed) return 'Full name is required.';
   if (trimmed.length < 2) return 'Full name must be at least 2 characters.';
   if (!/^[A-Z]+(?: [A-Z]+)+$/.test(trimmed)) {
-    return 'Use ALL CAPS in the format NAME SURNAME (e.g. MARIA PAPADOPOULOU).';
+    return 'Use ALL CAPS in the format NAME SURNAME.';
   }
   return undefined;
 }
 
 function validate_email(value: string): string | undefined {
   const trimmed = value.trim();
-  if (!trimmed) return 'Email address is required.';
+  if (!trimmed) return undefined;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)) return 'Please enter a valid email address.';
   return undefined;
 }
 
 function validate_phone(value: string): string | undefined {
   const trimmed = value.trim();
-  if (!trimmed) return 'Phone number is required.';
+  if (!trimmed) return undefined;
   if (!/^[+\d\s\-(). ]+$/.test(trimmed)) return 'Phone number contains invalid characters.';
   const digits = trimmed.replace(/\D/g, '');
   if (digits.length < 7) return 'Please enter a valid phone number.';
@@ -253,8 +253,10 @@ function SuccessBanner({
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-success">Account created</p>
           <p className="mt-1 text-sm text-success">
-            The account for {data.email.trim()} was created immediately. Share the temporary
-            password securely and ask them to change it after signing in.
+            The account for {data.full_name.trim()} was created immediately. Share the temporary
+            password securely and ask them to login with their name
+            {data.email.trim() ? ', email,' : ''}
+            {data.phone.trim() ? ' or phone' : ''}.
           </p>
 
           <div className="mt-4 rounded-md border border-success-border bg-success-surface p-4">
@@ -268,11 +270,13 @@ function SuccessBanner({
               </div>
               <div>
                 <dt className="font-medium text-foreground/80">Email</dt>
-                <dd className="mt-0.5 break-all text-foreground">{data.email.trim()}</dd>
+                <dd className="mt-0.5 break-all text-foreground">
+                  {data.email.trim() || 'Not provided'}
+                </dd>
               </div>
               <div>
                 <dt className="font-medium text-foreground/80">Phone</dt>
-                <dd className="mt-0.5 text-foreground">{data.phone.trim()}</dd>
+                <dd className="mt-0.5 text-foreground">{data.phone.trim() || 'Not provided'}</dd>
               </div>
               <div>
                 <dt className="font-medium text-foreground/80">Role</dt>
@@ -450,19 +454,19 @@ export function InviteForm({ currentRole }: InviteFormProps) {
               disabled={is_disabled}
               id="full_name"
               name="full_name"
-              placeholder="MARIA PAPADOPOULOU"
+              placeholder="NAME SURNAME"
               type="text"
               value={form_data.full_name}
               onBlur={() => handle_blur('full_name')}
               onChange={(e) => handle_change('full_name', e.target.value.toUpperCase())}
             />
             <p className="mt-2 text-xs text-foreground/60" id="full_name-hint">
-              Enter ALL CAPS as NAME SURNAME. Clients can sign in with this name or their email.
+              Enter ALL CAPS as NAME SURNAME. Clients can login with this name, email, or phone.
             </p>
           </FormField>
 
           {/* Email */}
-          <FormField error={errors.email} id="email" label="Email address" required>
+          <FormField error={errors.email} id="email" label="Email address">
             <input
               aria-describedby={errors.email ? 'email-error' : undefined}
               aria-invalid={!!errors.email}
@@ -477,15 +481,15 @@ export function InviteForm({ currentRole }: InviteFormProps) {
               onBlur={() => handle_blur('email')}
               onChange={(e) => handle_change('email', e.target.value)}
             />
+            <p className="mt-2 text-xs text-foreground/60">Optional. Leave blank if the client will login with name or phone only.</p>
           </FormField>
 
           {/* Phone */}
           <FormField
             error={errors.phone}
-            hint="Include country code, e.g. +357 97621017"
+            hint="Optional. Include country code, e.g. +357 97621017"
             id="phone"
             label="Phone number"
-            required
           >
             <input
               aria-describedby={errors.phone ? 'phone-error' : 'phone-hint'}
@@ -533,7 +537,7 @@ export function InviteForm({ currentRole }: InviteFormProps) {
 
           <FormField
               error={errors.password}
-              hint="Use at least 8 characters. Share this privately and ask the user to change it after first sign-in."
+              hint="Use at least 8 characters. Share this privately and ask the user to change it after first login."
               id="password"
               label="Temporary password"
               required

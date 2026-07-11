@@ -141,7 +141,7 @@ export function InviteClient({ debugEnabled }: InviteClientProps) {
           className="mt-5 inline-flex min-h-11 items-center text-sm font-medium text-destructive underline underline-offset-4"
           href="/login"
         >
-          Return to sign in
+          Return to login
         </Link>
       </div>
     );

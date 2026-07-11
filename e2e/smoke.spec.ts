@@ -4,13 +4,13 @@ test.describe("public smoke", () => {
   test("login page loads for unauthenticated visitors", async ({ page }) => {
     await page.goto("/login");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
-    await expect(page.getByRole("button", { name: "Sign in", exact: true })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Login", exact: true })).toBeVisible();
   });
 
-  test("book page prompts sign-in when logged out", async ({ page }) => {
+  test("book page prompts login when logged out", async ({ page }) => {
     await page.goto("/book");
     await expect(page.getByRole("heading", { level: 1, name: /book a session/i })).toBeVisible();
-    await expect(page.getByRole("link", { name: /sign in to book/i })).toBeVisible();
+    await expect(page.getByRole("link", { name: /login to book/i })).toBeVisible();
   });
 
   test("contact page shows the contact form", async ({ page }) => {

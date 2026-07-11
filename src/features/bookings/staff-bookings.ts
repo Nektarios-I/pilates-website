@@ -44,7 +44,8 @@ export type StaffBookingRecord = {
   cancellation_reason: string | null;
   credits_used: number;
   client_name: string | null;
-  client_email: string;
+  client_email: string | null;
+  client_phone: string | null;
   session_title: string;
   session_starts_at: string;
   session_ends_at: string;
@@ -66,7 +67,7 @@ type RawStaffBookingRow = {
   cancelled_at: string | null;
   cancellation_reason: string | null;
   credits_used: number;
-  profiles: RelatedRow<{ full_name: string | null; email: string }>;
+  profiles: RelatedRow<{ full_name: string | null; email: string | null; phone: string | null }>;
   sessions: RelatedRow<{
     title: string;
     starts_at: string;
@@ -83,7 +84,7 @@ type RawStaffBookingRow = {
 export function map_staff_booking(row: RawStaffBookingRow): StaffBookingRecord | null {
   const session = related_booking_row(row.sessions);
   const profile = related_booking_row(row.profiles);
-  if (!session || !profile?.email) return null;
+  if (!session || !profile) return null;
 
   if (!BOOKING_STATUSES.includes(row.status as BookingStatus)) return null;
 
@@ -96,6 +97,7 @@ export function map_staff_booking(row: RawStaffBookingRow): StaffBookingRecord |
     credits_used: row.credits_used,
     client_name: profile.full_name,
     client_email: profile.email,
+    client_phone: profile.phone,
     session_title: session.title,
     session_starts_at: session.starts_at,
     session_ends_at: session.ends_at,
@@ -125,9 +127,24 @@ export function filter_staff_bookings_by_search(
 
   return bookings.filter((booking) => {
     const name = booking.client_name?.toLowerCase() ?? '';
-    const email = booking.client_email.toLowerCase();
-    return name.includes(query) || email.includes(query);
+    const email = booking.client_email?.toLowerCase() ?? '';
+    const phone = booking.client_phone?.toLowerCase() ?? '';
+    const phone_digits = phone.replace(/\D/g, '');
+    const query_digits = query.replace(/\D/g, '');
+
+    return (
+      name.includes(query) ||
+      email.includes(query) ||
+      phone.includes(query) ||
+      (query_digits.length >= 3 && phone_digits.includes(query_digits))
+    );
   });
+}
+
+export function format_booking_client_contact(
+  booking: Pick<StaffBookingRecord, 'client_email' | 'client_phone'>,
+): string {
+  return booking.client_email ?? booking.client_phone ?? 'Contact details not provided';
 }
 
 export function format_booking_status(status: BookingStatus): string {

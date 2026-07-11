@@ -77,7 +77,7 @@ export function map_postgres_booking_error(raw_message: string): {
     P0015: 'This session is full and cannot be booked.',
     P0032: 'This time is reserved until recurring prebookings are processed for this date.',
     P0017: 'Bookings can only be created for client accounts.',
-    P0029: 'Online cancellation closes 2 hours before class. Your session credit is kept for this booking.',
+    P0029: 'Online cancellation closes 4 hours before class. Your session credit is kept for this booking.',
   };
 
   const matched_code = Object.keys(msg_map).find((code) => raw_message.includes(code));

@@ -68,7 +68,7 @@ describe('booking RPC contract — staff manual path', () => {
   it('maps cancellation cutoff P0029', () => {
     const result = map_postgres_booking_error('ERROR: P0029 cutoff');
     expect(result.code).toBe(BOOKING_ERROR_CODES.cancellation_cutoff);
-    expect(result.friendly).toMatch(/2 hours before class/i);
+    expect(result.friendly).toMatch(/4 hours before class/i);
   });
 
   it('staff may cancel another user booking when is_staff', () => {

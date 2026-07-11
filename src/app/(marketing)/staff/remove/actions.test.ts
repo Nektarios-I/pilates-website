@@ -80,6 +80,7 @@ describe('staff remove admin queries', () => {
         id: 'target-user',
         full_name: 'Test Client',
         email: 'client@example.com',
+        phone: null,
         role: 'client',
       },
     ]);
@@ -112,6 +113,7 @@ describe('staff membership admin queries', () => {
         id: 'client-user',
         full_name: 'Studio Client',
         email: 'studio@example.com',
+        phone: null,
       },
     ]);
   });

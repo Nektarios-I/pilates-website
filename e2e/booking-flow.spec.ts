@@ -39,7 +39,7 @@ test.describe('authenticated booking flows', () => {
     await book_first_available_open_slot(page);
 
     await page.goto('/account');
-    await expect(page.getByText(/Cancel more than 2 hours before class/i)).toBeVisible();
+    await expect(page.getByText(/Cancel more than 4 hours before class/i)).toBeVisible();
     const cancel_button = page.getByRole('button', { name: 'Cancel booking' }).first();
     await expect(cancel_button).toBeVisible();
 
@@ -54,7 +54,7 @@ test.describe('authenticated booking flows', () => {
     }
   });
 
-  test('client cancel inside 2h is blocked in UI and via RPC (P0029)', async ({ page }) => {
+  test('client cancel inside 4h is blocked in UI and via RPC (P0029)', async ({ page }) => {
     test.skip(
       !near_cutoff_booking_configured(),
       'Set E2E_NEAR_CUTOFF_BOOKING_ID and E2E_NEAR_CUTOFF_BOOKING_TITLE for the near-cutoff fixture booking.',
@@ -76,7 +76,7 @@ test.describe('authenticated booking flows', () => {
     await expect(page.getByText(booking_title)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Cancel booking' })).toHaveCount(0);
     await expect(
-      page.getByText(/Online cancellation closes 2 hours before class/i),
+      page.getByText(/Online cancellation closes 4 hours before class/i),
     ).toBeVisible();
 
     const { error } = await supabase.rpc('cancel_booking', {

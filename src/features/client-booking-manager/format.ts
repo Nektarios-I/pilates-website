@@ -1,3 +1,4 @@
+import { display_contact_label, matches_client_search } from '@/lib/auth/account-identifiers';
 import type {
   RecurringBookingState,
   RecurringHealthStatus,
@@ -31,9 +32,15 @@ export function parse_manager_tab(value: string | null | undefined): ClientBooki
   return 'overview';
 }
 
-export function format_client_label(full_name: string | null, email: string): string {
-  return full_name ? `${full_name} (${email})` : email;
+export function format_client_label(
+  full_name: string | null,
+  email: string | null,
+  phone?: string | null,
+): string {
+  return display_contact_label({ full_name, email, phone });
 }
+
+export { matches_client_search };
 
 export function format_session_datetime(iso: string): string {
   return new Date(iso).toLocaleString('en-GB', {
@@ -92,7 +99,7 @@ export function materializable_occurrence_key(
 
 export function health_status_label(status: RecurringHealthStatus | null | undefined): string {
   if (status === 'ready') return 'Ready';
-  if (status === 'insufficient_tokens') return 'Not enough tokens';
+  if (status === 'insufficient_tokens') return 'Not enough slots';
   if (status === 'failed') return 'Failed';
   return 'Unknown';
 }
@@ -118,8 +125,8 @@ export function booking_state_badge_class(state: RecurringBookingState | null | 
 }
 
 export function token_health_label(health: RecurringTokenHealth | null | undefined): string {
-  if (health === 'ok') return 'Credits OK';
-  if (health === 'insufficient_tokens') return 'Not enough tokens';
+  if (health === 'ok') return 'Slots OK';
+  if (health === 'insufficient_tokens') return 'Not enough slots';
   return '';
 }
 

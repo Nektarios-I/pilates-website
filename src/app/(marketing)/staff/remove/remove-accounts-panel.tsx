@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+import { display_contact_label } from '@/lib/auth/account-identifiers';
 import { Button } from '@/components/ui/button';
 import { ROLE_BADGE_CLASS } from '@/components/ui/marketing-field-styles';
 import { remove_user, type RemovableUser } from './actions';
@@ -58,7 +59,11 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
       {visible.map((user) => {
         const is_confirming = confirm?.user_id === user.id;
         const is_removing = removing_id === user.id;
-        const display_name = user.full_name ?? user.email;
+        const display_name = display_contact_label({
+          full_name: user.full_name,
+          email: user.email,
+          phone: user.phone,
+        });
         const badge = ROLE_BADGE_CLASS[user.role] ?? ROLE_BADGE_CLASS.client;
         const role_label = ROLE_LABELS[user.role] ?? user.role;
 
@@ -76,7 +81,9 @@ export function RemoveAccountsPanel({ users }: { users: RemovableUser[] }) {
                   {role_label}
                 </span>
               </div>
-              <p className="mt-0.5 truncate text-xs text-foreground/60">{user.email}</p>
+              <p className="mt-0.5 truncate text-xs text-foreground/60">
+                {user.email ?? user.phone ?? 'No contact details'}
+              </p>
               {errors[user.id] && (
                 <p className="mt-2 text-xs text-destructive">{errors[user.id]}</p>
               )}

@@ -68,6 +68,7 @@ function admin_client(options?: {
           eq: vi.fn(() => ({
             maybeSingle: vi.fn(async () => ({ data: null, error: null })),
           })),
+          not: vi.fn(async () => ({ data: [], error: null })),
         })),
         insert: vi.fn(async () => ({ error: null })),
         update: vi.fn(() => ({
@@ -162,6 +163,32 @@ describe('create_staff_invite', () => {
       },
     });
     expect(admin.auth.admin.inviteUserByEmail).not.toHaveBeenCalled();
+  });
+
+  it('manual_account without email uses an internal auth email and null profile email', async () => {
+    const admin = admin_client();
+    create_admin_client_mock.mockReturnValue(admin as never);
+
+    const result = await create_staff_invite({
+      full_name: 'PHONE ONLY CLIENT',
+      email: '',
+      phone: '+357 99 123 456',
+      role: 'client',
+      method: 'manual_account',
+      password: 'temporary-password',
+    });
+
+    expect(result.success).toBe(true);
+    expect(admin.auth.admin.createUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        email: 'phone+35799123456@accounts.corehouse.internal',
+        password: 'temporary-password',
+        user_metadata: {
+          full_name: 'PHONE ONLY CLIENT',
+          phone: '+357 99 123 456',
+        },
+      }),
+    );
   });
 
   it('repairs orphaned auth.users rows when profiles were cleared by a data reset', async () => {

@@ -6,7 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 export type ManageableClient = {
   id: string;
   full_name: string | null;
-  email: string;
+  email: string | null;
+  phone: string | null;
 };
 
 export type MembershipPackage = {
@@ -62,7 +63,7 @@ export async function list_manageable_clients(): Promise<ManageableClient[]> {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from('profiles')
-    .select('id, full_name, email, user_roles(role)')
+    .select('id, full_name, email, phone, user_roles(role)')
     .order('full_name', { ascending: true });
 
   if (error) {
@@ -79,12 +80,13 @@ export async function list_manageable_clients(): Promise<ManageableClient[]> {
     clients.push({
       id: row.id,
       full_name: row.full_name ?? null,
-      email: row.email,
+      email: row.email ?? null,
+      phone: row.phone ?? null,
     });
   }
 
   clients.sort((a, b) =>
-    (a.full_name ?? a.email).localeCompare(b.full_name ?? b.email),
+    (a.full_name ?? a.email ?? a.phone ?? '').localeCompare(b.full_name ?? b.email ?? b.phone ?? ''),
   );
 
   return clients;
@@ -213,6 +215,30 @@ export async function deactivate_membership(user_package_id: string): Promise<Me
     .eq('id', user_package_id);
 
   if (error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function remove_membership(user_package_id: string): Promise<MembershipResult> {
+  const caller = await resolve_caller_staff();
+  if (!caller) {
+    return { success: false, error: 'You must be signed in as staff to manage memberships.' };
+  }
+
+  const admin = createAdminClient();
+  const { error } = await admin.from('user_packages').delete().eq('id', user_package_id);
+
+  if (error) {
+    if (error.code === '23503') {
+      return {
+        success: false,
+        error:
+          'This membership is linked to existing bookings and cannot be removed. Deactivate it instead.',
+      };
+    }
+
     return { success: false, error: error.message };
   }
 

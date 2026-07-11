@@ -2,7 +2,10 @@
 
 import { useMemo, useState } from 'react';
 
-import { format_client_label } from '@/features/client-booking-manager/format';
+import {
+  format_client_label,
+  matches_client_search,
+} from '@/features/client-booking-manager/format';
 import type { ManageableClient } from '@/app/(marketing)/staff/membership/actions';
 
 type ClientSelectorProps = {
@@ -18,10 +21,13 @@ export function ClientSelector({ clients, selected_client_id, on_select }: Clien
     const normalized = query.trim().toLowerCase();
     if (!normalized) return clients;
 
-    return clients.filter((client) => {
-      const haystack = `${client.full_name ?? ''} ${client.email}`.toLowerCase();
-      return haystack.includes(normalized);
-    });
+    return clients.filter((client) =>
+      matches_client_search(normalized, {
+        full_name: client.full_name,
+        email: client.email,
+        phone: client.phone,
+      }),
+    );
   }, [clients, query]);
 
   if (clients.length === 0) {
@@ -40,7 +46,7 @@ export function ClientSelector({ clients, selected_client_id, on_select }: Clien
           className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm text-foreground"
           id="client-booking-search"
           onChange={(event) => set_query(event.target.value)}
-          placeholder="Name or email"
+          placeholder="Name, email, or phone"
           type="search"
           value={query}
         />
@@ -59,7 +65,7 @@ export function ClientSelector({ clients, selected_client_id, on_select }: Clien
           <option value="">Select a client</option>
           {filtered_clients.map((client) => (
             <option key={client.id} value={client.id}>
-              {format_client_label(client.full_name, client.email)}
+              {format_client_label(client.full_name, client.email, client.phone)}
             </option>
           ))}
         </select>

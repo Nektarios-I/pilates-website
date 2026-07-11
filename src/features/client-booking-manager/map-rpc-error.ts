@@ -27,7 +27,7 @@ const STAFF_BOOKING_MSG_MAP: Record<string, string> = {
   P0035: 'One or more selected occurrences are invalid or no longer available.',
   P0036: 'Materialization failed for one or more selected occurrences.',
   P0037:
-    'Not enough credits for all selected occurrences. Uncheck classes marked insufficient tokens or add credits.',
+    'Not enough credits for all selected occurrences. Uncheck classes marked insufficient slots or add credits.',
 };
 
 export function map_staff_rpc_error(message: string | undefined): string {

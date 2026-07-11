@@ -135,7 +135,7 @@ export function MaterializeClientDialog({
   );
 
   const token_block_message = has_insufficient_selected
-    ? 'Not enough credits for all selected classes. Uncheck rows marked “Not enough tokens” or add credits before materializing.'
+    ? 'Not enough credits for all selected classes. Uncheck rows marked “Not enough slots” or add credits before materializing.'
     : '';
 
   if (!open || typeof document === 'undefined') return null;

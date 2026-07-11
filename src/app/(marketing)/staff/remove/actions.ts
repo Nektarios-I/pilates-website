@@ -8,7 +8,8 @@ export type RemovableRole = 'client' | 'instructor' | 'owner' | 'admin';
 export type RemovableUser = {
   id: string;
   full_name: string | null;
-  email: string;
+  email: string | null;
+  phone: string | null;
   role: RemovableRole;
 };
 
@@ -59,7 +60,7 @@ export async function list_removable_users(): Promise<RemovableUser[]> {
 
   const { data, error } = await admin
     .from('profiles')
-    .select('id, full_name, email, user_roles(role)')
+    .select('id, full_name, email, phone, user_roles(role)')
     .neq('id', caller.user_id);
 
   if (error) {
@@ -81,7 +82,8 @@ export async function list_removable_users(): Promise<RemovableUser[]> {
     result.push({
       id: row.id,
       full_name: row.full_name ?? null,
-      email: row.email,
+      email: row.email ?? null,
+      phone: row.phone ?? null,
       role: highest_role,
     });
   }
@@ -89,7 +91,9 @@ export async function list_removable_users(): Promise<RemovableUser[]> {
   result.sort((a, b) => {
     const role_order = ROLE_PRIORITY.indexOf(a.role) - ROLE_PRIORITY.indexOf(b.role);
     if (role_order !== 0) return role_order;
-    return (a.full_name ?? a.email).localeCompare(b.full_name ?? b.email);
+    return (a.full_name ?? a.email ?? a.phone ?? '').localeCompare(
+      b.full_name ?? b.email ?? b.phone ?? '',
+    );
   });
 
   return result;

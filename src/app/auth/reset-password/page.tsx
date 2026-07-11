@@ -80,10 +80,10 @@ export default function ResetPasswordPage() {
           <h1 className="mt-4 text-3xl font-semibold text-foreground">Link expired</h1>
           <p className={marketingPageIntroClass}>
             This password reset link is invalid or has already been used. Request a new one from
-            the sign-in page.
+            the login page.
           </p>
           <a className={`mt-6 ${marketingTextLinkClass}`} href="/login">
-            Back to sign in
+            Back to login
           </a>
         </div>
       </div>

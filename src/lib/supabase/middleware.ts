@@ -47,7 +47,7 @@ export async function updateSession(request: NextRequest) {
 
   if (is_protected_route && !user) {
     const redirect_url = new URL('/login', request.url);
-    redirect_url.searchParams.set('message', 'Please sign in to continue');
+    redirect_url.searchParams.set('message', 'Please login to continue');
     redirect_url.searchParams.set('next', pathname);
     return NextResponse.redirect(redirect_url);
   }

@@ -4,10 +4,12 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { format_client_label } from '@/features/client-booking-manager/format';
 import {
   apply_membership,
   deactivate_membership,
   list_user_memberships,
+  remove_membership,
   update_membership_credits,
   type ManageableClient,
   type MembershipPackage,
@@ -92,6 +94,25 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
     });
   }
 
+  function handle_remove(user_package_id: string, package_name: string) {
+    if (!selected_user_id) return;
+
+    const confirmed = window.confirm(
+      `Permanently remove "${package_name}" from this account? This deletes the membership record entirely and cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    start_transition(async () => {
+      set_error('');
+      const result = await remove_membership(user_package_id);
+      if (!result.success) {
+        set_error(result.error);
+        return;
+      }
+      refresh_memberships(selected_user_id);
+    });
+  }
+
   function handle_save_credits(user_package_id: string) {
     if (!selected_user_id) return;
 
@@ -137,7 +158,7 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
           <option value="">Select a client</option>
           {clients.map((client) => (
             <option key={client.id} value={client.id}>
-              {client.full_name ?? client.email} ({client.email})
+              {format_client_label(client.full_name, client.email, client.phone)}
             </option>
           ))}
         </select>
@@ -202,17 +223,28 @@ export function MembershipPanel({ clients, packages }: MembershipPanelProps) {
                           : ''}
                       </p>
                     </div>
-                    {membership.status === 'active' ? (
+                    <div className="flex flex-wrap gap-2">
+                      {membership.status === 'active' ? (
+                        <Button
+                          className="w-full sm:w-auto"
+                          disabled={is_pending}
+                          onClick={() => handle_deactivate(membership.id)}
+                          type="button"
+                          variant="secondary"
+                        >
+                          Deactivate
+                        </Button>
+                      ) : null}
                       <Button
-                        className="w-full sm:w-auto"
+                        className="w-full border-danger text-danger-foreground hover:bg-danger/10 sm:w-auto"
                         disabled={is_pending}
-                        onClick={() => handle_deactivate(membership.id)}
+                        onClick={() => handle_remove(membership.id, membership.package_name)}
                         type="button"
                         variant="secondary"
                       >
-                        Deactivate
+                        Remove membership
                       </Button>
-                    ) : null}
+                    </div>
                   </div>
 
                   <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">

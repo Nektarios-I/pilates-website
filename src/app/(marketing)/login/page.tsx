@@ -15,7 +15,7 @@ import { LoginForm } from './login-form';
 
 export const metadata = createPageMetadata({
   title: 'Login',
-  description: 'Sign in to your account to book classes and manage your membership.',
+  description: 'Login to your account to book classes and manage your membership.',
   path: '/login',
 });
 
@@ -43,10 +43,10 @@ export default async function LoginPage({
             <div className="text-center">
               <p className={marketingEyebrowClass}>Account</p>
               <h1 className={marketingPageTitleClass} id="login-page-heading">
-                Sign in
+                Login
               </h1>
               <p className={marketingPageIntroClass}>
-                Sign in with your email and password, or a one-time code.
+                Login with your email and password, or a one-time code.
               </p>
             </div>
 

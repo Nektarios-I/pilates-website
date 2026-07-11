@@ -1,5 +1,13 @@
 'use server';
 
+import {
+  is_internal_auth_email,
+  normalize_email,
+  normalize_phone_digits,
+  phones_match,
+  profile_email_from_input,
+  resolve_auth_email_for_account,
+} from '@/lib/auth/account-identifiers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
 
@@ -26,7 +34,6 @@ export type InviteResult =
 
 type AdminClient = ReturnType<typeof createAdminClient>;
 
-// Which roles each acting role is allowed to create.
 const ROLE_PERMISSIONS: Record<InviteRole, InviteRole[]> = {
   client: [],
   instructor: ['client'],
@@ -34,12 +41,7 @@ const ROLE_PERMISSIONS: Record<InviteRole, InviteRole[]> = {
   admin: ['client', 'instructor', 'owner', 'admin'],
 };
 
-// The highest-privilege role wins when a user holds multiple.
 const ROLE_PRIORITY: InviteRole[] = ['admin', 'owner', 'instructor', 'client'];
-
-function normalize_email(email: string): string {
-  return email.trim().toLowerCase();
-}
 
 function is_email_taken_error(message: string): boolean {
   const msg = message.toLowerCase();
@@ -95,12 +97,32 @@ async function find_profile_by_email(
   return data;
 }
 
+async function find_profile_by_phone(
+  admin: AdminClient,
+  phone: string,
+): Promise<{ id: string; phone: string | null } | null> {
+  const target_digits = normalize_phone_digits(phone);
+  if (!target_digits) return null;
+
+  const { data, error } = await admin.from('profiles').select('id, phone').not('phone', 'is', null);
+
+  if (error) {
+    console.error('[find_profile_by_phone] query failed:', error.message);
+    return null;
+  }
+
+  return (
+    (data ?? []).find((row) => phones_match(row.phone, phone)) ?? null
+  );
+}
+
 async function ensure_profile_and_role(
   admin: AdminClient,
   user_id: string,
   input: InviteUserInput,
 ): Promise<void> {
-  const email = normalize_email(input.email);
+  const profile_email = profile_email_from_input(input.email);
+  const phone = input.phone.trim() || null;
   const status = input.method === 'manual_account' ? 'active' : 'invited';
 
   const { data: existing_profile } = await admin
@@ -112,9 +134,9 @@ async function ensure_profile_and_role(
   if (!existing_profile) {
     const { error: insert_error } = await admin.from('profiles').insert({
       id: user_id,
-      email,
+      email: profile_email,
       full_name: input.full_name,
-      phone: input.phone,
+      phone,
       status,
     });
 
@@ -125,9 +147,9 @@ async function ensure_profile_and_role(
     const { error: update_error } = await admin
       .from('profiles')
       .update({
-        email,
+        email: profile_email,
         full_name: input.full_name,
-        phone: input.phone,
+        phone,
         status,
       })
       .eq('id', user_id);
@@ -158,6 +180,7 @@ async function repair_orphan_auth_user(
   admin: AdminClient,
   auth_user_id: string,
   input: InviteUserInput,
+  auth_email: string,
   invite_redirect_to: string,
   auth_user_confirmed: boolean,
 ): Promise<InviteResult> {
@@ -175,7 +198,7 @@ async function repair_orphan_auth_user(
       email_confirm: true,
       user_metadata: {
         full_name: input.full_name,
-        phone: input.phone,
+        phone: input.phone.trim() || null,
       },
     });
 
@@ -183,16 +206,13 @@ async function repair_orphan_auth_user(
       return { success: false, error: update_error.message };
     }
   } else if (!auth_user_confirmed) {
-    const { error: invite_error } = await admin.auth.admin.inviteUserByEmail(
-      normalize_email(input.email),
-      {
-        data: {
-          full_name: input.full_name,
-          phone: input.phone,
-        },
-        redirectTo: invite_redirect_to,
+    const { error: invite_error } = await admin.auth.admin.inviteUserByEmail(auth_email, {
+      data: {
+        full_name: input.full_name,
+        phone: input.phone.trim() || null,
       },
-    );
+      redirectTo: invite_redirect_to,
+    });
 
     if (invite_error && !is_email_taken_error(invite_error.message)) {
       return { success: false, error: invite_error.message };
@@ -205,9 +225,10 @@ async function repair_orphan_auth_user(
 }
 
 export async function create_staff_invite(input: InviteUserInput): Promise<InviteResult> {
-  const email = normalize_email(input.email);
+  const profile_email = profile_email_from_input(input.email);
+  const phone = input.phone.trim();
+  const auth_email = resolve_auth_email_for_account(input);
 
-  // ── 1. Verify the caller is authenticated ──────────────────────────────
   const supabase = await createClient();
   const {
     data: { user },
@@ -217,7 +238,6 @@ export async function create_staff_invite(input: InviteUserInput): Promise<Invit
     return { success: false, error: 'You must be signed in to create invitations.' };
   }
 
-  // ── 2. Resolve the caller's highest role ───────────────────────────────
   const { data: caller_roles } = await supabase
     .from('user_roles')
     .select('role')
@@ -233,7 +253,6 @@ export async function create_staff_invite(input: InviteUserInput): Promise<Invit
     };
   }
 
-  // ── 3. Verify the target role is permitted for this caller ─────────────
   const allowed = ROLE_PERMISSIONS[caller_role];
   if (!allowed.includes(input.role)) {
     return {
@@ -242,52 +261,72 @@ export async function create_staff_invite(input: InviteUserInput): Promise<Invit
     };
   }
 
+  if (input.method === 'email_password' && !profile_email) {
+    return {
+      success: false,
+      error: 'Email is required when using the email invite method.',
+    };
+  }
+
   const admin = createAdminClient();
   const site_url = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
   const invite_redirect_to = `${site_url}/auth/invite`;
 
-  // ── 4. Block only when a full studio account already exists ────────────
-  const existing_profile = await find_profile_by_email(admin, email);
-  if (existing_profile) {
-    return {
-      success: false,
-      error: 'An account with this email address already exists.',
-    };
+  if (profile_email) {
+    const existing_profile = await find_profile_by_email(admin, profile_email);
+    if (existing_profile) {
+      return {
+        success: false,
+        error: 'An account with this email address already exists.',
+      };
+    }
   }
 
-  // ── 5. Repair orphaned auth.users rows (common after DB data resets) ───
-  const existing_auth = await find_auth_user_by_email(admin, email);
+  if (phone) {
+    const existing_phone_profile = await find_profile_by_phone(admin, phone);
+    if (existing_phone_profile) {
+      return {
+        success: false,
+        error: 'An account with this phone number already exists.',
+      };
+    }
+  }
+
+  const existing_auth = await find_auth_user_by_email(admin, auth_email);
   if (existing_auth) {
-    return repair_orphan_auth_user(
-      admin,
-      existing_auth.id,
-      { ...input, email },
-      invite_redirect_to,
-      Boolean(existing_auth.email_confirmed_at),
-    );
+    if (profile_email || is_internal_auth_email(auth_email)) {
+      return repair_orphan_auth_user(
+        admin,
+        existing_auth.id,
+        input,
+        auth_email,
+        invite_redirect_to,
+        Boolean(existing_auth.email_confirmed_at),
+      );
+    }
   }
 
-  // ── 6. Create a brand-new auth user ────────────────────────────────────
   let new_user_id: string | null = null;
 
   try {
     if (input.method === 'email_password') {
-      const { data, error } = await admin.auth.admin.inviteUserByEmail(email, {
+      const { data, error } = await admin.auth.admin.inviteUserByEmail(auth_email, {
         data: {
           full_name: input.full_name,
-          phone: input.phone,
+          phone: phone || null,
         },
         redirectTo: invite_redirect_to,
       });
 
       if (error) {
         if (is_email_taken_error(error.message)) {
-          const auth_user = await find_auth_user_by_email(admin, email);
+          const auth_user = await find_auth_user_by_email(admin, auth_email);
           if (auth_user) {
             return repair_orphan_auth_user(
               admin,
               auth_user.id,
-              { ...input, email },
+              input,
+              auth_email,
               invite_redirect_to,
               Boolean(auth_user.email_confirmed_at),
             );
@@ -308,23 +347,24 @@ export async function create_staff_invite(input: InviteUserInput): Promise<Invit
       }
 
       const { data, error } = await admin.auth.admin.createUser({
-        email,
+        email: auth_email,
         password,
         email_confirm: true,
         user_metadata: {
           full_name: input.full_name,
-          phone: input.phone,
+          phone: phone || null,
         },
       });
 
       if (error) {
         if (is_email_taken_error(error.message)) {
-          const auth_user = await find_auth_user_by_email(admin, email);
+          const auth_user = await find_auth_user_by_email(admin, auth_email);
           if (auth_user) {
             return repair_orphan_auth_user(
               admin,
               auth_user.id,
-              { ...input, email },
+              input,
+              auth_email,
               invite_redirect_to,
               Boolean(auth_user.email_confirmed_at),
             );
@@ -345,7 +385,7 @@ export async function create_staff_invite(input: InviteUserInput): Promise<Invit
     return { success: false, error: 'The invited account was not created.' };
   }
 
-  await ensure_profile_and_role(admin, new_user_id, { ...input, email });
+  await ensure_profile_and_role(admin, new_user_id, input);
 
   return { success: true, user_id: new_user_id, method: input.method };
 }
