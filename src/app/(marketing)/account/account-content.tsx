@@ -14,6 +14,11 @@ import {
 } from '@/components/ui/marketing-field-styles';
 import { Section } from '@/components/ui/section';
 import { createClient } from '@/lib/supabase/client';
+import {
+  cancellation_blocked_message,
+  CANCELLATION_POLICY_SHORT,
+  client_may_cancel_online,
+} from '@/lib/booking/cancellation-policy';
 import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
 
@@ -302,6 +307,7 @@ export function AccountContent({
                 <div>
                   <h2 className="text-xl font-semibold text-foreground">Upcoming Bookings</h2>
                   <p className="mt-1 text-sm text-foreground/70">Your scheduled classes</p>
+                  <p className="mt-2 text-xs text-foreground/60">{CANCELLATION_POLICY_SHORT}</p>
                 </div>
                 <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
                   <ButtonLink className="w-full sm:w-auto" href="/book" variant="secondary">
@@ -318,6 +324,10 @@ export function AccountContent({
                   {upcoming_bookings.map((booking) => {
                     const session = get_related_row(booking.sessions);
                     if (!session) return null;
+
+                    const may_cancel =
+                      booking.status === 'booked' &&
+                      client_may_cancel_online(session.starts_at);
 
                     return (
                       <div
@@ -348,22 +358,28 @@ export function AccountContent({
                             {booking.status}
                           </span>
                         </div>
-                        {!cancelled_ids.has(booking.id) && (
+                        {!cancelled_ids.has(booking.id) && booking.status === 'booked' ? (
                           <div className="mt-4">
-                            <Button
-                              className="w-full sm:w-auto"
-                              disabled={cancelling_id === booking.id}
-                              size="sm"
-                              variant="secondary"
-                              onClick={() => handle_cancel(booking.id)}
-                            >
-                              {cancelling_id === booking.id ? 'Cancelling…' : 'Cancel booking'}
-                            </Button>
-                            {cancel_errors[booking.id] && (
-                              <p className="mt-2 text-xs text-destructive">{cancel_errors[booking.id]}</p>
+                            {may_cancel ? (
+                              <Button
+                                className="w-full sm:w-auto"
+                                disabled={cancelling_id === booking.id}
+                                size="sm"
+                                variant="secondary"
+                                onClick={() => handle_cancel(booking.id)}
+                              >
+                                {cancelling_id === booking.id ? 'Cancelling…' : 'Cancel booking'}
+                              </Button>
+                            ) : (
+                              <p className="text-xs text-foreground/60">
+                                {cancellation_blocked_message()}
+                              </p>
                             )}
+                            {cancel_errors[booking.id] ? (
+                              <p className="mt-2 text-xs text-destructive">{cancel_errors[booking.id]}</p>
+                            ) : null}
                           </div>
-                        )}
+                        ) : null}
                       </div>
                     );
                   })}

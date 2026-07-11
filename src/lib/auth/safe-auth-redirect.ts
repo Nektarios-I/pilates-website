@@ -13,6 +13,7 @@ const ALLOWED_NEXT_PATHS = new Set([
   '/staff/session-cards',
   '/staff/membership',
   '/staff/remove',
+  '/staff/client-bookings',
 ]);
 
 /**

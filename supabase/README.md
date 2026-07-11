@@ -24,10 +24,51 @@ Run each file **once**, top to bottom:
 | 9 | `14_contact_messages.sql` | Public contact form storage + admin inbox RLS |
 | 10 | `16_account_safety_mirror.sql` | Account profile safety mirror + backfill (excluded from data reset) |
 | 11 | `17_booking_one_per_time_slot.sql` | One booking per time slot per client (P0013) |
+| 12 | `18_recurring_prebook_schema.sql` | Recurring prebook tables + booking provenance columns |
+| 13 | `19_booking_core_refactor.sql` | Shared `private.book_session_core` + public wrapper refactor |
+| 14 | `20_staff_booking_rpc.sql` | Staff-on-behalf booking RPCs |
+| 15 | `21_cancel_booking_staff_auth.sql` | Staff cancel parity + package visibility |
+| 16 | `22_recurring_prebook_functions.sql` | Recurring CRUD, forecast, materialization, retry |
+| 17 | `23_recurring_prebook_cron.sql` | Daily pg_cron materialization job |
+| 18 | `24_public_full_fail_cancel_cutoff.sql` | No public waitlist + 2h client cancel cutoff |
+| 19 | `25_recurring_skip_validation.sql` | Recurring skip must match active schedule line (P0031) |
+| 20 | `26_delete_recurring_rule.sql` | Hard-delete recurring prebook rules (staff) |
+| 21 | `27_booking_horizon_recurring_priority_forecast.sql` | 14-day horizon, recurring gate, token forecast |
+| 22 | `28_staff_client_materialization.sql` | Client-scoped materialization + exclusion dialog RPCs |
+| 23 | `29_fix_recurring_forecast_volatility.sql` | Fix forecast STABLE + temp table error |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
 **Optional — dev demo users:** Before step 4, run `select set_config('app.seed_demo_data','true',false);` then uncomment the demo block in `04_seed.sql`.
+
+---
+
+## Upgrade an existing database (incremental)
+
+| If you have… | Run… |
+|--------------|------|
+| Scripts 01–17 only | `18_recurring_prebook_schema.sql` |
+| Script 18 only | `19` → `20` → `21` (in order) |
+| Scripts 01–18 | `19` → `20` → `21` |
+| Scripts 01–21 | `22` → verify with `supabase/tests/recurring_prebook_regression.sql` → `23` |
+| Scripts 01–23 | `24_public_full_fail_cancel_cutoff.sql` |
+| Scripts 01–24 | `25_recurring_skip_validation.sql` |
+| Scripts 01–25 | `26_delete_recurring_rule.sql` |
+| Scripts 01–26 | `27_booking_horizon_recurring_priority_forecast.sql` |
+| Scripts 01–27 | `28_staff_client_materialization.sql` |
+| Scripts 01–28 | `29_fix_recurring_forecast_volatility.sql` |
+
+After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
+
+After `22`, run `supabase/tests/recurring_prebook_regression.sql` before enabling cron (`23`).
+
+Public `book_session` wrappers fail on full capacity (no waitlist). Public and staff manual booking use a **14-day horizon** and wait for recurring materialization before a slot opens (migration 27).
+
+**Booking window (migration 27):** public/staff can book within 14 days; slots with pending recurring prebooks stay reserved until materialization runs (daily cron or `staff_materialize_recurring_prebooks()`).
+
+**Migration 27 re-run:** If you see `cannot change return type of existing function` for `get_recurring_prebook_forecast`, the script now includes `DROP FUNCTION` before recreating it. Re-run the full `27_booking_horizon_recurring_priority_forecast.sql` file (safe to re-run).
+
+**Cancellation policy (migration 24):** client self-cancel blocked within 2 hours of class start (P0029); staff may cancel anytime.
 
 ---
 
@@ -40,7 +81,7 @@ set app.allow_data_reset = 'true';
 -- then run the full 05_reset_data.sql file
 ```
 
-This clears application tables and `auth.users`, then re-seeds packages and default session cards. Re-run `10_add_admin.sql` afterward so you can sign in again.
+`05_reset_data.sql` truncates recurring prebook tables (before `bookings`) and clears application data and `auth.users`, then re-seeds packages and default session cards. Re-run `10_add_admin.sql` afterward so you can sign in again.
 
 `account_safety_mirror` is **not** truncated by `05_reset_data.sql` (safety mirror).
 

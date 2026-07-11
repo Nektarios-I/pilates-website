@@ -26,6 +26,11 @@ test.describe("protected route smoke", () => {
     await expect(page).toHaveURL(/\/login/);
   });
 
+  test("staff client bookings redirects to login when logged out", async ({ page }) => {
+    await page.goto("/staff/client-bookings");
+    await expect(page).toHaveURL(/\/login/);
+  });
+
   test("staff booking history redirects to login when logged out", async ({ page }) => {
     await page.goto("/staff/bookings");
     await expect(page).toHaveURL(/\/login/);

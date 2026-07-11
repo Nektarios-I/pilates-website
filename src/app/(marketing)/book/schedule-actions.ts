@@ -1,11 +1,15 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
 import { createClient } from '@/lib/supabase/server';
 import type { DaySchedule, TimeRange } from '@/lib/schedule/studio-hours';
 import { get_default_weekly_ranges } from '@/lib/schedule/studio-hours';
 
-import type { SessionItem } from './booking-panel';
+import type { SessionItem } from './booking-types';
 import { book_session_action } from './actions';
+
+export type { PackageItem, SessionItem } from './booking-types';
 
 export type SlotSession = {
   slot_start: string;
@@ -13,6 +17,7 @@ export type SlotSession = {
   session_id: string | null;
   confirmed_count: number;
   capacity: number;
+  open_for_public_booking: boolean;
 };
 
 export type SessionCard = {
@@ -147,6 +152,24 @@ export async function get_slots_for_day(
   const { generate_hourly_slots } = await import('@/lib/schedule/studio-hours');
   const slots = generate_hourly_slots(schedule.time_ranges, duration_minutes);
 
+  const { data: open_slots, error: open_slots_error } = await supabase.rpc(
+    'list_open_slot_starts_for_day',
+    {
+      p_schedule_date: date_key,
+      p_session_type: session_type,
+      p_duration_minutes: duration_minutes,
+    },
+  );
+
+  const open_slot_starts = open_slots_error
+    ? new Set(slots.map((slot) => slot.start))
+    : new Set(
+        (open_slots ?? []).map((row: { slot_start: string }) => {
+          const value = row.slot_start;
+          return typeof value === 'string' ? value.slice(0, 5) : String(value).slice(0, 5);
+        }),
+      );
+
   return slots.map((slot) => {
     const match = (sessions ?? []).find((session) => {
       const local_start = studio_time_from_iso(session.starts_at);
@@ -159,6 +182,7 @@ export async function get_slots_for_day(
       session_id: match?.id ?? null,
       confirmed_count: match ? (count_map[match.id] ?? 0) : 0,
       capacity: match?.capacity ?? 6,
+      open_for_public_booking: open_slot_starts.has(slot.start),
     };
   });
 }
@@ -225,6 +249,8 @@ export async function book_slot_action(
   if (!result.success) {
     return { success: false, error: result.error };
   }
+
+  revalidatePath('/book');
 
   const { data: session_row } = await supabase
     .from('sessions')

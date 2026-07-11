@@ -13,6 +13,10 @@ alter table public.booking_credit_charges enable row level security;
 alter table public.staff_invites       enable row level security;
 alter table public.studio_day_schedule enable row level security;
 alter table public.contact_messages    enable row level security;
+alter table public.recurring_prebook_rules enable row level security;
+alter table public.recurring_prebook_schedule_lines enable row level security;
+alter table public.recurring_prebook_skipped_occurrences enable row level security;
+alter table public.recurring_prebook_materialization_log enable row level security;
 
 select tablename, rowsecurity as rls_enabled
 from pg_tables
@@ -20,6 +24,8 @@ where schemaname = 'public'
   and tablename in (
     'profiles', 'user_roles', 'packages', 'session_cards', 'user_packages', 'sessions', 'bookings',
     'booking_credit_charges',
-    'staff_invites', 'studio_day_schedule', 'contact_messages'
+    'staff_invites', 'studio_day_schedule', 'contact_messages',
+    'recurring_prebook_rules', 'recurring_prebook_schedule_lines',
+    'recurring_prebook_skipped_occurrences', 'recurring_prebook_materialization_log'
   )
 order by tablename;

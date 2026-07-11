@@ -1,0 +1,31 @@
+-- =============================================================================
+-- materialize_selection_regression.sql — Manual verification checklist (migration 31)
+-- =============================================================================
+--
+-- Preconditions: migration 31 applied; staff JWT; client with active packages +
+-- active recurring rule with schedule lines inside the 14-day window.
+--
+-- 1) List dialog rows include token_health
+--    select * from public.list_client_materializable_occurrences('<client_uuid>');
+--    expect: planned/failed rows with token_health ok | insufficient_tokens
+--
+-- 2) Atomic token preflight (all-or-nothing)
+--    select public.staff_materialize_client_recurring_selection(
+--      '<client_uuid>',
+--      '[{"rule_id":"…","occurrence_date":"2026-07-15","start_time":"09:00:00"}]'::jsonb
+--    );
+--    With insufficient credits for full selection: expect ERROR P0037, zero new bookings.
+--
+-- 3) Successful materialization
+--    expect json booking_ids array length = number selected
+--    select id, status, booking_source from public.bookings
+--     where user_id = '<client_uuid>' and booking_source = 'recurring';
+--    select credits_remaining from public.user_packages where user_id = '<client_uuid>';
+--    select booking_state from public.get_recurring_prebook_forecast('<rule_uuid>');
+--    expect: booked rows + reduced credits + forecast booking_state = booked
+--
+-- 4) Idempotency — re-run same selection after success
+--    expect ERROR P0013 (already booked) or empty materializable list; no duplicate bookings.
+--
+-- 5) Cancel sync — cancel a recurring booking, then list + materialize again
+--    expect occurrence returns to materializable; re-book succeeds.

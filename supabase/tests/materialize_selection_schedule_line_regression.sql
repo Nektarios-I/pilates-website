@@ -1,0 +1,28 @@
+-- Regression notes for migration 32 (schedule_line_id selection matching)
+--
+-- 1) Verify helpers exist:
+--    select proname from pg_proc
+--     where proname in (
+--       'normalize_occurrence_time',
+--       'normalize_occurrence_date',
+--       'staff_materialize_client_recurring_selection'
+--     );
+--
+-- 2) List materializable rows for a client:
+--    select rule_id, schedule_line_id, occurrence_date, start_time, token_health
+--      from list_client_materializable_occurrences('<client_uuid>');
+--
+-- 3) Materialize one selected row (use schedule_line_id from step 2):
+--    select staff_materialize_client_recurring_selection(
+--      '<client_uuid>'::uuid,
+--      jsonb_build_array(
+--        jsonb_build_object(
+--          'rule_id', '<rule_uuid>',
+--          'schedule_line_id', '<line_uuid>',
+--          'occurrence_date', '2026-07-11',
+--          'start_time', '07:00:00'
+--        )
+--      )
+--    );
+--
+-- Expected: booking_ids array with one UUID; forecast row becomes Booked.

@@ -6,11 +6,18 @@ async function openMobileNavigation(page: import("@playwright/test").Page) {
 }
 
 async function navigateFromHeader(page: import("@playwright/test").Page, label: string) {
+  const route_by_label: Record<string, string> = {
+    Classes: "/classes",
+    Pricing: "/pricing",
+    Contact: "/contact",
+  };
+  const expected_path = route_by_label[label];
   const width = page.viewportSize()?.width ?? 1280;
 
   if (width < 1024) {
     const mobileNavigation = await openMobileNavigation(page);
     await mobileNavigation.getByRole("link", { name: label }).click();
+    await page.waitForURL(expected_path, { timeout: 10_000 });
     return;
   }
 
@@ -18,6 +25,7 @@ async function navigateFromHeader(page: import("@playwright/test").Page, label: 
     .getByRole("navigation", { name: "Primary navigation" })
     .getByRole("link", { name: label })
     .click();
+  await page.waitForURL(expected_path, { timeout: 10_000 });
 }
 
 test("loads the homepage and navigates through primary routes", async ({ page }) => {
@@ -44,19 +52,16 @@ test("loads the homepage and navigates through primary routes", async ({ page })
   }
 
   await navigateFromHeader(page, "Classes");
-  await expect(page).toHaveURL("/classes");
   await expect(
     page.getByRole("heading", { level: 1, name: "Reformer and mat" }),
   ).toBeVisible();
 
   await navigateFromHeader(page, "Pricing");
-  await expect(page).toHaveURL("/pricing");
   await expect(
     page.getByRole("heading", { level: 1, name: "Class packages" }),
   ).toBeVisible();
 
   await navigateFromHeader(page, "Contact");
-  await expect(page).toHaveURL("/contact");
   await expect(
     page.getByRole("heading", { level: 1, name: "Get in touch" }),
   ).toBeVisible();

@@ -160,6 +160,14 @@ export function AccountMenu({ is_staff, is_admin_or_owner, display_name }: Accou
               >
                 Manage membership
               </Link>
+              <Link
+                className={link_class}
+                href="/staff/client-bookings"
+                onClick={close_menu}
+                role="menuitem"
+              >
+                Client bookings
+              </Link>
             </>
           ) : null}
 

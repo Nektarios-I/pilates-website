@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { createPageMetadata } from '@/lib/metadata';
 
 import { BookingCalendar } from './booking-calendar';
-import type { PackageItem } from './booking-panel';
+import type { PackageItem } from './booking-types';
 import { get_day_schedule, get_session_cards, get_slots_for_day } from './schedule-actions';
 import { to_date_key } from '@/lib/schedule/studio-hours';
 

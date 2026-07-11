@@ -1,5 +1,6 @@
 'use server';
 
+import { map_postgres_booking_error } from '@/features/bookings/booking-rpc-contract';
 import { createClient } from '@/lib/supabase/server';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -15,7 +16,7 @@ export type BookingRow = {
 };
 
 export type BookResult =
-  | { success: true; booking: BookingRow; status: 'booked' | 'waitlisted' }
+  | { success: true; booking: BookingRow; status: 'booked' }
   | { success: false; error: string; code?: string };
 
 export type CancelResult =
@@ -27,7 +28,7 @@ export type CancelResult =
 // Calls the book_session() Postgres function which:
 //   • Validates the session is scheduled and hasn't started
 //   • Validates the package belongs to the caller and has sufficient credits
-//   • Determines booked vs waitlisted based on capacity
+//   • Fails on full capacity (P0015) — no waitlist for public booking
 //   • Atomically deducts credits and inserts the booking row
 //
 // Error codes from the DB function:
@@ -57,33 +58,23 @@ export async function book_session_action(
       });
 
   if (error) {
-    // Map known Postgres error codes to friendly messages.
-    const msg_map: Record<string, string> = {
-      P0001: 'You must be signed in to book a session.',
-      P0002: 'That session could not be found.',
-      P0003: 'This session is no longer available for booking.',
-      P0004: 'This session has already started and cannot be booked.',
-      P0005: 'The selected package could not be found or does not belong to your account.',
-      P0006: 'The selected package is not active.',
-      P0007: 'The selected package has expired.',
-      P0008: 'You do not have enough credits in this package for this session.',
-      P0009: 'The selected package is for a different class type.',
-      P0013: 'You already have a booking at this time. You can book other sessions the same day, but not two classes at the same time.',
-    };
-
-    // Supabase wraps Postgres exceptions; check the detail/message for the code
-    const raw = error.message ?? '';
-    const matched_code = Object.keys(msg_map).find((code) => raw.includes(code));
-    const friendly = matched_code ? msg_map[matched_code] : error.message;
-
-    return { success: false, error: friendly, code: matched_code };
+    const mapped = map_postgres_booking_error(error.message ?? '');
+    return { success: false, error: mapped.friendly, code: mapped.code };
   }
 
   const booking = data as BookingRow;
+  if (booking.status !== 'booked') {
+    return {
+      success: false,
+      error: 'This session is full and cannot be booked.',
+      code: 'P0015',
+    };
+  }
+
   return {
     success: true,
     booking,
-    status: booking.status as 'booked' | 'waitlisted',
+    status: 'booked',
   };
 }
 
@@ -91,7 +82,8 @@ export async function book_session_action(
 //
 // Calls the cancel_booking() Postgres function which:
 //   • Verifies the booking exists and belongs to the caller (or caller is admin/owner)
-//   • Refunds credits to the package (for 'booked' status only — not waitlisted)
+//   • Client self-cancel blocked within 2 hours of session start (P0029)
+//   • Refunds credits to the package (for 'booked' status only)
 //   • Re-activates the package if it was used_up
 //   • Marks the booking as 'cancelled'
 
@@ -112,6 +104,8 @@ export async function cancel_booking_action(
       P0010: 'That booking could not be found.',
       P0011: 'You are not authorised to cancel this booking.',
       P0012: 'This booking cannot be cancelled in its current state.',
+      P0029:
+        'Online cancellation closes 2 hours before class. Your session credit is kept for this booking.',
     };
 
     const raw = error.message ?? '';

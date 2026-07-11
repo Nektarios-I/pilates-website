@@ -238,7 +238,7 @@ export default async function AccountBookingsPage() {
                       Upcoming
                     </h2>
                     <p className="mt-1 text-sm text-foreground/70">
-                      Your next confirmed and waitlisted classes.
+                      Your next confirmed classes.
                     </p>
                   </div>
                   <ButtonLink href="/book" variant="secondary">
@@ -262,7 +262,7 @@ export default async function AccountBookingsPage() {
                   History
                 </h2>
                 <p className="mt-1 text-sm text-foreground/70">
-                  Past, cancelled, attended, and waitlisted records.
+                  Past, cancelled, and attended records.
                 </p>
 
                 <div className="mt-5 space-y-4">

@@ -180,7 +180,7 @@ export const site_content = {
       { name: '3 months · 2×/week', price: '€265', description: '24 classes' },
     ],
     policies_short:
-      'Arrive a few minutes early. Cancel at least 12 hours before class. Grip socks required for reformer.',
+      'Arrive a few minutes early. Cancel more than 2 hours before class to restore your credit. Grip socks required for reformer.',
   },
 
   instructors_preview: {
@@ -233,7 +233,8 @@ export const site_content = {
       },
       {
         question: 'How do cancellations work?',
-        answer: 'Cancel at least 12 hours before class. Late cancellations may forfeit the session credit.',
+        answer:
+          'Cancel online more than 2 hours before class start to restore your session credit. Inside 2 hours, online cancellation is not available and the credit is kept.',
       },
     ],
   },

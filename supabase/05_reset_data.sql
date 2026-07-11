@@ -23,7 +23,13 @@ begin
 end;
 $$;
 
+-- Child-first: materialization_log references bookings; bookings may reference log.
+-- Truncate log before bookings. CASCADE handles any remaining FK edges.
 truncate table
+  public.recurring_prebook_materialization_log,
+  public.recurring_prebook_skipped_occurrences,
+  public.recurring_prebook_schedule_lines,
+  public.recurring_prebook_rules,
   public.booking_credit_charges,
   public.bookings,
   public.user_packages,

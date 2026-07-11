@@ -11,6 +11,7 @@ describe('safe_auth_next_path', () => {
     expect(safe_auth_next_path('/book')).toBe('/book');
     expect(safe_auth_next_path('/staff/bookings')).toBe('/staff/bookings');
     expect(safe_auth_next_path('/staff/day-bookings')).toBe('/staff/day-bookings');
+    expect(safe_auth_next_path('/staff/client-bookings')).toBe('/staff/client-bookings');
   });
 
   it('blocks open redirects', () => {
