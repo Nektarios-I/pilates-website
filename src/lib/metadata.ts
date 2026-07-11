@@ -57,8 +57,22 @@ export const siteMetadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: [{ url: brand_seo_images.logo.path, type: "image/png" }],
-    apple: [{ url: brand_seo_images.logo.path, type: "image/png" }],
+    icon: [
+      { url: brand_seo_images.favicon.path, sizes: 'any' },
+      {
+        url: brand_seo_images.icon_png.path,
+        sizes: `${brand_seo_images.icon_png.width}x${brand_seo_images.icon_png.height}`,
+        type: brand_seo_images.icon_png.type,
+      },
+    ],
+    apple: [
+      {
+        url: brand_seo_images.apple_icon.path,
+        sizes: `${brand_seo_images.apple_icon.width}x${brand_seo_images.apple_icon.height}`,
+        type: brand_seo_images.apple_icon.type,
+      },
+    ],
+    shortcut: [brand_seo_images.favicon.path],
   },
   openGraph: {
     title: siteConfig.defaultTitle,

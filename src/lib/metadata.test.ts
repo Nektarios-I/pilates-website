@@ -27,7 +27,11 @@ describe("metadata helpers", () => {
       ],
     });
     expect(siteMetadata.icons).toMatchObject({
-      icon: [{ url: "/images/seo/corehouse_logo.png", type: "image/png" }],
+      icon: [
+        { url: '/favicon.ico', sizes: 'any' },
+        { url: '/images/seo/favicon-192.png', sizes: '192x192', type: 'image/png' },
+      ],
+      shortcut: ['/favicon.ico'],
     });
     expect(siteMetadata.twitter).toMatchObject({
       card: "summary_large_image",
