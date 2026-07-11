@@ -48,6 +48,6 @@ export const site_images = {
     },
   },
   seo: {
-    og_image: '/images/seo/og-image.jpg',
+    og_image: '/images/seo/corehouse_logo.png',
   },
 } as const;

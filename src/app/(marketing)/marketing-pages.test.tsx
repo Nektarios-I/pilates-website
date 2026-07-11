@@ -34,7 +34,7 @@ const marketingPages = [
     Page: HomePage,
     heading: "Where movement comes home.",
     metadata: homeMetadata,
-    expectedTitle: "Home",
+    expectedTitle: "Reformer & Mat Pilates in Cyprus",
   },
   {
     name: "about",

@@ -11,7 +11,8 @@ import { to_date_key } from '@/lib/schedule/studio-hours';
 
 export const metadata = createPageMetadata({
   title: 'Book a Class',
-  description: 'Choose a day and time for your reformer Pilates session.',
+  description:
+    'Book reformer or mat Pilates online. Choose your day and time from the studio schedule in Cyprus.',
   path: '/book',
 });
 

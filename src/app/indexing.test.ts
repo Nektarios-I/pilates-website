@@ -14,6 +14,7 @@ describe("indexing routes", () => {
       rules: {
         userAgent: "*",
         allow: "/",
+        disallow: ["/staff/", "/account/", "/login", "/auth/", "/design"],
       },
       sitemap: `${siteConfig.siteUrl}/sitemap.xml`,
     });

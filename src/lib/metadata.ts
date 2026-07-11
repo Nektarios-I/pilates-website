@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { site_content } from "@/config/site_content";
 import { siteConfig } from "@/config/site";
+import { brand_seo_images } from "@/lib/seo/brand-images";
 
 type PageMetadataInput = {
   title: string;
@@ -11,6 +12,28 @@ type PageMetadataInput = {
 
 const absoluteUrl = (path: string) => new URL(path, siteConfig.siteUrl).toString();
 
+const shared_open_graph = {
+  siteName: siteConfig.name,
+  type: "website" as const,
+  locale: "en_GB",
+};
+
+const shared_social_image = [
+  {
+    url: brand_seo_images.logo.path,
+    width: brand_seo_images.logo.width,
+    height: brand_seo_images.logo.height,
+    alt: brand_seo_images.logo.alt,
+  },
+];
+
+const shared_twitter = {
+  card: "summary_large_image" as const,
+  title: siteConfig.defaultTitle,
+  description: siteConfig.defaultDescription,
+  images: shared_social_image,
+};
+
 export const siteMetadata: Metadata = {
   metadataBase: new URL(siteConfig.siteUrl),
   title: {
@@ -19,21 +42,35 @@ export const siteMetadata: Metadata = {
   },
   description: siteConfig.defaultDescription,
   applicationName: siteConfig.name,
+  keywords: [...site_content.seo.keywords],
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  alternates: {
+    canonical: "/",
+  },
+  icons: {
+    icon: [{ url: brand_seo_images.logo.path, type: "image/png" }],
+    apple: [{ url: brand_seo_images.logo.path, type: "image/png" }],
+  },
   openGraph: {
     title: siteConfig.defaultTitle,
     description: siteConfig.defaultDescription,
-    siteName: siteConfig.name,
-    type: "website",
+    ...shared_open_graph,
     url: absoluteUrl("/"),
-    images: [
-      {
-        url: site_content.seo.og_image,
-        width: 1200,
-        height: 630,
-        alt: site_content.hero_content.image_alt,
-      },
-    ],
+    images: shared_social_image,
   },
+  twitter: {
+    ...shared_twitter,
+  },
+  category: "health",
 };
 
 export const createPageMetadata = ({
@@ -50,7 +87,13 @@ export const createPageMetadata = ({
     title,
     description,
     url: absoluteUrl(path),
-    siteName: siteConfig.name,
-    type: "website",
+    ...shared_open_graph,
+    images: shared_social_image,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: shared_social_image,
   },
 });

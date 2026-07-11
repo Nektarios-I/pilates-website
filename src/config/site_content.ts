@@ -274,8 +274,18 @@ export const site_content = {
   seo: {
     site_title: 'corehouse Pilates Studio',
     site_description:
-      'Reformer and mat Pilates in Cyprus. View classes, pricing, instructors, and studio hours.',
-    og_image: site_images.seo.og_image,
+      'Reformer & mat Pilates in Cyprus. Small-group classes with attentive instruction for strength, alignment, and mobility. View pricing and book online.',
+    google_business_description:
+      'corehouse Pilates Studio offers reformer and mat Pilates in a calm, focused setting. Our small-group classes give you attentive instruction and a clear weekly schedule, whether you are new to Pilates or returning to your practice.\n\nChoose reformer sessions on professional equipment or mat classes for core strength, mobility, and breath-led control. Flexible pricing includes single classes and monthly packages.\n\nView class types, meet our instructors, and book sessions online. Grip socks are required for reformer classes. We look forward to welcoming you to the studio.',
+    keywords: [
+      'Pilates studio Cyprus',
+      'reformer Pilates Cyprus',
+      'mat Pilates Cyprus',
+      'Pilates classes',
+      'book Pilates online',
+      'corehouse Pilates',
+    ],
+    og_image: '/images/seo/corehouse_logo.png',
     canonical_url: '',
   },
 } as const;

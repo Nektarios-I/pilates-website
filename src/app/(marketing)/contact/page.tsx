@@ -6,7 +6,7 @@ import { createPageMetadata } from '@/lib/metadata';
 export const metadata = createPageMetadata({
   title: 'Contact',
   description:
-    'Get in touch with our studio. Find our location, contact details, and studio hours.',
+    'Contact corehouse Pilates Studio in Cyprus. Find studio hours, location, and send us a message.',
   path: '/contact',
 });
 

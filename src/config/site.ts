@@ -1,11 +1,12 @@
+import { site_content } from "@/config/site_content";
+
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 export const siteConfig = {
   name: process.env.NEXT_PUBLIC_STUDIO_NAME ?? "corehouse Pilates Studio",
   siteUrl: trimTrailingSlash(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   defaultTitle: "corehouse Pilates Studio",
-  defaultDescription:
-    "Reformer and mat Pilates in Cyprus. View classes, pricing, instructors, and studio hours.",
+  defaultDescription: site_content.seo.site_description,
   contactEmail: process.env.NEXT_PUBLIC_CONTACT_EMAIL ?? "",
   contactPhone: process.env.NEXT_PUBLIC_CONTACT_PHONE ?? "+35799954286",
   bookingUrl: process.env.NEXT_PUBLIC_BOOKING_URL ?? "/contact",

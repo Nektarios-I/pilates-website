@@ -14,8 +14,9 @@ import type { PricingPlanCard } from '@/lib/packages/types';
 import { createPageMetadata } from "@/lib/metadata";
 
 export const metadata = createPageMetadata({
-  title: "Home",
+  title: "Reformer & Mat Pilates in Cyprus",
   description: site_content.seo.site_description,
+  path: "/",
 });
 
 export default async function HomePage() {

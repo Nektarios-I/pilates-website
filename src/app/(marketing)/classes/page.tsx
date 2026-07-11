@@ -5,7 +5,8 @@ import { createPageMetadata } from '@/lib/metadata';
 
 export const metadata = createPageMetadata({
   title: 'Classes',
-  description: 'Reformer and mat Pilates classes at corehouse Pilates Studio.',
+  description:
+    'Reformer and mat Pilates classes in Cyprus. Small-group sessions for strength, mobility, and alignment. All levels welcome.',
   path: '/classes',
 });
 
