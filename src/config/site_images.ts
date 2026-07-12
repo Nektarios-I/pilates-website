@@ -31,8 +31,8 @@ export const site_images = {
       alt: 'Contact corehouse Pilates studio',
     },
     schedule: {
-      src: '/images/Contact/schedule.jpg',
-      alt: 'corehouse Pilates studio schedule',
+      src: '/images/Contact/Schedule.png',
+      alt: 'corehouse Pilates studio weekly schedule',
     },
   },
   faq: {

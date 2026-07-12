@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
-    "images:process": "node scripts/process-site-images.mjs"
+    "images:process": "node scripts/process-site-images.mjs",
+    "favicons:generate": "node scripts/generate-favicons.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.0",
@@ -36,6 +37,7 @@
     "jsdom": "^29.1.1",
     "sharp": "^0.35.2",
     "tailwindcss": "^4",
+    "to-ico": "^1.1.5",
     "typescript": "^5",
     "vitest": "^4.1.6"
   }

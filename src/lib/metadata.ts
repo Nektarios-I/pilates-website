@@ -58,7 +58,7 @@ export const siteMetadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: brand_seo_images.favicon.path, sizes: 'any' },
+      { url: brand_seo_images.favicon.path, sizes: '48x48', type: 'image/x-icon' },
       {
         url: brand_seo_images.icon_png.path,
         sizes: `${brand_seo_images.icon_png.width}x${brand_seo_images.icon_png.height}`,
