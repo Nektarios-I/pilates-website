@@ -39,6 +39,7 @@ const maria_row = {
 function admin_supabase(options?: {
   bookings_error?: { message: string; code?: string; hint?: string } | null;
   bookings_data?: unknown[];
+  finalize_error?: string | null;
 }) {
   const select = vi.fn(() => {
     const query: Record<string, unknown> = {};
@@ -52,13 +53,23 @@ function admin_supabase(options?: {
     query.eq = vi.fn(() => query);
     query.neq = vi.fn(() => query);
     query.lt = vi.fn(() => query);
+    query.in = vi.fn(() => query);
     query.gte = vi.fn(() => query);
     query.lte = vi.fn(() => query);
-    // terminal thenable
     query.then = (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
       Promise.resolve(finalize()).then(resolve, reject);
 
     return query;
+  });
+
+  const rpc = vi.fn(async (name: string) => {
+    if (name === 'finalize_past_bookings') {
+      if (options?.finalize_error) {
+        return { data: null, error: { message: options.finalize_error } };
+      }
+      return { data: 3, error: null };
+    }
+    return { data: null, error: null };
   });
 
   return {
@@ -76,6 +87,7 @@ function admin_supabase(options?: {
       }
       throw new Error(`Unexpected table: ${table}`);
     }),
+    rpc,
     _select: select,
   };
 }
@@ -83,6 +95,15 @@ function admin_supabase(options?: {
 describe('list_staff_bookings', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('finalizes past bookings before listing', async () => {
+    const supabase = admin_supabase();
+    create_client_mock.mockResolvedValue(supabase as never);
+
+    await list_staff_bookings();
+
+    expect(supabase.rpc).toHaveBeenCalledWith('finalize_past_bookings');
   });
 
   it('selects bookings with the explicit client profile relationship', async () => {
@@ -109,6 +130,27 @@ describe('list_staff_bookings', () => {
       session_starts_at: '2026-07-30T16:00:00.000Z',
       credit_charges: [{ class_type: 'reformer', credits_used: 1 }],
     });
+  });
+
+  it('filters finished status to finished/attended/no_show rows', async () => {
+    const finished_row = { ...maria_row, id: 'finished-1', status: 'finished' };
+    const supabase = admin_supabase({ bookings_data: [finished_row] });
+    create_client_mock.mockResolvedValue(supabase as never);
+
+    const result = await list_staff_bookings({
+      status: 'finished',
+      search: '',
+      session_start_date: '',
+      session_end_date: '',
+    });
+
+    expect(result.error).toBeNull();
+    expect(result.bookings[0]?.status).toBe('finished');
+    expect(supabase._select.mock.results[0]?.value.in).toHaveBeenCalledWith('status', [
+      'finished',
+      'attended',
+      'no_show',
+    ]);
   });
 
   it('maps cancelled bookings and keeps friendly load errors', async () => {

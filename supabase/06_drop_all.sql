@@ -62,6 +62,7 @@ drop function if exists public.get_active_packages(uuid)                        
 drop function if exists public.get_session_roster(uuid)                              cascade;
 drop function if exists public.has_role(uuid, text)                                  cascade;
 drop function if exists public.expire_packages()                                     cascade;
+drop function if exists public.finalize_past_bookings()                              cascade;
 
 -- ── 5. Private RLS helper functions ──────────────────────────────────────────
 drop function if exists public.staff_book_session_with_credits_for_client(uuid, uuid, uuid, uuid) cascade;

@@ -37,6 +37,16 @@ async function resolve_admin_or_owner(): Promise<boolean> {
   return (roles ?? []).some((row) => row.role === 'owner' || row.role === 'admin');
 }
 
+/** Best-effort catch-up before listing so past booked rows show as finished. */
+async function ensure_past_bookings_finalized(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+): Promise<void> {
+  const { error } = await supabase.rpc('finalize_past_bookings');
+  if (error) {
+    console.error('[list_staff_bookings] finalize_past_bookings failed:', error.message);
+  }
+}
+
 export async function list_staff_bookings(
   filters: StaffBookingFilters = DEFAULT_STAFF_BOOKING_FILTERS,
 ): Promise<StaffBookingsListResult> {
@@ -52,20 +62,21 @@ export async function list_staff_bookings(
   }
 
   const supabase = await createClient();
+  await ensure_past_bookings_finalized(supabase);
+
   let query = supabase
     .from('bookings')
     .select(STAFF_BOOKING_HISTORY_SELECT)
     .order('starts_at', { foreignTable: 'sessions', ascending: false })
     .limit(STAFF_BOOKINGS_LIMIT);
 
-  const now_iso = new Date().toISOString();
-
   if (filters.status === 'booked') {
     query = query.eq('status', 'booked');
   } else if (filters.status === 'cancelled') {
     query = query.eq('status', 'cancelled');
   } else if (filters.status === 'finished') {
-    query = query.neq('status', 'cancelled').lt('sessions.starts_at', now_iso);
+    // Completed sessions: auto-finished plus staff attendance / no-show marks.
+    query = query.in('status', ['finished', 'attended', 'no_show']);
   }
 
   if (filters.session_start_date) {

@@ -91,10 +91,10 @@ describe('staff booking helpers', () => {
     expect(filter_staff_bookings_by_search([mapped], 'unknown')).toHaveLength(0);
   });
 
-  it('map_staff_booking maps a finished/history-style attended booking with client name', () => {
+  it('map_staff_booking maps a finished booking with client name', () => {
     const mapped = map_staff_booking({
       ...sample_row,
-      status: 'attended',
+      status: 'finished',
       profiles: {
         full_name: 'MARIA ERAKLEOUS',
         email: 'mariaerakleous6@iclous.com',
@@ -109,7 +109,7 @@ describe('staff booking helpers', () => {
     });
 
     expect(mapped).toMatchObject({
-      status: 'attended',
+      status: 'finished',
       client_name: 'MARIA ERAKLEOUS',
       session_title: 'Reformer · 30 Jul 19:00',
       session_starts_at: '2026-07-30T16:00:00.000Z',
@@ -129,6 +129,7 @@ describe('staff booking helpers', () => {
   it('format_booking_status humanizes values', () => {
     expect(format_booking_status('no_show')).toBe('No Show');
     expect(format_booking_status('waitlisted')).toBe('Waitlisted');
+    expect(format_booking_status('finished')).toBe('Finished');
   });
 
   it('format_staff_booking_history_status labels filter options', () => {

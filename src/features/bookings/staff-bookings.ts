@@ -4,6 +4,7 @@ export const BOOKING_STATUSES = [
   'cancelled',
   'attended',
   'no_show',
+  'finished',
 ] as const;
 
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
@@ -148,6 +149,7 @@ export function format_booking_client_contact(
 }
 
 export function format_booking_status(status: BookingStatus): string {
+  if (status === 'finished') return 'Finished';
   return status
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

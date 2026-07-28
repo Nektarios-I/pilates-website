@@ -260,7 +260,7 @@ create table if not exists public.bookings (
   session_id          uuid        not null references public.sessions(id)       on delete restrict,
   user_package_id     uuid        not null references public.user_packages(id)  on delete restrict,
   status              text        not null default 'booked'
-                        check (status in ('booked','waitlisted','cancelled','attended','no_show')),
+                        check (status in ('booked','waitlisted','cancelled','attended','no_show','finished')),
   -- Snapshot of credits_required at booking time — used for accurate refunds
   -- even if sessions.credits_required changes later.
   credits_used        integer     not null default 1,

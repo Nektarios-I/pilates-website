@@ -25,6 +25,7 @@ describe('day booking helpers', () => {
   it('classifies active and cancelled booking statuses', () => {
     expect(is_active_booking_status('booked')).toBe(true);
     expect(is_active_booking_status('waitlisted')).toBe(true);
+    expect(is_active_booking_status('finished')).toBe(true);
     expect(is_cancelled_booking_status('cancelled')).toBe(true);
     expect(is_cancelled_booking_status('no_show')).toBe(true);
   });

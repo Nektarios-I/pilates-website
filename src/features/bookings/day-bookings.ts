@@ -6,7 +6,7 @@ import {
   type BookingStatus,
 } from './staff-bookings';
 
-export const ACTIVE_BOOKING_STATUSES = ['booked', 'waitlisted', 'attended'] as const;
+export const ACTIVE_BOOKING_STATUSES = ['booked', 'waitlisted', 'attended', 'finished'] as const;
 export const CANCELLED_BOOKING_STATUSES = ['cancelled', 'no_show'] as const;
 
 export type DayBookingsFilters = {

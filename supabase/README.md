@@ -44,6 +44,7 @@ Run each file **once**, top to bottom:
 | 29 | `35_cron_materialize_live_booking_check.sql` | Align daily cron skip guard with live-booking check (run after 34) |
 | 30 | `36_client_cancel_four_hour_cutoff.sql` | Client self-cancel cutoff 4 hours (P0029) |
 | 31 | `37_profiles_rls_staff_directory.sql` | Restrict profile reads: staff see all; clients see staff directory + own row |
+| 32 | `38_finalize_past_bookings.sql` | Auto-mark past `booked` rows as `finished` + hourly pg_cron |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -73,6 +74,7 @@ Run each file **once**, top to bottom:
 | Scripts 01–34 | `35_cron_materialize_live_booking_check.sql` |
 | Scripts 01–35 | `36_client_cancel_four_hour_cutoff.sql` |
 | Scripts 01–36 | `37_profiles_rls_staff_directory.sql` |
+| Scripts 01–37 | `38_finalize_past_bookings.sql` |
 
 After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
 
