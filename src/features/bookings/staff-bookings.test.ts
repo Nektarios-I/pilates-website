@@ -91,6 +91,31 @@ describe('staff booking helpers', () => {
     expect(filter_staff_bookings_by_search([mapped], 'unknown')).toHaveLength(0);
   });
 
+  it('map_staff_booking maps a finished/history-style attended booking with client name', () => {
+    const mapped = map_staff_booking({
+      ...sample_row,
+      status: 'attended',
+      profiles: {
+        full_name: 'MARIA ERAKLEOUS',
+        email: 'mariaerakleous6@iclous.com',
+        phone: null,
+      },
+      sessions: {
+        ...sample_row.sessions,
+        title: 'Reformer · 30 Jul 19:00',
+        starts_at: '2026-07-30T16:00:00.000Z',
+        ends_at: '2026-07-30T17:00:00.000Z',
+      },
+    });
+
+    expect(mapped).toMatchObject({
+      status: 'attended',
+      client_name: 'MARIA ERAKLEOUS',
+      session_title: 'Reformer · 30 Jul 19:00',
+      session_starts_at: '2026-07-30T16:00:00.000Z',
+    });
+  });
+
   it('map_staff_booking keeps rows when email is missing but phone is present', () => {
     const mapped = map_staff_booking({
       ...sample_row,

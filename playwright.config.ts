@@ -48,12 +48,12 @@ export default defineConfig({
   projects: [
     {
       name: "chromium",
-      testIgnore: ["**/booking-flow.spec.ts"],
+      testIgnore: ["**/booking-flow.spec.ts", "**/staff-bookings.spec.ts"],
       use: { ...devices["Desktop Chrome"] },
     },
     {
       name: "mobile-320",
-      testIgnore: ["**/booking-flow.spec.ts"],
+      testIgnore: ["**/booking-flow.spec.ts", "**/staff-bookings.spec.ts"],
       use: {
         browserName: "chromium",
         viewport: { width: 320, height: 844 },
@@ -63,7 +63,7 @@ export default defineConfig({
     },
     {
       name: "mobile-375",
-      testIgnore: ["**/booking-flow.spec.ts"],
+      testIgnore: ["**/booking-flow.spec.ts", "**/staff-bookings.spec.ts"],
       use: {
         browserName: "chromium",
         viewport: { width: 375, height: 844 },
@@ -73,7 +73,7 @@ export default defineConfig({
     },
     {
       name: "mobile-390",
-      testIgnore: ["**/booking-flow.spec.ts"],
+      testIgnore: ["**/booking-flow.spec.ts", "**/staff-bookings.spec.ts"],
       use: {
         browserName: "chromium",
         viewport: { width: 390, height: 844 },
@@ -83,7 +83,7 @@ export default defineConfig({
     },
     {
       name: "mobile-412",
-      testIgnore: ["**/booking-flow.spec.ts"],
+      testIgnore: ["**/booking-flow.spec.ts", "**/staff-bookings.spec.ts"],
       use: {
         browserName: "chromium",
         viewport: { width: 412, height: 844 },
@@ -94,6 +94,12 @@ export default defineConfig({
     {
       name: "authenticated-booking",
       testMatch: ["**/booking-flow.spec.ts"],
+      timeout: 60_000,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "authenticated-staff-bookings",
+      testMatch: ["**/staff-bookings.spec.ts"],
       timeout: 60_000,
       use: { ...devices["Desktop Chrome"] },
     },

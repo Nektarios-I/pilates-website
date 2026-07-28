@@ -42,8 +42,25 @@ export function near_cutoff_booking_configured(): boolean {
   );
 }
 
+export function staff_booking_e2e_configured(): boolean {
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY &&
+      process.env.E2E_STAFF_EMAIL &&
+      process.env.E2E_STAFF_PASSWORD,
+  );
+}
+
 export const e2e_client_email = () => process.env.E2E_CLIENT_EMAIL ?? '';
 export const e2e_client_password = () => process.env.E2E_CLIENT_PASSWORD ?? '';
+export const e2e_staff_email = () => process.env.E2E_STAFF_EMAIL ?? '';
+export const e2e_staff_password = () => process.env.E2E_STAFF_PASSWORD ?? '';
 export const e2e_near_cutoff_booking_id = () => process.env.E2E_NEAR_CUTOFF_BOOKING_ID ?? '';
 export const e2e_near_cutoff_booking_title = () =>
   process.env.E2E_NEAR_CUTOFF_BOOKING_TITLE ?? '';
+/** Optional known client display name for staff booking regression (e.g. MARIA ERAKLEOUS). */
+export const e2e_staff_known_client_name = () =>
+  process.env.E2E_STAFF_KNOWN_CLIENT_NAME ?? 'MARIA ERAKLEOUS';
+/** Optional YYYY-MM-DD for day bookings regression (defaults to 2026-07-30). */
+export const e2e_staff_known_booking_date = () =>
+  process.env.E2E_STAFF_KNOWN_BOOKING_DATE ?? '2026-07-30';

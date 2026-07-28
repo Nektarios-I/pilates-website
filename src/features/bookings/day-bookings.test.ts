@@ -36,7 +36,7 @@ describe('day booking helpers', () => {
       booked_at: '2026-06-20T09:00:00.000Z',
       cancelled_at: null,
       session_id: 'session-1',
-      profiles: { full_name: 'Maria Papadou', email: 'maria@example.com' },
+      profiles: { full_name: 'Maria Papadou', email: 'maria@example.com', phone: null },
     });
 
     expect(mapped).toEqual({
@@ -83,7 +83,7 @@ describe('day booking helpers', () => {
       booked_at: '2026-06-20T09:00:00.000Z',
       cancelled_at: null,
       session_id: 'session-1',
-      profiles: { full_name: 'Maria', email: 'maria@example.com' },
+      profiles: { full_name: 'Maria', email: 'maria@example.com', phone: null },
     })!;
     const cancelled = map_day_booking_attendee({
       id: 'cancelled-1',
@@ -91,7 +91,7 @@ describe('day booking helpers', () => {
       booked_at: '2026-06-19T09:00:00.000Z',
       cancelled_at: '2026-06-20T10:00:00.000Z',
       session_id: 'session-1',
-      profiles: { full_name: 'Alex', email: 'alex@example.com' },
+      profiles: { full_name: 'Alex', email: 'alex@example.com', phone: null },
     })!;
 
     const grouped = build_day_bookings_sessions(
@@ -142,7 +142,7 @@ describe('day booking helpers', () => {
               booked_at: '2026-06-20T09:00:00.000Z',
               cancelled_at: null,
               session_id: 'reformer-1',
-              profiles: { full_name: 'Test', email: 'test@example.com' },
+              profiles: { full_name: 'Test', email: 'test@example.com', phone: null },
             })!,
           ],
         ],
@@ -155,6 +155,36 @@ describe('day booking helpers', () => {
     expect(visible[0]?.session_type).toBe('reformer');
   });
 
+  it('group_day_bookings_from_rows keeps Maria Erakleous on the active roster', () => {
+    const grouped = group_day_bookings_from_rows([
+      {
+        id: '2c230621-2812-44b4-9bfb-2c38c97eb178',
+        status: 'booked',
+        booked_at: '2026-07-20T09:00:00.000Z',
+        cancelled_at: null,
+        session_id: 'session-30-jul',
+        profiles: {
+          full_name: 'MARIA ERAKLEOUS',
+          email: 'mariaerakleous6@iclous.com',
+          phone: null,
+        },
+        sessions: {
+          id: 'session-30-jul',
+          title: 'Reformer · 30 Jul 19:00',
+          starts_at: '2026-07-30T16:00:00.000Z',
+          ends_at: '2026-07-30T17:00:00.000Z',
+          session_type: 'reformer',
+          location: 'Studio',
+          instructor: { full_name: 'Instructor' },
+        },
+      },
+    ]);
+
+    expect(grouped).toHaveLength(1);
+    expect(grouped[0]?.active_bookings[0]?.client_name).toBe('MARIA ERAKLEOUS');
+    expect(grouped[0]?.cancelled_bookings).toHaveLength(0);
+  });
+
   it('group_day_bookings_from_rows dedupes by session id', () => {
     const grouped = group_day_bookings_from_rows([
       {
@@ -163,7 +193,7 @@ describe('day booking helpers', () => {
         booked_at: '2026-06-20T09:00:00.000Z',
         cancelled_at: null,
         session_id: 'session-1',
-        profiles: { full_name: 'Test', email: 'test@example.com' },
+        profiles: { full_name: 'Test', email: 'test@example.com', phone: null },
         sessions: {
           id: 'session-1',
           title: 'Reformer · 01 Jul 06:00',
@@ -180,7 +210,7 @@ describe('day booking helpers', () => {
         booked_at: '2026-06-20T09:00:00.000Z',
         cancelled_at: null,
         session_id: 'session-1',
-        profiles: { full_name: 'Test', email: 'test@example.com' },
+        profiles: { full_name: 'Test', email: 'test@example.com', phone: null },
         sessions: {
           id: 'session-1',
           title: 'Reformer · 01 Jul 06:00',

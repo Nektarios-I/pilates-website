@@ -10,40 +10,17 @@ import {
   type StaffBookingFilters,
   type StaffBookingRecord,
 } from '@/features/bookings/staff-bookings';
+import {
+  log_staff_booking_query_error,
+  STAFF_BOOKING_HISTORY_SELECT,
+  studio_day_window_bounds,
+} from '@/features/bookings/staff-booking-queries';
 import { createClient } from '@/lib/supabase/server';
 
 export type StaffBookingsListResult = {
   bookings: StaffBookingRecord[];
   error: string | null;
 };
-
-const BOOKINGS_SELECT = `
-  id,
-  status,
-  booked_at,
-  cancelled_at,
-  cancellation_reason,
-  credits_used,
-  profiles!inner (
-    full_name,
-    email,
-    phone
-  ),
-  sessions!inner (
-    title,
-    starts_at,
-    ends_at,
-    session_type,
-    location,
-    credits_required,
-    reformer_credits_required,
-    mat_credits_required
-  ),
-  booking_credit_charges (
-    class_type,
-    credits_used
-  )
-`;
 
 async function resolve_admin_or_owner(): Promise<boolean> {
   const supabase = await createClient();
@@ -77,7 +54,7 @@ export async function list_staff_bookings(
   const supabase = await createClient();
   let query = supabase
     .from('bookings')
-    .select(BOOKINGS_SELECT)
+    .select(STAFF_BOOKING_HISTORY_SELECT)
     .order('starts_at', { foreignTable: 'sessions', ascending: false })
     .limit(STAFF_BOOKINGS_LIMIT);
 
@@ -92,17 +69,23 @@ export async function list_staff_bookings(
   }
 
   if (filters.session_start_date) {
-    query = query.gte('sessions.starts_at', `${filters.session_start_date}T00:00:00`);
+    query = query.gte(
+      'sessions.starts_at',
+      studio_day_window_bounds(filters.session_start_date).day_start,
+    );
   }
 
   if (filters.session_end_date) {
-    query = query.lte('sessions.starts_at', `${filters.session_end_date}T23:59:59`);
+    query = query.lte(
+      'sessions.starts_at',
+      studio_day_window_bounds(filters.session_end_date).day_end,
+    );
   }
 
   const { data, error } = await query;
 
   if (error) {
-    console.error('[list_staff_bookings] query failed:', error.message);
+    log_staff_booking_query_error('list_staff_bookings', error);
     return {
       bookings: [],
       error: 'Unable to load bookings. Please try again.',

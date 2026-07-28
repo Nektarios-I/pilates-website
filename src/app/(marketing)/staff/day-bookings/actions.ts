@@ -10,6 +10,11 @@ import {
   type DayBookingsSession,
   type DayBookingsSummary,
 } from '@/features/bookings/day-bookings';
+import {
+  log_staff_booking_query_error,
+  STAFF_DAY_BOOKINGS_SELECT,
+  studio_day_window_bounds,
+} from '@/features/bookings/staff-booking-queries';
 import { createClient } from '@/lib/supabase/server';
 
 const STAFF_ROLES = ['instructor', 'owner', 'admin'] as const;
@@ -45,31 +50,6 @@ export type DayBookingsListResult = {
   error: string | null;
 };
 
-const BOOKINGS_WITH_SESSION_SELECT = `
-  id,
-  status,
-  booked_at,
-  cancelled_at,
-  session_id,
-  profiles!inner (
-    full_name,
-    email,
-    phone
-  ),
-  sessions!inner (
-    id,
-    title,
-    starts_at,
-    ends_at,
-    session_type,
-    location,
-    status,
-    instructor:profiles!sessions_instructor_id_fkey (
-      full_name
-    )
-  )
-`;
-
 export async function list_day_bookings(
   filters: DayBookingsFilters = DEFAULT_DAY_BOOKINGS_FILTERS,
 ): Promise<DayBookingsListResult> {
@@ -90,19 +70,18 @@ export async function list_day_bookings(
   }
 
   const supabase = await createClient();
-  const day_start = `${filters.date_key}T00:00:00`;
-  const day_end = `${filters.date_key}T23:59:59`;
+  const { day_start, day_end } = studio_day_window_bounds(filters.date_key);
 
   const { data: booking_rows, error: bookings_error } = await supabase
     .from('bookings')
-    .select(BOOKINGS_WITH_SESSION_SELECT)
+    .select(STAFF_DAY_BOOKINGS_SELECT)
     .gte('sessions.starts_at', day_start)
     .lte('sessions.starts_at', day_end)
     .in('sessions.status', ['scheduled', 'completed'])
     .order('booked_at', { ascending: true });
 
   if (bookings_error) {
-    console.error('[list_day_bookings] query failed:', bookings_error.message);
+    log_staff_booking_query_error('list_day_bookings', bookings_error);
     return {
       ...empty,
       error: 'Unable to load bookings for this day. Please try again.',
