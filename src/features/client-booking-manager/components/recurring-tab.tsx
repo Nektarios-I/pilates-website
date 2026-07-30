@@ -520,8 +520,9 @@ function RuleCard({
             <h3 className="text-sm font-semibold text-foreground">14-day forecast</h3>
             <p className="mt-1 text-xs text-foreground/60">
               Class dates inside the booking window. <strong>Planned</strong> means not yet
-              materialized; <strong>Booked</strong> means a real booking exists. Slot status
-              counts all recurring rules for this client, soonest first.
+              reserved. <strong>Credits OK</strong> means credits look sufficient right now —
+              not that the class is already booked. Warnings appear when credits are missing
+              or a package expires before the class date.
             </p>
             {forecast.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No forecast occurrences in window.</p>

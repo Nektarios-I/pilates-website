@@ -12,7 +12,10 @@ describe('client booking manager format', () => {
   it('labels booking and slot states for staff UI', () => {
     expect(booking_state_label('planned')).toBe('Planned');
     expect(booking_state_label('booked')).toBe('Booked');
-    expect(token_health_label('insufficient_tokens')).toBe('Not enough slots');
+    expect(token_health_label('insufficient_tokens')).toBe('Not enough credits');
+    expect(token_health_label('package_expires_before')).toBe('Package expires before class');
+    expect(token_health_label('ok')).toBe('Credits OK');
+    expect(booking_state_label('failed')).toBe('Needs attention');
     expect(health_status_label('insufficient_tokens')).toBe('Not enough slots');
     expect(materializable_occurrence_key('rule-1', '2026-07-13', '06:00')).toBe(
       'rule-1|2026-07-13|06:00:00',

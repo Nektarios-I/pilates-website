@@ -1,8 +1,8 @@
 export type RecurringHealthStatus = 'ready' | 'insufficient_tokens' | 'failed';
 
-export type RecurringBookingState = 'planned' | 'booked' | 'failed';
+export type RecurringBookingState = 'planned' | 'booked' | 'failed' | 'skipped';
 
-export type RecurringTokenHealth = 'ok' | 'insufficient_tokens';
+export type RecurringTokenHealth = 'ok' | 'insufficient_tokens' | 'package_expires_before';
 
 export type ClientBookingRecord = {
   id: string;

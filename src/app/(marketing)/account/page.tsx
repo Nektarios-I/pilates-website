@@ -95,6 +95,34 @@ export default async function AccountPage() {
     })
     .slice(0, 5);
 
+  const { data: planned_slot_rows } = await supabase.rpc('get_my_recurring_planned_slots');
+
+  const planned_slots = (planned_slot_rows ?? []).map(
+    (row: {
+      rule_id: string;
+      rule_label: string;
+      session_card_title: string;
+      occurrence_date: string;
+      start_time: string;
+      occurrence_starts_at: string;
+      occurrence_ends_at: string;
+      booking_state: string;
+      token_health: string | null;
+      failure_message: string | null;
+    }) => ({
+      rule_id: row.rule_id,
+      rule_label: row.rule_label,
+      session_card_title: row.session_card_title,
+      occurrence_date: row.occurrence_date,
+      start_time: row.start_time,
+      occurrence_starts_at: row.occurrence_starts_at,
+      occurrence_ends_at: row.occurrence_ends_at,
+      booking_state: row.booking_state,
+      token_health: row.token_health,
+      failure_message: row.failure_message,
+    }),
+  );
+
   return (
     <>
       <Section aria-labelledby="account-page-heading" className="bg-background">
@@ -113,6 +141,7 @@ export default async function AccountPage() {
 
       <AccountContent
         packages={package_rows || []}
+        planned_slots={planned_slots}
         profile={profile}
         roles={roles || []}
         upcoming_bookings={upcoming_bookings || []}

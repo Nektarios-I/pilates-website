@@ -107,7 +107,8 @@ export function health_status_label(status: RecurringHealthStatus | null | undef
 export function booking_state_label(state: RecurringBookingState | null | undefined): string {
   if (state === 'booked') return 'Booked';
   if (state === 'planned') return 'Planned';
-  if (state === 'failed') return 'Materialization failed';
+  if (state === 'failed') return 'Needs attention';
+  if (state === 'skipped') return 'Skipped';
   return 'Unknown';
 }
 
@@ -121,12 +122,16 @@ export function booking_state_badge_class(state: RecurringBookingState | null | 
   if (state === 'failed') {
     return 'rounded-full bg-danger-surface px-2.5 py-0.5 text-xs font-medium text-danger-foreground ring-1 ring-danger-border';
   }
+  if (state === 'skipped') {
+    return 'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/70 ring-1 ring-border';
+  }
   return 'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/70';
 }
 
 export function token_health_label(health: RecurringTokenHealth | null | undefined): string {
-  if (health === 'ok') return 'Slots OK';
-  if (health === 'insufficient_tokens') return 'Not enough slots';
+  if (health === 'ok') return 'Credits OK';
+  if (health === 'insufficient_tokens') return 'Not enough credits';
+  if (health === 'package_expires_before') return 'Package expires before class';
   return '';
 }
 
@@ -134,7 +139,7 @@ export function token_health_badge_class(health: RecurringTokenHealth | null | u
   if (health === 'ok') {
     return 'rounded-full bg-success-surface/60 px-2.5 py-0.5 text-xs font-medium text-success ring-1 ring-success-border';
   }
-  if (health === 'insufficient_tokens') {
+  if (health === 'insufficient_tokens' || health === 'package_expires_before') {
     return 'rounded-full bg-warning-surface px-2.5 py-0.5 text-xs font-medium text-warning-foreground ring-1 ring-warning-border';
   }
   return '';

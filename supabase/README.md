@@ -45,6 +45,8 @@ Run each file **once**, top to bottom:
 | 30 | `36_client_cancel_four_hour_cutoff.sql` | Client self-cancel cutoff 4 hours (P0029) |
 | 31 | `37_profiles_rls_staff_directory.sql` | Restrict profile reads: staff see all; clients see staff directory + own row |
 | 32 | `38_finalize_past_bookings.sql` | Auto-mark past `booked` rows as `finished` + hourly pg_cron |
+| 33 | `39_package_lifecycle_alignment.sql` | Package lifecycle grouping, extend/reactivate, audit |
+| 34 | `40_recurring_materialize_failure_visibility.sql` | Durable cron failures; staff-cancel skip; package-expiry warnings; client planned slots |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -75,6 +77,8 @@ Run each file **once**, top to bottom:
 | Scripts 01–35 | `36_client_cancel_four_hour_cutoff.sql` |
 | Scripts 01–36 | `37_profiles_rls_staff_directory.sql` |
 | Scripts 01–37 | `38_finalize_past_bookings.sql` |
+| Scripts 01–38 | `39_package_lifecycle_alignment.sql` |
+| Scripts 01–39 | `40_recurring_materialize_failure_visibility.sql` |
 
 After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
 

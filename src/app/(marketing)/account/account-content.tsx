@@ -20,6 +20,12 @@ import {
   client_may_cancel_online,
 } from '@/lib/booking/cancellation-policy';
 import { display_profile_email } from '@/lib/auth/account-identifiers';
+import {
+  planned_slot_detail_label,
+  planned_slot_needs_attention,
+  planned_slot_status_label,
+  type PlannedSlotRow,
+} from '@/features/account/planned-recurring-slots';
 import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
 import {
@@ -82,6 +88,7 @@ interface AccountContentProps {
   roles: Role[];
   packages: AccountPackage[];
   upcoming_bookings: UpcomingBooking[];
+  planned_slots?: PlannedSlotRow[];
 }
 
 export function AccountContent({
@@ -90,6 +97,7 @@ export function AccountContent({
   roles,
   packages,
   upcoming_bookings,
+  planned_slots = [],
 }: AccountContentProps) {
   const router = useRouter();
   const [is_pending, start_transition] = useTransition();
@@ -367,6 +375,80 @@ export function AccountContent({
               ) : null}
 
             </div>
+
+            {/* Planned recurring slots */}
+            {planned_slots.length > 0 ? (
+              <div className="rounded-md border border-border bg-background p-6">
+                <div>
+                  <h2 className="text-xl font-semibold text-foreground">Planned slots</h2>
+                  <p className="mt-1 text-sm text-foreground/70">
+                    Your recurring class times in the next two weeks
+                  </p>
+                </div>
+
+                <div className="mt-6 space-y-4">
+                  {planned_slots.map((slot) => {
+                    const status = planned_slot_status_label(slot.booking_state, slot.token_health);
+                    const detail = planned_slot_detail_label(
+                      slot.booking_state,
+                      slot.token_health,
+                      slot.failure_message,
+                    );
+                    const needs_attention = planned_slot_needs_attention(
+                      slot.booking_state,
+                      slot.token_health,
+                    );
+                    const key = `${slot.rule_id}-${slot.occurrence_starts_at}`;
+
+                    return (
+                      <div
+                        className="rounded-md border border-border bg-surface p-4"
+                        key={key}
+                      >
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-foreground">
+                              {slot.session_card_title || slot.rule_label}
+                            </h3>
+                            <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/60">
+                              <span>{format_date(slot.occurrence_starts_at)}</span>
+                              <span>
+                                {format_time(slot.occurrence_starts_at)}
+                                {slot.occurrence_ends_at
+                                  ? ` - ${format_time(slot.occurrence_ends_at)}`
+                                  : ''}
+                              </span>
+                            </div>
+                            {detail ? (
+                              <p className="mt-2 text-sm text-foreground/70">{detail}</p>
+                            ) : null}
+                            {needs_attention ? (
+                              <p className="mt-2 text-sm text-foreground/70">
+                                <a className="underline underline-offset-2" href="/pricing">
+                                  View pricing
+                                </a>{' '}
+                                if you need more credits.
+                              </p>
+                            ) : null}
+                          </div>
+                          <span
+                            className={
+                              needs_attention
+                                ? marketingWarningBadgeClass
+                                : slot.booking_state === 'booked'
+                                  ? marketingSuccessBadgeClass
+                                  : 'inline-flex items-center rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/80 ring-1 ring-border'
+                            }
+                          >
+                            {status}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
 
             {/* Upcoming Bookings Section */}
             <div className="rounded-md border border-border bg-background p-6">
