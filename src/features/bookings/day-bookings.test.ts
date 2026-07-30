@@ -11,6 +11,11 @@ import {
   session_starts_in_hour_range,
   summarize_day_bookings,
 } from './day-bookings';
+import {
+  build_session_availability,
+  count_occupying_bookings,
+  format_occupancy_label,
+} from './session-availability';
 
 describe('day booking helpers', () => {
   it('session_starts_in_hour_range respects studio-local session start', () => {
@@ -186,6 +191,59 @@ describe('day booking helpers', () => {
     expect(grouped).toHaveLength(1);
     expect(grouped[0]?.active_bookings[0]?.client_name).toBe('MARIA ERAKLEOUS');
     expect(grouped[0]?.cancelled_bookings).toHaveLength(0);
+  });
+
+  it('group_day_bookings_from_rows aggregates multiple bookings on one session for occupancy', () => {
+    const grouped = group_day_bookings_from_rows([
+      {
+        id: 'booking-1',
+        status: 'booked',
+        booked_at: '2026-07-31T05:00:00.000Z',
+        cancelled_at: null,
+        session_id: 'session-31-jul-0600',
+        profiles: { full_name: 'TEST TEST', email: 'test@example.com', phone: null },
+        sessions: {
+          id: 'session-31-jul-0600',
+          title: 'Reformer Pilates',
+          starts_at: '2026-07-31T03:00:00.000Z',
+          ends_at: '2026-07-31T04:00:00.000Z',
+          session_type: 'reformer',
+          location: 'Studio',
+          capacity: 4,
+          instructor: null,
+        },
+      },
+      {
+        id: 'booking-2',
+        status: 'booked',
+        booked_at: '2026-07-31T05:10:00.000Z',
+        cancelled_at: null,
+        session_id: 'session-31-jul-0600',
+        profiles: { full_name: 'Second Client', email: 'second@example.com', phone: null },
+        sessions: {
+          id: 'session-31-jul-0600',
+          title: 'Reformer Pilates',
+          starts_at: '2026-07-31T03:00:00.000Z',
+          ends_at: '2026-07-31T04:00:00.000Z',
+          session_type: 'reformer',
+          location: 'Studio',
+          capacity: 4,
+          instructor: null,
+        },
+      },
+    ]);
+
+    expect(grouped).toHaveLength(1);
+    expect(grouped[0]?.capacity).toBe(4);
+    expect(grouped[0]?.active_bookings).toHaveLength(2);
+
+    const occupying = count_occupying_bookings(
+      grouped[0]!.active_bookings.map((booking) => booking.status),
+      'occupancy',
+    );
+    expect(
+      format_occupancy_label(build_session_availability(grouped[0]!.capacity, occupying)),
+    ).toBe('2 / 4 booked');
   });
 
   it('group_day_bookings_from_rows dedupes by session id', () => {

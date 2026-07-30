@@ -90,7 +90,12 @@ export default async function BookPage() {
   ]);
   const initial_card = session_cards[0] ?? null;
   const initial_slots = initial_card
-    ? await get_slots_for_day(today_key, initial_card.session_type, initial_card.duration_minutes)
+    ? await get_slots_for_day(
+        today_key,
+        initial_card.session_type,
+        initial_card.duration_minutes,
+        initial_card.capacity,
+      )
     : [];
 
   return (

@@ -125,7 +125,7 @@ export function BookingCalendar({
 
     void Promise.all([
       get_day_schedule(date_key),
-      get_slots_for_day(date_key, card.session_type, card.duration_minutes),
+      get_slots_for_day(date_key, card.session_type, card.duration_minutes, card.capacity),
     ])
       .then(([schedule, day_slots]) => {
         set_day_schedule(schedule);
@@ -204,6 +204,7 @@ export function BookingCalendar({
           selected_date,
           selected_card.session_type,
           selected_card.duration_minutes,
+          selected_card.capacity,
         );
         set_slots(refreshed);
       } catch {

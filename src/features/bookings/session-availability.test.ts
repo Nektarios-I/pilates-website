@@ -7,7 +7,24 @@ import {
   format_availability_label,
   format_occupancy_label,
   format_remaining_spots_label,
+  resolve_slot_capacity,
 } from './session-availability';
+
+describe('resolve_slot_capacity', () => {
+  it('prefers materialized session capacity over the card', () => {
+    expect(resolve_slot_capacity(4, 6)).toBe(4);
+  });
+
+  it('uses session-card capacity when no session exists yet', () => {
+    expect(resolve_slot_capacity(null, 4)).toBe(4);
+    expect(resolve_slot_capacity(undefined, 4)).toBe(4);
+  });
+
+  it('does not invent a hardcoded capacity when both are missing', () => {
+    expect(resolve_slot_capacity(null, null)).toBe(0);
+    expect(resolve_slot_capacity(0, 0)).toBe(0);
+  });
+});
 
 describe('build_session_availability', () => {
   it('computes remaining spots for an ordinary session', () => {

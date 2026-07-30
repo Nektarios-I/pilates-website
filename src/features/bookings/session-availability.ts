@@ -30,6 +30,23 @@ export type SessionAvailability = {
 
 export type AvailabilityLabelMode = 'remaining' | 'occupancy';
 
+/**
+ * Prefer the materialized session capacity; otherwise use the session-card
+ * capacity from the dataset. Never invent a hardcoded studio size.
+ */
+export function resolve_slot_capacity(
+  session_capacity: number | null | undefined,
+  card_capacity: number | null | undefined,
+): number {
+  if (typeof session_capacity === 'number' && Number.isFinite(session_capacity) && session_capacity > 0) {
+    return session_capacity;
+  }
+  if (typeof card_capacity === 'number' && Number.isFinite(card_capacity) && card_capacity > 0) {
+    return card_capacity;
+  }
+  return 0;
+}
+
 export function build_session_availability(
   capacity: number | null | undefined,
   confirmed_count: number | null | undefined,

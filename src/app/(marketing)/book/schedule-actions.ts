@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import type { DaySchedule, TimeRange } from '@/lib/schedule/studio-hours';
 import { get_default_weekly_ranges } from '@/lib/schedule/studio-hours';
 
+import { resolve_slot_capacity } from '@/features/bookings/session-availability';
+
 import type { SessionItem } from './booking-types';
 import { book_session_action } from './actions';
 
@@ -119,6 +121,8 @@ export async function get_slots_for_day(
   date_key: string,
   session_type = 'reformer',
   duration_minutes = 60,
+  /** Capacity from the selected session card — used when no session row exists yet. */
+  card_capacity?: number | null,
 ): Promise<SlotSession[]> {
   const schedule = await get_day_schedule(date_key);
   if (schedule.is_closed) return [];
@@ -126,6 +130,24 @@ export async function get_slots_for_day(
   const supabase = await createClient();
   const day_start = `${date_key}T00:00:00`;
   const day_end = `${date_key}T23:59:59`;
+
+  let default_capacity =
+    typeof card_capacity === 'number' && card_capacity > 0 ? card_capacity : 0;
+
+  if (default_capacity <= 0) {
+    const { data: cards } = await supabase
+      .from('session_cards')
+      .select('capacity')
+      .eq('session_type', session_type)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true })
+      .limit(1);
+
+    const looked_up = cards?.[0]?.capacity;
+    if (typeof looked_up === 'number' && looked_up > 0) {
+      default_capacity = looked_up;
+    }
+  }
 
   const { data: sessions } = await supabase
     .from('sessions')
@@ -181,7 +203,7 @@ export async function get_slots_for_day(
       slot_end: slot.end,
       session_id: match?.id ?? null,
       confirmed_count: match ? (count_map[match.id] ?? 0) : 0,
-      capacity: match?.capacity ?? 6,
+      capacity: resolve_slot_capacity(match?.capacity, default_capacity),
       open_for_public_booking: open_slot_starts.has(slot.start),
     };
   });
