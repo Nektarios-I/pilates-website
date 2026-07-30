@@ -30,6 +30,7 @@ const maria_row = {
     session_type: 'reformer',
     location: 'Studio',
     status: 'scheduled',
+    capacity: 6,
     instructor: { full_name: 'Instructor' },
   },
 };

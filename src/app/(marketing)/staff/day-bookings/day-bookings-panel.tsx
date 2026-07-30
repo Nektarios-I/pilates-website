@@ -15,6 +15,11 @@ import {
   type DayBookingsSession,
   type DayBookingsSummary,
 } from '@/features/bookings/day-bookings';
+import {
+  build_session_availability,
+  count_occupying_bookings,
+  format_occupancy_label,
+} from '@/features/bookings/session-availability';
 
 import { list_day_bookings } from './actions';
 
@@ -64,6 +69,16 @@ function AttendeeRow({
 
 function SessionCard({ session }: { session: DayBookingsSession }) {
   const total = session.active_bookings.length + session.cancelled_bookings.length;
+  const occupying = count_occupying_bookings(
+    [
+      ...session.active_bookings.map((booking) => booking.status),
+      ...session.cancelled_bookings.map((booking) => booking.status),
+    ],
+    'occupancy',
+  );
+  const occupancy_label = format_occupancy_label(
+    build_session_availability(session.capacity, occupying),
+  );
 
   return (
     <article className="rounded-md border border-border bg-background p-5 sm:p-6">
@@ -78,9 +93,14 @@ function SessionCard({ session }: { session: DayBookingsSession }) {
             {session.instructor_name ? ` · ${session.instructor_name}` : ''}
           </p>
         </div>
-        <p className="text-sm text-foreground/70">
-          {total} booking{total === 1 ? '' : 's'}
-        </p>
+        <div className="text-sm text-foreground/70 sm:text-right">
+          {occupancy_label ? (
+            <p className="font-medium text-foreground">{occupancy_label}</p>
+          ) : null}
+          <p className={occupancy_label ? 'mt-1' : undefined}>
+            {total} booking{total === 1 ? '' : 's'}
+          </p>
+        </div>
       </div>
 
       <div className="mt-4 space-y-5">

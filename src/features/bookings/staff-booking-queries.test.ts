@@ -26,8 +26,9 @@ describe('staff booking query contract (post-migration 18)', () => {
     }
   });
 
-  it('day select keeps the disambiguated instructor embed', () => {
+  it('day select keeps the disambiguated instructor embed and capacity', () => {
     expect(STAFF_DAY_BOOKINGS_SELECT).toContain('profiles!sessions_instructor_id_fkey');
+    expect(STAFF_DAY_BOOKINGS_SELECT).toContain('capacity');
   });
 
   it('rejects the legacy ambiguous profiles!inner pattern', () => {

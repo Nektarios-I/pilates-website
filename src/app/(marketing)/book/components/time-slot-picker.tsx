@@ -1,6 +1,11 @@
 'use client';
 
 import type { HourlySlot } from '@/lib/schedule/studio-hours';
+import {
+  build_session_availability,
+  format_availability_label,
+  type AvailabilityLabelMode,
+} from '@/features/bookings/session-availability';
 
 import { is_slot_full, is_slot_in_past, slot_is_selectable } from '../booking-ui';
 import type { SlotSession } from '../schedule-actions';
@@ -12,6 +17,8 @@ type TimeSlotPickerProps = {
   selected_slot: SlotSession | null;
   show_available_only: boolean;
   on_select: (slot: SlotSession) => void;
+  /** Client: remaining spots. Staff: booked / capacity ratio. */
+  availability_mode?: AvailabilityLabelMode;
 };
 
 export function TimeSlotPicker({
@@ -21,6 +28,7 @@ export function TimeSlotPicker({
   selected_slot,
   show_available_only,
   on_select,
+  availability_mode = 'remaining',
 }: TimeSlotPickerProps) {
   return (
     <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
@@ -37,11 +45,29 @@ export function TimeSlotPicker({
 
         if (show_available_only && !is_selectable) return null;
 
+        const availability = slot_state
+          ? build_session_availability(slot_state.capacity, slot_state.confirmed_count)
+          : null;
+
+        let status_label: string | null = null;
+        if (is_full) {
+          status_label = 'Full';
+        } else if (!is_open && !is_past) {
+          status_label = 'Recurring';
+        } else if (availability && !is_past && is_open) {
+          status_label = format_availability_label(availability, availability_mode);
+        }
+
+        const accessible_name = status_label
+          ? `${slot.label}, ${status_label}`
+          : slot.label;
+
         return (
           <button
             key={`${slot.start}-${slot.end}`}
+            aria-label={accessible_name}
             className={[
-              'w-full rounded-full py-3 text-center font-sans text-[17px] transition-colors',
+              'w-full rounded-full px-2 py-3 text-center font-sans text-[17px] transition-colors',
               !is_selectable
                 ? 'cursor-not-allowed bg-surface text-foreground opacity-40'
                 : is_active
@@ -56,13 +82,9 @@ export function TimeSlotPicker({
             type="button"
           >
             <span>{slot.label}</span>
-            {is_full ? (
-              <span className="mt-0.5 block font-sans text-[11px] font-semibold uppercase tracking-wide">
-                Full
-              </span>
-            ) : !is_open && !is_past ? (
-              <span className="mt-0.5 block font-sans text-[11px] font-semibold uppercase tracking-wide">
-                Recurring
+            {status_label ? (
+              <span className="mt-0.5 block font-sans text-[11px] font-medium tracking-wide text-current/80">
+                {status_label}
               </span>
             ) : null}
           </button>

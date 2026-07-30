@@ -59,6 +59,7 @@ export type DayBookingsSession = {
   session_type: string;
   location: string | null;
   instructor_name: string | null;
+  capacity: number;
   active_bookings: DayBookingAttendee[];
   cancelled_bookings: DayBookingAttendee[];
 };
@@ -146,10 +147,13 @@ type RawDaySessionRow = {
   ends_at: string;
   session_type: string;
   location: string | null;
+  capacity?: number | null;
   instructor: { full_name: string | null } | { full_name: string | null }[] | null;
 };
 
-export function map_day_session_row(row: RawDaySessionRow): Omit<DayBookingsSession, 'active_bookings' | 'cancelled_bookings'> {
+export function map_day_session_row(
+  row: RawDaySessionRow,
+): Omit<DayBookingsSession, 'active_bookings' | 'cancelled_bookings'> {
   const instructor = Array.isArray(row.instructor) ? row.instructor[0] : row.instructor;
 
   return {
@@ -160,6 +164,7 @@ export function map_day_session_row(row: RawDaySessionRow): Omit<DayBookingsSess
     session_type: row.session_type,
     location: row.location,
     instructor_name: instructor?.full_name ?? null,
+    capacity: typeof row.capacity === 'number' && row.capacity > 0 ? row.capacity : 0,
   };
 }
 

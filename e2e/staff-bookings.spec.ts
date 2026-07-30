@@ -40,6 +40,7 @@ test.describe('staff booking pages after profiles FK disambiguation', () => {
       page.getByText('Unable to load bookings for this day. Please try again.'),
     ).toHaveCount(0);
     await expect(page.getByText(client_name)).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(/\d+\s*\/\s*\d+\s+booked|Full/i).first()).toBeVisible();
   });
 
   test('booking history loads and can find the known client', async ({ page }) => {

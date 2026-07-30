@@ -213,6 +213,7 @@ export function SlotBookingPicker({
           <p className="text-sm text-foreground/70">No sessions available.</p>
         ) : (
           <TimeSlotPicker
+            availability_mode="occupancy"
             date_key={selected_date}
             hourly_slots={hourly_slots}
             on_select={(slot) => {

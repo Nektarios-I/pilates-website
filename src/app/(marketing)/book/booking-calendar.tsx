@@ -25,6 +25,10 @@ import {
   success_banner_title,
 } from './booking-ui';
 import { CANCELLATION_POLICY_BOOKING } from '@/lib/booking/cancellation-policy';
+import {
+  build_session_availability,
+  format_remaining_spots_label,
+} from '@/features/bookings/session-availability';
 import type { PackageItem } from './booking-types';
 import { DateNavigationHeading, DatePillStrip } from './components/date-pill-strip';
 import { TimeSlotPicker } from './components/time-slot-picker';
@@ -416,6 +420,17 @@ export function BookingCalendar({
               {selected_card?.title ?? 'Class'} · {selected_date} · {selected_slot.slot_start} –{' '}
               {selected_slot.slot_end}
             </p>
+            {(() => {
+              const remaining = format_remaining_spots_label(
+                build_session_availability(
+                  selected_slot.capacity,
+                  selected_slot.confirmed_count,
+                ),
+              );
+              return remaining && remaining !== 'Full' ? (
+                <p className="mt-2 text-sm text-foreground/65">{remaining}</p>
+              ) : null;
+            })()}
             <p className="mt-3 text-sm text-foreground/70">{CANCELLATION_POLICY_BOOKING}</p>
           </div>
 

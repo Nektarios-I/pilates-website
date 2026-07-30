@@ -1,4 +1,5 @@
 import { add_days, parse_date_key, start_of_week_monday, studio_date_key } from '@/lib/schedule/studio-hours';
+import { build_session_availability } from '@/features/bookings/session-availability';
 
 import type { PackageItem } from './booking-types';
 import type { SlotSession } from './schedule-actions';
@@ -19,7 +20,7 @@ export function is_slot_in_past(date_key: string, slot_start: string, now = Date
 
 export function is_slot_full(slot_state: SlotSession | undefined): boolean {
   if (!slot_state) return false;
-  return slot_state.confirmed_count >= slot_state.capacity;
+  return build_session_availability(slot_state.capacity, slot_state.confirmed_count).is_full;
 }
 
 export function is_within_public_booking_horizon(date_key: string, now = new Date()): boolean {

@@ -51,7 +51,7 @@ describe('day booking helpers', () => {
     });
   });
 
-  it('map_day_session_row reads instructor name', () => {
+  it('map_day_session_row reads instructor name and capacity', () => {
     const mapped = map_day_session_row({
       id: 'session-1',
       title: 'Morning Reformer',
@@ -59,10 +59,12 @@ describe('day booking helpers', () => {
       ends_at: '2026-06-25T09:00:00.000Z',
       session_type: 'reformer',
       location: 'Studio A',
+      capacity: 6,
       instructor: { full_name: 'Panayiota' },
     });
 
     expect(mapped.instructor_name).toBe('Panayiota');
+    expect(mapped.capacity).toBe(6);
   });
 
   it('build_day_bookings_sessions splits active and cancelled attendees', () => {

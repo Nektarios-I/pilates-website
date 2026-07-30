@@ -1,3 +1,5 @@
+import { build_session_availability } from '@/features/bookings/session-availability';
+
 /**
  * Client-facing booking cancellation policy (4-hour cutoff).
  * Backend enforcement lives in cancel_booking (P0029); staff may override.
@@ -32,5 +34,5 @@ export function session_is_full_for_public_booking(
   confirmed_count: number,
   capacity: number,
 ): boolean {
-  return confirmed_count >= capacity;
+  return build_session_availability(capacity, confirmed_count).is_full;
 }

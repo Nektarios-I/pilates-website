@@ -63,6 +63,7 @@ export const STAFF_DAY_BOOKINGS_SELECT = `
     session_type,
     location,
     status,
+    capacity,
     ${SESSIONS_INSTRUCTOR_PROFILE_EMBED}
   )
 `;

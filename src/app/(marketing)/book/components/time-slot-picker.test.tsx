@@ -40,6 +40,56 @@ describe('TimeSlotPicker', () => {
     expect(on_select).not.toHaveBeenCalled();
   });
 
+  it('shows remaining spots on open bookable slots', () => {
+    render(
+      <TimeSlotPicker
+        date_key="2099-12-01"
+        hourly_slots={hourly_slots}
+        on_select={vi.fn()}
+        selected_slot={null}
+        show_available_only={false}
+        slots={[
+          {
+            slot_start: '09:00',
+            slot_end: '10:00',
+            session_id: 'session-1',
+            confirmed_count: 4,
+            capacity: 6,
+            open_for_public_booking: true,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('2 spots left')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /09:00 – 10:00, 2 spots left/i })).toBeEnabled();
+  });
+
+  it('shows staff occupancy labels when requested', () => {
+    render(
+      <TimeSlotPicker
+        availability_mode="occupancy"
+        date_key="2099-12-01"
+        hourly_slots={hourly_slots}
+        on_select={vi.fn()}
+        selected_slot={null}
+        show_available_only={false}
+        slots={[
+          {
+            slot_start: '09:00',
+            slot_end: '10:00',
+            session_id: 'session-1',
+            confirmed_count: 3,
+            capacity: 6,
+            open_for_public_booking: true,
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByText('3 / 6 booked')).toBeInTheDocument();
+  });
+
   it('hides full slots when showing available only', () => {
     render(
       <TimeSlotPicker
@@ -71,5 +121,6 @@ describe('TimeSlotPicker', () => {
 
     expect(screen.queryByRole('button', { name: /09:00 – 10:00/i })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: /10:00 – 11:00/i })).toBeInTheDocument();
+    expect(screen.getByText('6 spots left')).toBeInTheDocument();
   });
 });
