@@ -1,13 +1,17 @@
 import Link from 'next/link';
 
 import { ButtonLink } from '@/components/ui/button-link';
-import { createClient } from '@/lib/supabase/server';
 import { createPageMetadata } from '@/lib/metadata';
+import {
+  can_use_package_for_booking,
+  format_expires_in_days,
+} from '@/lib/packages/lifecycle';
+import { to_date_key } from '@/lib/schedule/studio-hours';
+import { createClient } from '@/lib/supabase/server';
 
 import { BookingCalendar } from './booking-calendar';
 import type { PackageItem } from './booking-types';
 import { get_day_schedule, get_session_cards, get_slots_for_day } from './schedule-actions';
-import { to_date_key } from '@/lib/schedule/studio-hours';
 
 export const metadata = createPageMetadata({
   title: 'Book a Class',
@@ -15,14 +19,6 @@ export const metadata = createPageMetadata({
     'Book reformer or mat Pilates online. Choose your day and time from the studio schedule in Cyprus.',
   path: '/book',
 });
-
-function package_has_credits(
-  package_type: string,
-  credits_remaining: number | null,
-): boolean {
-  if (package_type === 'unlimited' || package_type === 'monthly') return true;
-  return (credits_remaining ?? 0) > 0;
-}
 
 const text_link_class =
   'inline-flex min-h-11 items-center font-sans font-medium text-foreground border-b border-accent pb-0.5 transition-colors duration-200 hover:text-accent';
@@ -60,16 +56,21 @@ export default async function BookPage() {
   const { data: raw_packages } = await supabase
     .from('user_packages')
     .select('id, credits_remaining, expires_at, status, packages(name, class_type, package_type)')
-    .eq('user_id', user.id)
-    .eq('status', 'active');
+    .eq('user_id', user.id);
 
+  const now = new Date();
   const packages: PackageItem[] = (raw_packages ?? [])
-    .filter((entry) => {
-      if (entry.expires_at && new Date(entry.expires_at) < new Date()) return false;
-      const pkg = Array.isArray(entry.packages) ? entry.packages[0] : entry.packages;
-      if (!pkg) return false;
-      return package_has_credits(pkg.package_type, entry.credits_remaining);
-    })
+    .filter((entry) =>
+      can_use_package_for_booking(
+        {
+          status: entry.status,
+          credits_remaining: entry.credits_remaining,
+          expires_at: entry.expires_at,
+        },
+        1,
+        now,
+      ),
+    )
     .map((entry) => {
       const pkg = Array.isArray(entry.packages) ? entry.packages[0] : entry.packages;
       return {
@@ -129,7 +130,10 @@ export default async function BookPage() {
               {packages.length === 0 ? (
                 <div className="mt-4">
                   <p className="font-sans text-sm leading-normal text-foreground opacity-80">
-                    No active packages.
+                    You do not currently have an active package for this session.
+                  </p>
+                  <p className="mt-2 font-sans text-sm leading-normal text-foreground opacity-70">
+                    Your packages may have expired or have no credits remaining.
                   </p>
                   <Link className={`mt-3 ${text_link_class}`} href="/pricing">
                     View pricing
@@ -137,21 +141,26 @@ export default async function BookPage() {
                 </div>
               ) : (
                 <ul className="mt-4 space-y-3">
-                  {packages.map((pkg) => (
-                    <li key={pkg.id} className="rounded-xl bg-background p-3">
-                      <p className="font-sans text-sm font-medium text-foreground">
-                        {pkg.package_name}
-                      </p>
-                      <p className="mt-0.5 font-sans text-xs text-foreground opacity-70">
-                        {pkg.package_type === 'unlimited' || pkg.package_type === 'monthly'
-                          ? 'Unlimited classes'
-                          : `${pkg.credits_remaining ?? 0} credit${pkg.credits_remaining !== 1 ? 's' : ''} remaining`}
-                        {pkg.expires_at
-                          ? ` · expires ${new Date(pkg.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
-                          : ''}
-                      </p>
-                    </li>
-                  ))}
+                  {packages.map((pkg) => {
+                    const expires_in = format_expires_in_days(pkg.expires_at, now);
+                    return (
+                      <li key={pkg.id} className="rounded-xl bg-background p-3">
+                        <p className="font-sans text-sm font-medium text-foreground">
+                          {pkg.package_name}
+                        </p>
+                        <p className="mt-0.5 font-sans text-xs text-foreground opacity-70">
+                          {pkg.package_type === 'unlimited' || pkg.package_type === 'monthly'
+                            ? 'Unlimited classes'
+                            : `${pkg.credits_remaining ?? 0} credit${pkg.credits_remaining !== 1 ? 's' : ''} remaining`}
+                          {expires_in
+                            ? ` · ${expires_in}`
+                            : pkg.expires_at
+                              ? ` · expires ${new Date(pkg.expires_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}`
+                              : ''}
+                        </p>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
 

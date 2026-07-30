@@ -34,7 +34,7 @@ describe('AccountContent cancellation policy', () => {
 
     render(
       <AccountContent
-        active_packages={[]}
+        packages={[]}
         profile={null}
         roles={[]}
         upcoming_bookings={[
@@ -85,7 +85,7 @@ describe('AccountContent cancellation policy', () => {
   it('shows legacy waitlisted status without a cancel button', () => {
     render(
       <AccountContent
-        active_packages={[]}
+        packages={[]}
         profile={null}
         roles={[]}
         upcoming_bookings={[

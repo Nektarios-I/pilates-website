@@ -35,8 +35,8 @@ export default async function AccountPage() {
   // Fetch user roles
   const { data: roles } = await supabase.from('user_roles').select('role').eq('user_id', user.id);
 
-  // Fetch active packages with remaining credits
-  const { data: active_packages } = await supabase
+  // Fetch client packages; effective lifecycle filtering happens in AccountContent
+  const { data: package_rows } = await supabase
     .from('user_packages')
     .select(
       `
@@ -54,7 +54,6 @@ export default async function AccountPage() {
     `,
     )
     .eq('user_id', user.id)
-    .eq('status', 'active')
     .order('created_at', { ascending: false });
 
   // Fetch upcoming bookings
@@ -113,7 +112,7 @@ export default async function AccountPage() {
       </Section>
 
       <AccountContent
-        active_packages={active_packages || []}
+        packages={package_rows || []}
         profile={profile}
         roles={roles || []}
         upcoming_bookings={upcoming_bookings || []}

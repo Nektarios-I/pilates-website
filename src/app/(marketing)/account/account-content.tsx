@@ -22,6 +22,12 @@ import {
 import { display_profile_email } from '@/lib/auth/account-identifiers';
 import { cancel_booking_action } from '../book/actions';
 import { signOut } from '../login/actions';
+import {
+  format_expires_in_days,
+  get_effective_package_status,
+  get_package_status_label,
+  partition_packages_by_lifecycle,
+} from '@/lib/packages/lifecycle';
 
 
 interface Profile {
@@ -38,7 +44,7 @@ interface Role {
   role: string;
 }
 
-interface ActivePackage {
+interface AccountPackage {
   id: string;
   credits_remaining: number | null;
   starts_at: string;
@@ -74,7 +80,7 @@ interface AccountContentProps {
   user: User;
   profile: Profile | null;
   roles: Role[];
-  active_packages: ActivePackage[];
+  packages: AccountPackage[];
   upcoming_bookings: UpcomingBooking[];
 }
 
@@ -82,7 +88,7 @@ export function AccountContent({
   user,
   profile,
   roles,
-  active_packages,
+  packages,
   upcoming_bookings,
 }: AccountContentProps) {
   const router = useRouter();
@@ -96,6 +102,15 @@ export function AccountContent({
   const [password_loading, set_password_loading] = useState(false);
   const [password_error, set_password_error] = useState<string | undefined>();
   const [password_success, set_password_success] = useState(false);
+  const [history_open, set_history_open] = useState(false);
+
+  const package_groups = partition_packages_by_lifecycle(packages);
+  const active_packages = package_groups.active;
+  const history_packages = [
+    ...package_groups.expired,
+    ...package_groups.exhausted,
+    ...package_groups.cancelled,
+  ];
 
   const handle_sign_out = async () => {
     start_transition(async () => {
@@ -264,6 +279,8 @@ export function AccountContent({
                   {active_packages.map((pkg) => {
                     const package_data = get_related_row(pkg.packages);
                     if (!package_data) return null;
+                    const effective = get_effective_package_status(pkg);
+                    const expires_in = format_expires_in_days(pkg.expires_at);
 
                     return (
                       <div
@@ -282,11 +299,15 @@ export function AccountContent({
                             </p>
                             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-foreground/60">
                               <span>Started {format_date(pkg.starts_at)}</span>
-                              {pkg.expires_at && <span>Expires {format_date(pkg.expires_at)}</span>}
+                              {expires_in ? (
+                                <span>{expires_in}</span>
+                              ) : pkg.expires_at ? (
+                                <span>Expires {format_date(pkg.expires_at)}</span>
+                              ) : null}
                             </div>
                           </div>
                           <span className={marketingSuccessBadgeClass}>
-                            {pkg.status}
+                            {get_package_status_label(effective)}
                           </span>
                         </div>
                       </div>
@@ -301,6 +322,49 @@ export function AccountContent({
                   </p>
                 </div>
               )}
+
+              {history_packages.length > 0 ? (
+                <div className="mt-6 border-t border-border pt-4">
+                  <button
+                    aria-controls="account-package-history"
+                    aria-expanded={history_open}
+                    className="flex min-h-11 w-full items-center justify-between gap-3 text-left"
+                    onClick={() => set_history_open((open) => !open)}
+                    type="button"
+                  >
+                    <span className="text-sm font-medium text-foreground">
+                      Package history ({history_packages.length})
+                    </span>
+                    <span aria-hidden="true" className="text-foreground/50">
+                      {history_open ? '−' : '+'}
+                    </span>
+                  </button>
+                  {history_open ? (
+                    <ul className="mt-3 space-y-3" id="account-package-history">
+                      {history_packages.map((pkg) => {
+                        const package_data = get_related_row(pkg.packages);
+                        if (!package_data) return null;
+                        const effective = get_effective_package_status(pkg);
+                        return (
+                          <li
+                            className="rounded-md border border-border/70 bg-surface px-4 py-3"
+                            key={pkg.id}
+                          >
+                            <p className="text-sm font-medium text-foreground">{package_data.name}</p>
+                            <p className="mt-1 text-xs text-foreground/60">
+                              {get_package_status_label(effective)}
+                              {pkg.expires_at ? ` · ${format_date(pkg.expires_at)}` : ''}
+                              {pkg.credits_remaining !== null
+                                ? ` · ${pkg.credits_remaining} credits left`
+                                : ''}
+                            </p>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  ) : null}
+                </div>
+              ) : null}
 
             </div>
 

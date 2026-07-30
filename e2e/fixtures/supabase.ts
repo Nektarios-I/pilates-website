@@ -32,15 +32,24 @@ export async function get_active_package_credits(
 ): Promise<number | null> {
   const { data, error } = await supabase
     .from('user_packages')
-    .select('credits_remaining')
+    .select('credits_remaining, status, expires_at')
     .eq('user_id', user_id)
-    .eq('status', 'active')
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .order('created_at', { ascending: false });
 
   if (error) throw new Error(`Failed to read package credits: ${error.message}`);
-  return data?.credits_remaining ?? null;
+
+  const now = new Date();
+  const eligible = (data ?? []).find((row) => {
+    if (row.status === 'cancelled' || row.status === 'used_up' || row.status === 'expired') {
+      return false;
+    }
+    if (row.expires_at && new Date(row.expires_at).getTime() <= now.getTime()) {
+      return false;
+    }
+    return row.credits_remaining === null || row.credits_remaining > 0;
+  });
+
+  return eligible?.credits_remaining ?? null;
 }
 
 export async function get_booking_status(

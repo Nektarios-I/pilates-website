@@ -9,8 +9,8 @@ import { list_manageable_clients, list_membership_packages } from './actions';
 import { MembershipPanel } from './membership-panel';
 
 export const metadata = createPageMetadata({
-  title: 'Manage Membership',
-  description: 'Apply, deactivate, and adjust memberships for client accounts.',
+  title: 'Manage Packages',
+  description: 'Apply, extend, deactivate, and adjust client packages and credits.',
   path: '/staff/membership',
 });
 
@@ -58,11 +58,11 @@ export default async function ManageMembershipPage() {
             Staff portal
           </p>
           <h1 className="mt-2 text-3xl font-semibold text-foreground sm:text-4xl">
-            Manage membership
+            Manage packages
           </h1>
           <p className="mt-3 text-base leading-7 text-foreground/70">
-            Apply a package to a client account, deactivate or remove a membership, or adjust remaining
-            credits.
+            Apply a package to a client, adjust credits, extend expiry, or review expired and exhausted
+            packages separately from active ones.
           </p>
         </div>
 
