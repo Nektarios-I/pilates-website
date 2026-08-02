@@ -168,6 +168,72 @@ describe('week day bookings foundation', () => {
     expect(overview.days[2]?.slots).toEqual([]);
   });
 
+  it('counts active bookings as sessions and ignores cancelled-only class sessions', () => {
+    const overview = build_week_sessions_overview({
+      monday_key: '2026-07-27',
+      today_key: '2026-07-29',
+      sessions: [
+        session({
+          id: 'wed-shared',
+          // 18:00–19:00 Europe/Nicosia
+          starts_at: '2026-07-29T15:00:00.000Z',
+          ends_at: '2026-07-29T16:00:00.000Z',
+          active_bookings: [
+            {
+              id: 'myria',
+              status: 'booked',
+              client_name: 'MYRIA STAVROU',
+              client_email: 'myria@example.com',
+              client_phone: null,
+              booked_at: '2026-07-01T00:00:00.000Z',
+              cancelled_at: null,
+            },
+            {
+              id: 'sofia',
+              status: 'booked',
+              client_name: 'SOFIA MANOLI',
+              client_email: 'sofia@example.com',
+              client_phone: null,
+              booked_at: '2026-07-01T00:00:00.000Z',
+              cancelled_at: null,
+            },
+          ],
+        }),
+        session({
+          id: 'fri-cancelled-only',
+          // 06:00–07:00 Europe/Nicosia
+          starts_at: '2026-07-31T03:00:00.000Z',
+          ends_at: '2026-07-31T04:00:00.000Z',
+          active_bookings: [],
+          cancelled_bookings: [
+            {
+              id: 'cancelled-1',
+              status: 'cancelled',
+              client_name: 'Cancelled Client',
+              client_email: 'c@example.com',
+              client_phone: null,
+              booked_at: '2026-07-01T00:00:00.000Z',
+              cancelled_at: '2026-07-30T00:00:00.000Z',
+            },
+          ],
+        }),
+      ],
+    });
+
+    const wednesday = overview.days.find((day) => day.date_key === '2026-07-29');
+    expect(wednesday?.session_count).toBe(2);
+    expect(wednesday?.slots).toHaveLength(1);
+    expect(wednesday?.slots[0]?.session_count).toBe(2);
+    expect(wednesday?.slots[0]?.attendees.map((row) => row.client_name)).toEqual([
+      'MYRIA STAVROU',
+      'SOFIA MANOLI',
+    ]);
+
+    const friday = overview.days.find((day) => day.date_key === '2026-07-31');
+    expect(friday?.session_count).toBe(0);
+    expect(friday?.slots).toEqual([]);
+  });
+
   it('build_week_sessions_overview places sessions on the studio-local calendar day', () => {
     // 22:00 Tuesday Europe/Nicosia = 19:00Z Tuesday; still Tuesday locally
     const overview = build_week_sessions_overview({

@@ -34,9 +34,10 @@ export type WeekTimeSlot = {
   time_label: string;
   starts_at: string;
   ends_at: string;
+  /** Active booking count for this exact time range. */
   session_count: number;
   sessions: WeekSessionDetail[];
-  /** Active clients across sessions in this exact time range. */
+  /** Active clients across class sessions in this exact time range. */
   attendees: WeekSlotAttendee[];
 };
 
@@ -156,20 +157,27 @@ function attendees_from_session(session: DayBookingsSession): WeekSlotAttendee[]
   }));
 }
 
+/**
+ * Weekly overview “session” = one active booking.
+ * Slots are exact local time ranges; counts and lists both derive from active bookings only.
+ * Cancelled-only class sessions are omitted.
+ */
 function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
   const by_slot = new Map<string, WeekTimeSlot>();
 
   for (const session of sessions) {
+    const session_attendees = attendees_from_session(session);
+    if (session_attendees.length === 0) continue;
+
     const time_label = slot_time_label(session.starts_at, session.ends_at);
     const key = `${studio_time_from_iso(session.starts_at)}|${studio_time_from_iso(session.ends_at)}`;
     const existing = by_slot.get(key);
     const session_detail = to_week_session_detail(session);
-    const session_attendees = attendees_from_session(session);
 
     if (existing) {
       existing.sessions.push(session_detail);
-      existing.session_count = existing.sessions.length;
       existing.attendees.push(...session_attendees);
+      existing.session_count = existing.attendees.length;
       continue;
     }
 
@@ -178,7 +186,7 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
       time_label,
       starts_at: session.starts_at,
       ends_at: session.ends_at,
-      session_count: 1,
+      session_count: session_attendees.length,
       sessions: [session_detail],
       attendees: session_attendees,
     });
@@ -187,6 +195,7 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
   return [...by_slot.values()]
     .map((slot) => ({
       ...slot,
+      session_count: slot.attendees.length,
       attendees: [...slot.attendees].sort((a, b) => {
         const type_cmp = a.session_type_label.localeCompare(b.session_type_label);
         if (type_cmp !== 0) return type_cmp;
@@ -212,6 +221,7 @@ export function build_week_sessions_overview(options: {
   }
 
   for (const session of options.sessions) {
+    if (session.active_bookings.length === 0) continue;
     const day_key = session_date_key(session.starts_at);
     const bucket = by_day.get(day_key);
     if (!bucket) continue;
@@ -222,15 +232,17 @@ export function build_week_sessions_overview(options: {
     const day_sessions = (by_day.get(date_key) ?? []).sort(
       (a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
     );
+    const slots = group_day_slots(day_sessions);
     const parsed = parse_date_key(date_key);
+    const session_count = slots.reduce((sum, slot) => sum + slot.session_count, 0);
 
     return {
       date_key,
       weekday_short: parsed.toLocaleDateString('en-GB', { weekday: 'short' }),
       day_number: parsed.getDate(),
       is_today: date_key === today_key,
-      session_count: day_sessions.length,
-      slots: group_day_slots(day_sessions),
+      session_count,
+      slots,
     };
   });
 
