@@ -147,6 +147,20 @@ describe('week day bookings foundation', () => {
       'TEST TEST',
       'Mat Parallel',
     ]);
+    expect(overview.days[0]?.slots[0]?.attendees).toEqual([
+      {
+        id: 'booking-s-parallel',
+        client_name: 'Client',
+        session_type: 'mat',
+        session_type_label: 'Mat',
+      },
+      {
+        id: 'booking-s-early',
+        client_name: 'Client',
+        session_type: 'reformer',
+        session_type_label: 'Reformer',
+      },
+    ]);
     expect(overview.days[0]?.slots[1]?.time_label).toBe('17:30–18:30');
     expect(overview.days[1]?.session_count).toBe(1);
     expect(overview.days[2]?.is_today).toBe(true);

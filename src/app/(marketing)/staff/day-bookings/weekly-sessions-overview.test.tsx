@@ -152,11 +152,82 @@ describe('WeeklySessionsOverview', () => {
     expect(slot.tagName).toBe('BUTTON');
     fireEvent.click(slot);
     expect(slot).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.getByText('TEST TEST')).toBeInTheDocument();
+    expect(screen.getByText('Client')).toBeInTheDocument();
     expect(screen.getByText('Reformer')).toBeInTheDocument();
+    expect(screen.queryByText('TEST TEST')).not.toBeInTheDocument();
 
     fireEvent.click(slot);
     expect(slot).toHaveAttribute('aria-expanded', 'false');
+  });
+
+  it('lists Mat and Reformer clients from parallel sessions in one slot', () => {
+    const overview = build_week_sessions_overview({
+      monday_key: '2026-08-03',
+      today_key: '2026-08-05',
+      sessions: [
+        {
+          id: 's-reformer',
+          title: 'Reformer Pilates',
+          starts_at: '2026-08-03T03:00:00.000Z',
+          ends_at: '2026-08-03T04:00:00.000Z',
+          session_type: 'reformer',
+          location: 'Studio',
+          instructor_name: null,
+          capacity: 4,
+          active_bookings: [
+            {
+              id: 'b-r',
+              status: 'booked',
+              client_name: 'Maria',
+              client_email: 'm@example.com',
+              client_phone: null,
+              booked_at: '2026-07-01T00:00:00.000Z',
+              cancelled_at: null,
+            },
+          ],
+          cancelled_bookings: [],
+        },
+        {
+          id: 's-mat',
+          title: 'Mat Pilates',
+          starts_at: '2026-08-03T03:00:00.000Z',
+          ends_at: '2026-08-03T04:00:00.000Z',
+          session_type: 'mat',
+          location: 'Studio',
+          instructor_name: null,
+          capacity: 4,
+          active_bookings: [
+            {
+              id: 'b-m',
+              status: 'booked',
+              client_name: 'Alex',
+              client_email: 'a@example.com',
+              client_phone: null,
+              booked_at: '2026-07-01T00:00:00.000Z',
+              cancelled_at: null,
+            },
+          ],
+          cancelled_bookings: [],
+        },
+      ],
+    });
+
+    render(
+      <WeeklySessionsOverview
+        is_pending={false}
+        overview={overview}
+        on_navigate_week={vi.fn()}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Expand Monday, 3 August: 2 sessions/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Expand 06:00–07:00: 2 sessions/i }));
+
+    expect(screen.getByText('Mat')).toBeInTheDocument();
+    expect(screen.getByText('Alex')).toBeInTheDocument();
+    expect(screen.getByText('Reformer')).toBeInTheDocument();
+    expect(screen.getByText('Maria')).toBeInTheDocument();
+    expect(screen.queryByText('Reformer Pilates')).not.toBeInTheDocument();
   });
 
   it('shows empty day and empty week messaging', () => {

@@ -21,6 +21,14 @@ export type WeekSessionDetail = {
   ends_at: string;
 };
 
+/** One client row inside an expanded weekly time slot. */
+export type WeekSlotAttendee = {
+  id: string;
+  client_name: string;
+  session_type: string;
+  session_type_label: string;
+};
+
 export type WeekTimeSlot = {
   key: string;
   time_label: string;
@@ -28,6 +36,8 @@ export type WeekTimeSlot = {
   ends_at: string;
   session_count: number;
   sessions: WeekSessionDetail[];
+  /** Active clients across sessions in this exact time range. */
+  attendees: WeekSlotAttendee[];
 };
 
 export type WeekDayOverview = {
@@ -136,6 +146,16 @@ function to_week_session_detail(session: DayBookingsSession): WeekSessionDetail 
   };
 }
 
+function attendees_from_session(session: DayBookingsSession): WeekSlotAttendee[] {
+  const type_label = format_session_type(session.session_type);
+  return session.active_bookings.map((booking) => ({
+    id: booking.id,
+    client_name: booking.client_name?.trim() || 'Unnamed client',
+    session_type: session.session_type,
+    session_type_label: type_label,
+  }));
+}
+
 function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
   const by_slot = new Map<string, WeekTimeSlot>();
 
@@ -143,10 +163,13 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
     const time_label = slot_time_label(session.starts_at, session.ends_at);
     const key = `${studio_time_from_iso(session.starts_at)}|${studio_time_from_iso(session.ends_at)}`;
     const existing = by_slot.get(key);
+    const session_detail = to_week_session_detail(session);
+    const session_attendees = attendees_from_session(session);
 
     if (existing) {
-      existing.sessions.push(to_week_session_detail(session));
+      existing.sessions.push(session_detail);
       existing.session_count = existing.sessions.length;
+      existing.attendees.push(...session_attendees);
       continue;
     }
 
@@ -156,13 +179,21 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
       starts_at: session.starts_at,
       ends_at: session.ends_at,
       session_count: 1,
-      sessions: [to_week_session_detail(session)],
+      sessions: [session_detail],
+      attendees: session_attendees,
     });
   }
 
-  return [...by_slot.values()].sort(
-    (a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime(),
-  );
+  return [...by_slot.values()]
+    .map((slot) => ({
+      ...slot,
+      attendees: [...slot.attendees].sort((a, b) => {
+        const type_cmp = a.session_type_label.localeCompare(b.session_type_label);
+        if (type_cmp !== 0) return type_cmp;
+        return a.client_name.localeCompare(b.client_name);
+      }),
+    }))
+    .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime());
 }
 
 export function build_week_sessions_overview(options: {
