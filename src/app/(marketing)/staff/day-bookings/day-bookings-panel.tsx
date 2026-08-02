@@ -20,14 +20,25 @@ import {
   count_occupying_bookings,
   format_occupancy_label,
 } from '@/features/bookings/session-availability';
+import {
+  shift_date_key_by_days,
+  type WeekSessionsOverview,
+} from '@/features/bookings/week-day-bookings';
+import { studio_date_key } from '@/lib/schedule/studio-hours';
 
-import { list_day_bookings } from './actions';
+import { list_day_bookings, list_week_day_bookings } from './actions';
+import {
+  WeeklySessionsOverview,
+  type WeekNavigationDirection,
+} from './weekly-sessions-overview';
 
 type DayBookingsPanelProps = {
   initial_sessions: DayBookingsSession[];
   initial_summary: DayBookingsSummary;
   initial_filters: DayBookingsFilters;
+  initial_week_overview: WeekSessionsOverview;
   initial_error?: string | null;
+  initial_week_error?: string | null;
 };
 
 function AttendeeRow({
@@ -136,35 +147,54 @@ export function DayBookingsPanel({
   initial_sessions,
   initial_summary,
   initial_filters,
+  initial_week_overview,
   initial_error = null,
+  initial_week_error = null,
 }: DayBookingsPanelProps) {
   const [sessions, set_sessions] = useState(initial_sessions);
   const [summary, set_summary] = useState(initial_summary);
   const [filters, set_filters] = useState<DayBookingsFilters>(initial_filters);
   const [draft_filters, set_draft_filters] = useState<DayBookingsFilters>(initial_filters);
+  const [week_overview, set_week_overview] = useState(initial_week_overview);
   const [error, set_error] = useState<string | null>(initial_error);
+  const [week_error, set_week_error] = useState<string | null>(initial_week_error);
   const [is_pending, start_transition] = useTransition();
 
-  function apply_filters() {
+  function load_for_filters(next_filters: DayBookingsFilters) {
     start_transition(async () => {
       set_error(null);
-      const result = await list_day_bookings(draft_filters);
-      set_sessions(result.sessions);
-      set_summary(result.summary);
-      set_error(result.error);
-      set_filters(draft_filters);
+      set_week_error(null);
+      const [day_result, week_result] = await Promise.all([
+        list_day_bookings(next_filters),
+        list_week_day_bookings(next_filters),
+      ]);
+      set_sessions(day_result.sessions);
+      set_summary(day_result.summary);
+      set_error(day_result.error);
+      set_week_overview(week_result.overview);
+      set_week_error(week_result.error);
+      set_filters(next_filters);
+      set_draft_filters(next_filters);
     });
   }
 
+  function apply_filters() {
+    load_for_filters(draft_filters);
+  }
+
   function reset_filters() {
-    start_transition(async () => {
-      set_error(null);
-      const result = await list_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS);
-      set_sessions(result.sessions);
-      set_summary(result.summary);
-      set_error(result.error);
-      set_filters(DEFAULT_DAY_BOOKINGS_FILTERS);
-      set_draft_filters(DEFAULT_DAY_BOOKINGS_FILTERS);
+    load_for_filters(DEFAULT_DAY_BOOKINGS_FILTERS);
+  }
+
+  function navigate_week(direction: WeekNavigationDirection) {
+    const next_date_key =
+      direction === 'today'
+        ? studio_date_key()
+        : shift_date_key_by_days(filters.date_key, direction === 'previous' ? -7 : 7);
+
+    load_for_filters({
+      ...filters,
+      date_key: next_date_key,
     });
   }
 
@@ -232,6 +262,13 @@ export function DayBookingsPanel({
           </Button>
         </div>
       </form>
+
+      <WeeklySessionsOverview
+        error={week_error}
+        is_pending={is_pending}
+        overview={week_overview}
+        on_navigate_week={navigate_week}
+      />
 
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-foreground/70">
         <p className="font-medium text-foreground">{format_day_heading(filters.date_key)}</p>

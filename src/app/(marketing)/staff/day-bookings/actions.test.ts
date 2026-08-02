@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { STAFF_DAY_BOOKINGS_SELECT } from '@/features/bookings/staff-booking-queries';
 import { createClient } from '@/lib/supabase/server';
 
-import { list_day_bookings } from './actions';
+import { list_day_bookings, list_week_day_bookings } from './actions';
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(),
@@ -39,6 +39,13 @@ function staff_supabase(options?: {
   bookings_error?: { message: string; code?: string; hint?: string } | null;
   bookings_data?: unknown[];
 }) {
+  const last_query: {
+    gte?: ReturnType<typeof vi.fn>;
+    lte?: ReturnType<typeof vi.fn>;
+    in?: ReturnType<typeof vi.fn>;
+    order?: ReturnType<typeof vi.fn>;
+  } = {};
+
   const select = vi.fn(() => {
     const query: Record<string, unknown> = {};
     const finalize = async () => ({
@@ -52,6 +59,11 @@ function staff_supabase(options?: {
     query.order = vi.fn(() => query);
     query.then = (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
       Promise.resolve(finalize()).then(resolve, reject);
+
+    last_query.gte = query.gte as ReturnType<typeof vi.fn>;
+    last_query.lte = query.lte as ReturnType<typeof vi.fn>;
+    last_query.in = query.in as ReturnType<typeof vi.fn>;
+    last_query.order = query.order as ReturnType<typeof vi.fn>;
 
     return query;
   });
@@ -72,6 +84,7 @@ function staff_supabase(options?: {
       throw new Error(`Unexpected table: ${table}`);
     }),
     _select: select,
+    _last_query: last_query,
   };
 }
 
@@ -157,6 +170,74 @@ describe('list_day_bookings', () => {
     expect(console_error).toHaveBeenCalledWith(
       expect.stringContaining('code=PGRST201'),
     );
+
+    console_error.mockRestore();
+  });
+});
+
+describe('list_week_day_bookings', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('queries one week window with the shared day-bookings select', async () => {
+    const supabase = staff_supabase();
+    create_client_mock.mockResolvedValue(supabase as never);
+
+    await list_week_day_bookings({
+      date_key: '2026-07-30',
+      hour_start: '06:00',
+      hour_end: '22:00',
+    });
+
+    expect(supabase._select).toHaveBeenCalledWith(STAFF_DAY_BOOKINGS_SELECT);
+    expect(supabase._last_query.gte).toHaveBeenCalledWith(
+      'sessions.starts_at',
+      '2026-07-27T00:00:00',
+    );
+    expect(supabase._last_query.lte).toHaveBeenCalledWith(
+      'sessions.starts_at',
+      '2026-08-02T23:59:59',
+    );
+  });
+
+  it('groups week sessions onto the correct studio-local day', async () => {
+    create_client_mock.mockResolvedValue(staff_supabase() as never);
+
+    const result = await list_week_day_bookings({
+      date_key: '2026-07-30',
+      hour_start: '06:00',
+      hour_end: '22:00',
+    });
+
+    expect(result.error).toBeNull();
+    expect(result.overview.monday_key).toBe('2026-07-27');
+    expect(result.overview.total_sessions).toBe(1);
+    const thursday = result.overview.days.find((day) => day.date_key === '2026-07-30');
+    expect(thursday?.session_count).toBe(1);
+    expect(thursday?.slots[0]?.sessions[0]?.title).toBe('Reformer · 30 Jul 19:00');
+  });
+
+  it('returns a friendly week error without leaking PostgREST details', async () => {
+    const console_error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    create_client_mock.mockResolvedValue(
+      staff_supabase({
+        bookings_error: {
+          code: 'PGRST201',
+          message: 'Could not embed because more than one relationship was found',
+        },
+      }) as never,
+    );
+
+    const result = await list_week_day_bookings({
+      date_key: '2026-07-30',
+      hour_start: '06:00',
+      hour_end: '22:00',
+    });
+
+    expect(result.error).toBe('Unable to load bookings for this week. Please try again.');
+    expect(result.overview.total_sessions).toBe(0);
+    expect(console_error).toHaveBeenCalledWith(expect.stringContaining('list_week_day_bookings'));
 
     console_error.mockRestore();
   });

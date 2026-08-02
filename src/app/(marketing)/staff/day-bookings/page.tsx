@@ -6,7 +6,7 @@ import { DEFAULT_DAY_BOOKINGS_FILTERS } from '@/features/bookings/day-bookings';
 import { createPageMetadata } from '@/lib/metadata';
 import { createClient } from '@/lib/supabase/server';
 
-import { list_day_bookings } from './actions';
+import { list_day_bookings, list_week_day_bookings } from './actions';
 import { DayBookingsPanel } from './day-bookings-panel';
 
 export const metadata = createPageMetadata({
@@ -47,7 +47,10 @@ export default async function StaffDayBookingsPage() {
   const access = await resolve_page_access();
   if (!access.allowed) redirect('/account');
 
-  const { sessions, summary, error } = await list_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS);
+  const [day_result, week_result] = await Promise.all([
+    list_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS),
+    list_week_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS),
+  ]);
 
   return (
     <Container>
@@ -76,10 +79,12 @@ export default async function StaffDayBookingsPage() {
 
         <div className="rounded-md border border-border bg-surface p-6 sm:p-8">
           <DayBookingsPanel
-            initial_error={error}
+            initial_error={day_result.error}
             initial_filters={DEFAULT_DAY_BOOKINGS_FILTERS}
-            initial_sessions={sessions}
-            initial_summary={summary}
+            initial_sessions={day_result.sessions}
+            initial_summary={day_result.summary}
+            initial_week_error={week_result.error}
+            initial_week_overview={week_result.overview}
           />
         </div>
       </div>

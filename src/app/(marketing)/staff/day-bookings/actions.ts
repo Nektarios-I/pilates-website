@@ -15,6 +15,12 @@ import {
   STAFF_DAY_BOOKINGS_SELECT,
   studio_day_window_bounds,
 } from '@/features/bookings/staff-booking-queries';
+import {
+  build_week_sessions_overview,
+  monday_date_key_for,
+  studio_week_window_bounds,
+  type WeekSessionsOverview,
+} from '@/features/bookings/week-day-bookings';
 import { createClient } from '@/lib/supabase/server';
 
 const STAFF_ROLES = ['instructor', 'owner', 'admin'] as const;
@@ -97,6 +103,66 @@ export async function list_day_bookings(
   return {
     sessions,
     summary: summarize_day_bookings(sessions),
+    error: null,
+  };
+}
+
+export type WeekDayBookingsListResult = {
+  overview: WeekSessionsOverview;
+  error: string | null;
+};
+
+/**
+ * Single-query week load: same access, select, session statuses, grouping, and
+ * hour-range filtering as `list_day_bookings`, over Monday–Sunday.
+ */
+export async function list_week_day_bookings(
+  filters: DayBookingsFilters = DEFAULT_DAY_BOOKINGS_FILTERS,
+): Promise<WeekDayBookingsListResult> {
+  const monday_key = monday_date_key_for(filters.date_key);
+  const empty_overview = build_week_sessions_overview({
+    monday_key,
+    sessions: [],
+  });
+
+  const caller = await resolve_teaching_staff();
+  if (!caller) {
+    return { overview: empty_overview, error: null };
+  }
+
+  if (parse_hour_minutes(filters.hour_end) <= parse_hour_minutes(filters.hour_start)) {
+    return {
+      overview: empty_overview,
+      error: 'The end hour must be after the start hour.',
+    };
+  }
+
+  const supabase = await createClient();
+  const { week_start, week_end } = studio_week_window_bounds(monday_key);
+
+  const { data: booking_rows, error: bookings_error } = await supabase
+    .from('bookings')
+    .select(STAFF_DAY_BOOKINGS_SELECT)
+    .gte('sessions.starts_at', week_start)
+    .lte('sessions.starts_at', week_end)
+    .in('sessions.status', ['scheduled', 'completed'])
+    .order('booked_at', { ascending: true });
+
+  if (bookings_error) {
+    log_staff_booking_query_error('list_week_day_bookings', bookings_error);
+    return {
+      overview: empty_overview,
+      error: 'Unable to load bookings for this week. Please try again.',
+    };
+  }
+
+  const grouped = group_day_bookings_from_rows(booking_rows ?? []);
+  const sessions = grouped.filter((session) =>
+    session_starts_in_hour_range(session.starts_at, filters.hour_start, filters.hour_end),
+  );
+
+  return {
+    overview: build_week_sessions_overview({ monday_key, sessions }),
     error: null,
   };
 }
