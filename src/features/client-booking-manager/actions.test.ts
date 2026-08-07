@@ -218,7 +218,7 @@ describe('client booking manager actions', () => {
 
     const result = await staff_manual_book_slot(
       'client-1',
-      '2026-07-10',
+      '2026-08-20',
       '09:00',
       '10:00',
       'card-1',

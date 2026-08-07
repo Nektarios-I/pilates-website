@@ -33,6 +33,8 @@ type SlotBookingPickerProps = {
   session_cards: SessionCard[];
   confirm_label?: string;
   heading?: string;
+  /** Staff manual booking can navigate any future week; public keeps the shared strip. */
+  booking_mode?: 'public' | 'staff_manual';
   on_confirm: (payload: SlotBookingConfirmPayload) => Promise<{ success: boolean; error?: string }>;
 };
 
@@ -40,6 +42,7 @@ export function SlotBookingPicker({
   session_cards,
   confirm_label = 'Confirm booking',
   heading = 'Choose class and time',
+  booking_mode = 'public',
   on_confirm,
 }: SlotBookingPickerProps) {
   const today = useMemo(() => new Date(), []);
@@ -85,7 +88,13 @@ export function SlotBookingPicker({
 
     void Promise.all([
       get_day_schedule(date_key),
-      get_slots_for_day(date_key, card.session_type, card.duration_minutes, card.capacity),
+      get_slots_for_day(
+        date_key,
+        card.session_type,
+        card.duration_minutes,
+        card.capacity,
+        booking_mode === 'staff_manual',
+      ),
     ])
       .then(([schedule, day_slots]) => {
         set_day_schedule(schedule);
@@ -175,7 +184,15 @@ export function SlotBookingPicker({
       <DateNavigationHeading
         anchor={anchor}
         on_next={() => set_anchor(add_days(anchor, 7))}
-        on_prev={() => set_anchor(add_days(anchor, -7))}
+        on_prev={() => {
+          const previous = add_days(anchor, -7);
+          // Staff may browse future weeks freely; never navigate before the current week.
+          if (booking_mode === 'staff_manual' && previous < parse_date_key(today_key)) {
+            set_anchor(parse_date_key(today_key));
+            return;
+          }
+          set_anchor(previous);
+        }}
         on_today={() => {
           set_anchor(parse_date_key(today_key));
           select_date_key(today_key);

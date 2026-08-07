@@ -83,6 +83,8 @@ drop function if exists public.list_recurring_prebook_skips(uuid) cascade;
 drop function if exists public.list_recurring_prebook_schedule_lines(uuid) cascade;
 drop function if exists public.deactivate_recurring_prebook_schedule_line(uuid) cascade;
 drop function if exists public.update_recurring_prebook_schedule_line(uuid, smallint, time, integer, integer) cascade;
+drop function if exists public.list_staff_open_slot_starts_for_day(date, text, integer) cascade;
+drop function if exists public.add_recurring_prebook_schedule_line(uuid, smallint, time, date, integer, integer) cascade;
 drop function if exists public.add_recurring_prebook_schedule_line(uuid, smallint, time, integer, integer) cascade;
 drop function if exists public.list_recurring_prebook_rules(uuid) cascade;
 drop function if exists public.deactivate_recurring_prebook_rule(uuid) cascade;

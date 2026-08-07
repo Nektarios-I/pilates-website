@@ -43,8 +43,8 @@ export function ManualBookingTab({
   return (
     <div className="space-y-6">
       <p className="text-sm text-foreground/70">
-        Book the selected client using the same class and time slots as public booking. Full sessions
-        fail clearly — staff bookings do not waitlist.
+        Book the selected client for today or any future studio date. Full sessions fail clearly —
+        staff bookings do not waitlist. Public self-booking still uses the 14-day window.
       </p>
 
       {needs_split_credits ? (
@@ -78,6 +78,7 @@ export function ManualBookingTab({
       )}
 
       <SlotBookingPicker
+        booking_mode="staff_manual"
         confirm_label="Book for client"
         heading="Choose class and time"
         session_cards={session_cards}

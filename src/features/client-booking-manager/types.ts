@@ -61,6 +61,7 @@ export type RecurringScheduleLine = {
   duration_minutes: number;
   is_active: boolean;
   sort_order: number;
+  first_occurrence_date: string;
 };
 
 export type RecurringSkip = {

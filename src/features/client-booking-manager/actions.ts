@@ -28,7 +28,18 @@ import {
   build_recurring_weekly_slot_options,
   is_valid_recurring_weekly_slot,
 } from '@/features/bookings/recurring-weekly-slot-options';
+import {
+  iso_weekday_from_date_key,
+  validate_first_occurrence_date,
+} from '@/features/bookings/first-occurrence';
+import {
+  summarize_cancel_batch,
+  type CancelOccurrenceResult,
+  type CancelRecurringOccurrenceItem,
+} from '@/features/bookings/recurring-occurrence-cancellation';
+import { is_within_staff_manual_booking_window } from '@/features/bookings/staff-manual-booking-window';
 import type { WeeklySlotPattern } from '@/features/bookings/weekly-slot-patterns';
+import { studio_date_key } from '@/lib/schedule/studio-hours';
 import {
   list_manageable_clients,
   type ManageableClient,
@@ -322,6 +333,10 @@ export async function staff_manual_book_slot(
   const caller = await resolve_caller_staff();
   if (!caller) return { success: false, error: 'You must be signed in as staff.' };
 
+  if (!is_within_staff_manual_booking_window(date_key)) {
+    return { success: false, error: 'Staff cannot manually book sessions in the past.' };
+  }
+
   const supabase = await createClient();
   const { data: session_card, error: card_error } = await supabase
     .from('session_cards')
@@ -512,6 +527,7 @@ export async function add_recurring_schedule_line(
   day_of_week: number,
   start_time: string,
   duration_minutes: number,
+  first_occurrence_date: string,
 ): Promise<ActionResult> {
   const caller = await resolve_caller_staff();
   if (!caller) return { success: false, error: 'You must be signed in as staff.' };
@@ -542,10 +558,21 @@ export async function add_recurring_schedule_line(
     };
   }
 
+  const validation = validate_first_occurrence_date({
+    first_occurrence_date,
+    day_of_week,
+    start_time,
+    duration_minutes: card_duration_minutes,
+  });
+  if (!validation.ok) {
+    return { success: false, error: validation.error };
+  }
+
   const { error } = await supabase.rpc('add_recurring_prebook_schedule_line', {
     p_rule_id: rule_id,
     p_day_of_week: day_of_week,
     p_start_time: start_time,
+    p_first_occurrence_date: first_occurrence_date,
     p_duration_minutes: card_duration_minutes,
     p_sort_order: 0,
   });
@@ -594,12 +621,16 @@ export async function add_recurring_skip(
   const caller = await resolve_caller_staff();
   if (!caller) return { success: false, error: 'You must be signed in as staff.' };
 
-  const forecast = await load_recurring_forecast(rule_id);
-  const is_valid_occurrence = forecast.some(
-    (row) => row.occurrence_date === occurrence_date && row.start_time === start_time,
-  );
+  const lines = await list_recurring_schedule_lines(rule_id);
+  const normalized_time = start_time.slice(0, 5);
+  const matches_line = lines.some((line) => {
+    if (!line.is_active) return false;
+    if (line.start_time.slice(0, 5) !== normalized_time) return false;
+    if (occurrence_date < line.first_occurrence_date) return false;
+    return iso_weekday_from_date_key(occurrence_date) === line.day_of_week;
+  });
 
-  if (!is_valid_occurrence) {
+  if (!matches_line) {
     return {
       success: false,
       error: 'That occurrence is not part of this recurring rule schedule.',
@@ -834,3 +865,101 @@ export async function materialize_client_recurring_prebooks(
 
   return { success: true, result };
 }
+
+export async function cancel_selected_recurring_occurrences(
+  rule_id: string,
+  selected: CancelRecurringOccurrenceItem[],
+): Promise<{ success: boolean; message: string; results: CancelOccurrenceResult[] }> {
+  const caller = await resolve_caller_staff();
+  if (!caller) {
+    return {
+      success: false,
+      message: 'You must be signed in as staff.',
+      results: [],
+    };
+  }
+
+  if (selected.length === 0) {
+    return {
+      success: false,
+      message: 'Select at least one session to cancel.',
+      results: [],
+    };
+  }
+
+  const today = studio_date_key();
+  const results: CancelOccurrenceResult[] = [];
+
+  for (const item of selected) {
+    if (item.occurrence_date < today) {
+      results.push({
+        occurrence_date: item.occurrence_date,
+        start_time: item.start_time,
+        success: false,
+        error: 'Past sessions cannot be cancelled here.',
+      });
+      continue;
+    }
+
+    if (item.state === 'cancelled' || item.state === 'unavailable') {
+      results.push({
+        occurrence_date: item.occurrence_date,
+        start_time: item.start_time,
+        success: false,
+        error: 'That session cannot be cancelled.',
+      });
+      continue;
+    }
+
+    if (item.state === 'booked' || item.state === 'waitlisted' || item.booking_id) {
+      let booking_id = item.booking_id;
+      if (!booking_id) {
+        const supabase = await createClient();
+        const { data: log_row } = await supabase
+          .from('recurring_prebook_materialization_log')
+          .select('booking_id')
+          .eq('rule_id', rule_id)
+          .eq('occurrence_date', item.occurrence_date)
+          .eq('status', 'succeeded')
+          .not('booking_id', 'is', null)
+          .maybeSingle();
+        booking_id = log_row?.booking_id ?? null;
+      }
+
+      if (booking_id) {
+        const cancel_result = await staff_cancel_client_booking(booking_id);
+        results.push({
+          occurrence_date: item.occurrence_date,
+          start_time: item.start_time,
+          success: cancel_result.success,
+          error: cancel_result.success ? undefined : cancel_result.error,
+          mode: 'cancel_booking',
+        });
+        continue;
+      }
+    }
+
+    const skip_result = await add_recurring_skip(
+      rule_id,
+      item.occurrence_date,
+      item.start_time,
+      'Cancelled via recurring sessions modal',
+    );
+    results.push({
+      occurrence_date: item.occurrence_date,
+      start_time: item.start_time,
+      success: skip_result.success,
+      error: skip_result.success ? undefined : skip_result.error,
+      mode: 'skip',
+    });
+  }
+
+  const summary = summarize_cancel_batch(results);
+  revalidatePath(MANAGER_PATH);
+  return {
+    success: summary.all_succeeded,
+    message: summary.message,
+    results,
+  };
+}
+

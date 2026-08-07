@@ -47,6 +47,7 @@ Run each file **once**, top to bottom:
 | 32 | `38_finalize_past_bookings.sql` | Auto-mark past `booked` rows as `finished` + hourly pg_cron |
 | 33 | `39_package_lifecycle_alignment.sql` | Package lifecycle grouping, extend/reactivate, audit |
 | 34 | `40_recurring_materialize_failure_visibility.sql` | Durable cron failures; staff-cancel skip; package-expiry warnings; client planned slots |
+| 35 | `41_staff_manual_uncapped_recurring_first_occurrence.sql` | Staff manual uncapped future dates; recurring first_occurrence_date |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -79,14 +80,17 @@ Run each file **once**, top to bottom:
 | Scripts 01–37 | `38_finalize_past_bookings.sql` |
 | Scripts 01–38 | `39_package_lifecycle_alignment.sql` |
 | Scripts 01–39 | `40_recurring_materialize_failure_visibility.sql` |
+| Scripts 01–40 | `41_staff_manual_uncapped_recurring_first_occurrence.sql` |
 
 After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
 
 After `22`, run `supabase/tests/recurring_prebook_regression.sql` before enabling cron (`23`).
 
-Public `book_session` wrappers fail on full capacity (no waitlist). Public and staff manual booking use a **14-day horizon** and wait for recurring materialization before a slot opens (migration 27).
+Public `book_session` wrappers fail on full capacity (no waitlist). Public self-booking uses a **14-day horizon**. Staff/instructor manual booking has **no upper future-date horizon** (past dates still blocked) after migration 41; recurring priority still applies inside the public window.
 
-**Booking window (migration 27):** public/staff can book within 14 days; slots with pending recurring prebooks stay reserved until materialization runs (daily cron or `staff_materialize_recurring_prebooks()`).
+**Booking window (migration 27 + 41):** public can book within 14 days; staff manual can book today and any future available date; slots with pending recurring prebooks stay reserved until materialization runs (daily cron or `staff_materialize_recurring_prebooks()`).
+
+**Recurring first occurrence (migration 41):** schedule lines require `first_occurrence_date`; materialization/forecast begin on that date (indefinite afterward).
 
 **Migration 27 re-run:** If you see `cannot change return type of existing function` for `get_recurring_prebook_forecast`, the script now includes `DROP FUNCTION` before recreating it. Re-run the full `27_booking_horizon_recurring_priority_forecast.sql` file (safe to re-run).
 

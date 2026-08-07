@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import {
   add_recurring_schedule_line,
   add_recurring_skip,
+  cancel_selected_recurring_occurrences,
   create_recurring_rule,
   deactivate_recurring_rule,
   deactivate_recurring_schedule_line,
@@ -17,6 +18,8 @@ import {
   remove_recurring_skip,
   update_recurring_rule,
 } from '@/features/client-booking-manager/actions';
+import { CancelRecurringSessionsModal } from '@/features/client-booking-manager/components/cancel-recurring-sessions-modal';
+import { RecurringPlannedSessionsPreview } from '@/features/client-booking-manager/components/recurring-planned-sessions-preview';
 import { RecurringWeeklySlotPicker } from '@/features/client-booking-manager/components/recurring-weekly-slot-picker';
 import { MaterializeClientDialog } from '@/features/client-booking-manager/components/materialize-client-dialog';
 import {
@@ -37,6 +40,12 @@ import type {
   RecurringScheduleLine,
   RecurringSkip,
 } from '@/features/client-booking-manager/types';
+import {
+  generate_recurring_preview_occurrences,
+  recurring_preview_end_date,
+} from '@/features/bookings/recurring-preview';
+import type { CancelRecurringOccurrenceItem } from '@/features/bookings/recurring-occurrence-cancellation';
+import { studio_date_key } from '@/lib/schedule/studio-hours';
 
 type RecurringTabProps = {
   client_user_id: string;
@@ -216,6 +225,7 @@ function RuleCard({
   const [message, set_message] = useState('');
   const [error, set_error] = useState('');
   const [is_pending, start_transition] = useTransition();
+  const [cancel_modal_open, set_cancel_modal_open] = useState(false);
 
   const session_card =
     session_cards.find((card) => card.id === rule.session_card_id) ?? null;
@@ -253,6 +263,67 @@ function RuleCard({
           skip.occurrence_date === row.occurrence_date && skip.start_time === row.start_time,
       ),
   );
+
+  const cancel_modal_occurrences: CancelRecurringOccurrenceItem[] = (() => {
+    const today = studio_date_key();
+    const items: CancelRecurringOccurrenceItem[] = [];
+    for (const line of active_lines) {
+      const end = recurring_preview_end_date(line.first_occurrence_date);
+      const preview = generate_recurring_preview_occurrences({
+        first_occurrence_date: line.first_occurrence_date,
+        day_of_week: line.day_of_week,
+        start_time: line.start_time,
+        end_time: undefined,
+        session_title: session_card?.title,
+        skipped_dates: skips
+          .filter((skip) => skip.start_time.slice(0, 5) === line.start_time.slice(0, 5))
+          .map((skip) => skip.occurrence_date),
+      });
+      for (const occurrence of preview) {
+        if (occurrence.occurrence_date < today) continue;
+        if (occurrence.occurrence_date > end) continue;
+        const forecast_row = forecast.find(
+          (row) =>
+            row.occurrence_date === occurrence.occurrence_date &&
+            row.start_time.slice(0, 5) === line.start_time.slice(0, 5),
+        );
+        let state: CancelRecurringOccurrenceItem['state'] = 'planned';
+        if (occurrence.status === 'cancelled') state = 'cancelled';
+        else if (forecast_row?.booking_state === 'booked') state = 'booked';
+        else if (forecast_row?.booking_state === 'skipped') state = 'cancelled';
+        items.push({
+          occurrence_date: occurrence.occurrence_date,
+          start_time: line.start_time,
+          session_title: session_card?.title,
+          state,
+          booking_id: null,
+        });
+      }
+    }
+    return items.sort((a, b) =>
+      a.occurrence_date === b.occurrence_date
+        ? a.start_time.localeCompare(b.start_time)
+        : a.occurrence_date.localeCompare(b.occurrence_date),
+    );
+  })();
+
+  async function resolve_booking_ids_for_cancel(
+    items: CancelRecurringOccurrenceItem[],
+  ): Promise<CancelRecurringOccurrenceItem[]> {
+    // Enrich booked rows from forecast when materialization log booking is known via dashboard bookings.
+    // Booking IDs for recurring cancellations are resolved by staff_cancel when provided; planned use skips.
+    return items.map((item) => {
+      const forecast_row = forecast.find(
+        (row) =>
+          row.occurrence_date === item.occurrence_date &&
+          row.start_time.slice(0, 5) === item.start_time.slice(0, 5),
+      );
+      if (forecast_row?.booking_state === 'booked') {
+        return { ...item, state: 'booked' as const };
+      }
+      return item;
+    });
+  }
 
   function run_action(action: () => Promise<{ success: boolean; error?: string }>) {
     start_transition(async () => {
@@ -382,6 +453,9 @@ function RuleCard({
                     <span>
                       {ISO_WEEKDAY_OPTIONS.find((day) => day.value === line.day_of_week)?.label}{' '}
                       {format_time_value(line.start_time)} · {line.duration_minutes} min
+                      <span className="mt-1 block text-xs text-foreground/60">
+                        Starts {format_session_date(line.first_occurrence_date)}
+                      </span>
                     </span>
                     <Button
                       disabled={is_pending}
@@ -398,17 +472,58 @@ function RuleCard({
               </ul>
             )}
 
+            {active_lines.map((line) => (
+              <RecurringPlannedSessionsPreview
+                key={`preview-${line.id}`}
+                day_of_week={line.day_of_week}
+                first_occurrence_date={line.first_occurrence_date}
+                session_title={session_card?.title}
+                skipped_dates={skips
+                  .filter((skip) => skip.start_time.slice(0, 5) === line.start_time.slice(0, 5))
+                  .map((skip) => skip.occurrence_date)}
+                start_time={line.start_time}
+              />
+            ))}
+
+            <div className="mt-4">
+              <Button
+                disabled={is_pending || cancel_modal_occurrences.length === 0}
+                onClick={() => set_cancel_modal_open(true)}
+                size="sm"
+                variant="secondary"
+              >
+                Cancel recurring sessions
+              </Button>
+            </div>
+
+            <CancelRecurringSessionsModal
+              occurrences={cancel_modal_occurrences}
+              on_close={() => set_cancel_modal_open(false)}
+              on_confirm={async (selected) => {
+                const enriched = await resolve_booking_ids_for_cancel(selected);
+                const result = await cancel_selected_recurring_occurrences(rule.id, enriched);
+                if (result.success) {
+                  set_message(result.message);
+                  on_refresh();
+                }
+                return result;
+              }}
+              open={cancel_modal_open}
+            />
+
             <RecurringWeeklySlotPicker
               active_lines={active_lines}
               disabled={is_pending || rule.status !== 'active'}
               duration_minutes={duration_minutes}
-              on_add={(day_of_week, start_time) => {
+              session_title={session_card?.title}
+              on_add={(day_of_week, start_time, first_occurrence_date) => {
                 run_action(async () =>
                   add_recurring_schedule_line(
                     rule.id,
                     day_of_week,
                     start_time,
                     duration_minutes,
+                    first_occurrence_date,
                   ),
                 );
               }}
@@ -423,7 +538,8 @@ function RuleCard({
           <section className="mt-5">
             <h3 className="text-sm font-semibold text-foreground">Skipped occurrences</h3>
             <p className="mt-1 text-xs text-foreground/60">
-              Skip a specific upcoming occurrence from the 14-day forecast.
+              Skip a specific upcoming occurrence. Use Cancel recurring sessions for multi-select
+              across the three-month preview.
             </p>
             {skips.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No skipped dates.</p>
@@ -517,12 +633,10 @@ function RuleCard({
           </section>
 
           <section className="mt-5">
-            <h3 className="text-sm font-semibold text-foreground">14-day forecast</h3>
+            <h3 className="text-sm font-semibold text-foreground">14-day materialization window</h3>
             <p className="mt-1 text-xs text-foreground/60">
-              Class dates inside the booking window. <strong>Planned</strong> means not yet
-              reserved. <strong>Credits OK</strong> means credits look sufficient right now —
-              not that the class is already booked. Warnings appear when credits are missing
-              or a package expires before the class date.
+              Operational status inside the booking window (credits and materialization). Planned
+              sessions for three calendar months are shown above each weekly slot.
             </p>
             {forecast.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No forecast occurrences in window.</p>

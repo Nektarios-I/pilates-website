@@ -10,7 +10,7 @@ const STAFF_BOOKING_MSG_MAP: Record<string, string> = {
   P0009: 'The selected package does not match this session type.',
   P0011: 'You are not authorised to perform this action.',
   P0013: 'The client already has a booking at this time slot.',
-  P0014: 'Bookings are limited to the next 14 days.',
+  P0014: 'That date is outside the public booking window.',
   P0015: 'This session is full. Staff manual booking does not waitlist.',
   P0017: 'Bookings can only be created for client accounts.',
   P0018: 'The selected session card is not available.',
@@ -28,6 +28,9 @@ const STAFF_BOOKING_MSG_MAP: Record<string, string> = {
   P0036: 'Materialization failed for one or more selected occurrences.',
   P0037:
     'Not enough credits for all selected occurrences. Uncheck classes marked insufficient slots or add credits.',
+  P0038: 'Choose a valid first session date that matches the selected weekday and is today or later.',
+  P0039:
+    'This session is not available on the selected date. Choose another first occurrence date or session slot.',
 };
 
 export function map_staff_rpc_error(message: string | undefined): string {

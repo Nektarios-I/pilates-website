@@ -123,6 +123,8 @@ export async function get_slots_for_day(
   duration_minutes = 60,
   /** Capacity from the selected session card — used when no session row exists yet. */
   card_capacity?: number | null,
+  /** Staff manual booking lists open slots without the public 14-day upper bound. */
+  for_staff_manual = false,
 ): Promise<SlotSession[]> {
   const schedule = await get_day_schedule(date_key);
   if (schedule.is_closed) return [];
@@ -175,7 +177,7 @@ export async function get_slots_for_day(
   const slots = generate_hourly_slots(schedule.time_ranges, duration_minutes);
 
   const { data: open_slots, error: open_slots_error } = await supabase.rpc(
-    'list_open_slot_starts_for_day',
+    for_staff_manual ? 'list_staff_open_slot_starts_for_day' : 'list_open_slot_starts_for_day',
     {
       p_schedule_date: date_key,
       p_session_type: session_type,

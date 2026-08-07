@@ -50,10 +50,10 @@ describe('booking RPC contract — public path', () => {
 describe('booking RPC contract — staff manual path', () => {
   const staff_id = 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 
-  it('staff manual flags disable waitlist, enforce horizon, and set provenance', () => {
+  it('staff manual flags disable waitlist, skip public horizon upper bound, and set provenance', () => {
     const flags = staff_manual_book_session_core_flags(staff_id);
     expect(flags.allow_waitlist).toBe(false);
-    expect(flags.enforce_public_horizon).toBe(true);
+    expect(flags.enforce_public_horizon).toBe(false);
     expect(flags.booking_source).toBe('staff_manual');
     expect(flags.created_by_user_id).toBe(staff_id);
     expect(flags.recurring_materialization_log_id).toBeNull();

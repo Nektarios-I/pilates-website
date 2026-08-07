@@ -47,11 +47,11 @@ export const PUBLIC_BOOK_SESSION_CORE_FLAGS: BookSessionCoreFlags = {
   recurring_materialization_log_id: null,
 };
 
-/** Staff manual booking — fail on full capacity, write staff provenance. */
+/** Staff manual booking — fail on full capacity, write staff provenance. No public 14-day upper bound. */
 export function staff_manual_book_session_core_flags(staff_user_id: string): BookSessionCoreFlags {
   return {
     allow_waitlist: false,
-    enforce_public_horizon: true,
+    enforce_public_horizon: false,
     booking_source: 'staff_manual',
     created_by_user_id: staff_user_id,
     recurring_materialization_log_id: null,
