@@ -132,6 +132,7 @@ describe('MaterializeClientDialog', () => {
     await waitFor(() => {
       expect(screen.getByText(/three-calendar-month planned window/i)).toBeInTheDocument();
     });
+    expect(screen.getByText(/migration 42/i)).toBeInTheDocument();
     expect(screen.queryByText(/14-day window/i)).not.toBeInTheDocument();
   });
 

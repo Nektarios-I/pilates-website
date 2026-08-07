@@ -222,6 +222,16 @@ export function MaterializeClientDialog({
               booked or permanently skipped.
             </p>
           ) : (
+            <>
+              <p className="mb-3 text-xs text-foreground/60">
+                Showing {occurrences.length} materializable session
+                {occurrences.length === 1 ? '' : 's'}
+                {occurrences.length > 0
+                  ? ` · ${occurrences[0]?.occurrence_date} – ${occurrences[occurrences.length - 1]?.occurrence_date}`
+                  : ''}
+                . This list uses the three-calendar-month planned window (requires Supabase
+                migration 42).
+              </p>
             <ul className="space-y-2">
               {occurrences.map((row) => {
                 const key = materializable_occurrence_key(
@@ -265,6 +275,7 @@ export function MaterializeClientDialog({
                 );
               })}
             </ul>
+            </>
           )}
           {token_block_message ? (
             <p className="mt-3 text-sm text-danger-foreground" role="alert">

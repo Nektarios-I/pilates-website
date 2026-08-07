@@ -49,6 +49,7 @@ Run each file **once**, top to bottom:
 | 34 | `40_recurring_materialize_failure_visibility.sql` | Durable cron failures; staff-cancel skip; package-expiry warnings; client planned slots |
 | 35 | `41_staff_manual_uncapped_recurring_first_occurrence.sql` | Staff manual uncapped future dates; recurring first_occurrence_date |
 | 36 | `42_staff_materialize_three_month_preview.sql` | Staff Materialize Now uses three-calendar-month preview window |
+| 37 | `43_assert_staff_materialize_three_month_window.sql` | Optional assert that migration 42 helpers exist |
 
 **Optional — legacy DBs only:** If you previously seeded old `a0000000-…` packages, run `13_migrate_legacy_packages.sql` once after step 4. Fresh installs skip this.
 
@@ -83,6 +84,7 @@ Run each file **once**, top to bottom:
 | Scripts 01–39 | `40_recurring_materialize_failure_visibility.sql` |
 | Scripts 01–40 | `41_staff_manual_uncapped_recurring_first_occurrence.sql` |
 | Scripts 01–41 | `42_staff_materialize_three_month_preview.sql` |
+| Scripts 01–42 | `43_assert_staff_materialize_three_month_window.sql` (optional assert) |
 
 After `19`–`24`, run `supabase/tests/booking_core_regression.sql` and `supabase/tests/booking_policy_regression.sql` on dev/staging.
 

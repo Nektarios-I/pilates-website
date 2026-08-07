@@ -234,16 +234,18 @@ describe('client booking manager actions', () => {
     });
   });
 
-  it('rejects recurring skips that are not in the rule forecast', async () => {
+  it('rejects recurring skips that are not on an active schedule line', async () => {
     const supabase = staff_supabase();
     supabase.rpc = vi.fn(async (name: string) => {
-      if (name === 'get_recurring_prebook_forecast') {
+      if (name === 'list_recurring_prebook_schedule_lines') {
         return {
           data: [
             {
-              occurrence_date: '2026-07-12',
+              id: 'line-1',
+              day_of_week: 1,
               start_time: '09:00:00',
-              occurrence_starts_at: '2026-07-12T09:00:00+03:00',
+              first_occurrence_date: '2026-08-03',
+              is_active: true,
             },
           ],
           error: null,
@@ -253,11 +255,42 @@ describe('client booking manager actions', () => {
     });
     create_client_mock.mockResolvedValue(supabase);
 
-    const result = await add_recurring_skip('rule-1', '2026-07-13', '09:00', 'Away');
+    // Tuesday 2026-08-04 does not match Monday line
+    const result = await add_recurring_skip('rule-1', '2026-08-04', '09:00', 'Away');
 
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error).toContain('not part of this recurring rule');
+    }
+  });
+
+  it('rejects recurring skips outside the three-month planned window', async () => {
+    const supabase = staff_supabase();
+    supabase.rpc = vi.fn(async (name: string) => {
+      if (name === 'list_recurring_prebook_schedule_lines') {
+        return {
+          data: [
+            {
+              id: 'line-1',
+              day_of_week: 1,
+              start_time: '09:00:00',
+              first_occurrence_date: '2026-08-10',
+              is_active: true,
+            },
+          ],
+          error: null,
+        };
+      }
+      return { data: null, error: null };
+    });
+    create_client_mock.mockResolvedValue(supabase);
+
+    // Preview end for first 2026-08-10 is 2026-11-10; Dec 7 is outside
+    const result = await add_recurring_skip('rule-1', '2026-12-07', '09:00', 'Away');
+
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(result.error).toMatch(/three-month planned window/i);
     }
   });
 
@@ -442,7 +475,7 @@ describe('client booking manager actions', () => {
 
     expect(result.success).toBe(false);
     if (!result.success) {
-      expect(result.error).toContain('list_client_materializable_occurrences');
+      expect(result.error).toMatch(/migration 42/i);
     }
   });
 

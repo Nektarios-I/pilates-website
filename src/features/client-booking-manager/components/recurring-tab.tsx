@@ -44,6 +44,7 @@ import {
   generate_recurring_preview_occurrences,
   recurring_preview_end_date,
 } from '@/features/bookings/recurring-preview';
+import { list_skippable_recurring_occurrences } from '@/features/bookings/skippable-recurring-occurrences';
 import type { CancelRecurringOccurrenceItem } from '@/features/bookings/recurring-occurrence-cancellation';
 import { studio_date_key } from '@/lib/schedule/studio-hours';
 
@@ -257,13 +258,10 @@ function RuleCard({
   }, [rule.id, rule.forecast, forecast_revision]);
 
   const active_lines = lines.filter((line) => line.is_active);
-  const skippable_forecast = forecast.filter(
-    (row) =>
-      !skips.some(
-        (skip) =>
-          skip.occurrence_date === row.occurrence_date && skip.start_time === row.start_time,
-      ),
-  );
+  const skippable_occurrences = list_skippable_recurring_occurrences({
+    lines: active_lines,
+    skips,
+  });
 
   const cancel_modal_occurrences: CancelRecurringOccurrenceItem[] = (() => {
     const today = studio_date_key();
@@ -539,8 +537,9 @@ function RuleCard({
           <section className="mt-5">
             <h3 className="text-sm font-semibold text-foreground">Skipped occurrences</h3>
             <p className="mt-1 text-xs text-foreground/60">
-              Skip a specific upcoming occurrence. Use Cancel recurring sessions for multi-select
-              across the three-month preview.
+              Skip any upcoming planned session in the same three-calendar-month window as Planned
+              sessions / Cancel recurring sessions. Skips are stored the same way in both places and
+              block materialization.
             </p>
             {skips.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No skipped dates.</p>
@@ -583,18 +582,18 @@ function RuleCard({
                   value={selected_forecast_key}
                 >
                   <option value="">Select an occurrence</option>
-                  {skippable_forecast.map((row) => {
+                  {skippable_occurrences.map((row) => {
                     const key = `${row.occurrence_date}|${row.start_time}`;
                     return (
                       <option key={key} value={key}>
-                        {format_session_datetime(row.occurrence_starts_at)}
+                        {format_session_date(row.occurrence_date)} {format_time_value(row.start_time)}
                       </option>
                     );
                   })}
                 </select>
-                {skippable_forecast.length === 0 ? (
+                {skippable_occurrences.length === 0 ? (
                   <p className="mt-2 text-xs text-foreground/60">
-                    No skippable forecast occurrences in the next 14 days.
+                    No skippable planned occurrences in the three-month window.
                   </p>
                 ) : null}
               </div>
@@ -634,10 +633,13 @@ function RuleCard({
           </section>
 
           <section className="mt-5">
-            <h3 className="text-sm font-semibold text-foreground">14-day materialization window</h3>
+            <h3 className="text-sm font-semibold text-foreground">
+              Next 14 days — credit &amp; booking status
+            </h3>
             <p className="mt-1 text-xs text-foreground/60">
-              Operational status inside the booking window (credits and materialization). Planned
-              sessions for three calendar months are shown above each weekly slot.
+              Operational status inside the public booking window (credits and materialization
+              health). Planned sessions, skips, and Materialize Now use the three-calendar-month
+              window above.
             </p>
             {forecast.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No forecast occurrences in window.</p>

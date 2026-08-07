@@ -37,6 +37,7 @@ import {
   type CancelOccurrenceResult,
   type CancelRecurringOccurrenceItem,
 } from '@/features/bookings/recurring-occurrence-cancellation';
+import { is_within_recurring_preview_window } from '@/features/bookings/skippable-recurring-occurrences';
 import { is_within_staff_manual_booking_window } from '@/features/bookings/staff-manual-booking-window';
 import type { WeeklySlotPattern } from '@/features/bookings/weekly-slot-patterns';
 import { studio_date_key } from '@/lib/schedule/studio-hours';
@@ -623,7 +624,7 @@ export async function add_recurring_skip(
 
   const lines = await list_recurring_schedule_lines(rule_id);
   const normalized_time = start_time.slice(0, 5);
-  const matches_line = lines.some((line) => {
+  const matches_line = lines.find((line) => {
     if (!line.is_active) return false;
     if (line.start_time.slice(0, 5) !== normalized_time) return false;
     if (occurrence_date < line.first_occurrence_date) return false;
@@ -634,6 +635,18 @@ export async function add_recurring_skip(
     return {
       success: false,
       error: 'That occurrence is not part of this recurring rule schedule.',
+    };
+  }
+
+  if (
+    !is_within_recurring_preview_window(
+      occurrence_date,
+      matches_line.first_occurrence_date,
+    )
+  ) {
+    return {
+      success: false,
+      error: 'That occurrence is outside the three-month planned window for this recurring slot.',
     };
   }
 
@@ -729,9 +742,21 @@ export async function list_client_materializable_occurrences(
 
   if (error) {
     console.error('[list_client_materializable_occurrences]', error.message);
+    const mapped = map_staff_rpc_error(error.message);
+    if (
+      error.message.includes('list_client_materializable_occurrences') ||
+      error.message.includes('staff_materialize_window') ||
+      error.message.includes('recurring_preview_end_date')
+    ) {
+      return {
+        success: false,
+        error:
+          'Materialize Now needs migration 42 (three-month staff materialize window) applied in Supabase. Apply supabase/42_staff_materialize_three_month_preview.sql, then refresh.',
+      };
+    }
     return {
       success: false,
-      error: map_staff_rpc_error(error.message),
+      error: mapped,
     };
   }
 
