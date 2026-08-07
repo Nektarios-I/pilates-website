@@ -205,9 +205,9 @@ export function MaterializeClientDialog({
             Run materialization now
           </h2>
           <p className="mt-1 text-sm text-foreground/70">
-            Book recurring classes inside the rolling 14-day window for this client. Uncheck any
-            occurrence to exclude it from this run. All selected classes must have enough credits —
-            materialization is all-or-nothing.
+            Book recurring classes across the same three-calendar-month planned window used in the
+            recurring preview. Uncheck any occurrence to exclude it from this run. All selected
+            classes must have enough credits — materialization is all-or-nothing.
           </p>
         </div>
 
@@ -218,7 +218,7 @@ export function MaterializeClientDialog({
             <p className="text-sm text-danger-foreground">{load_error}</p>
           ) : occurrences.length === 0 ? (
             <p className="text-sm text-foreground/60">
-              Nothing to materialize in the current 14-day window. All occurrences are already
+              Nothing to materialize in the three-month planned window. All occurrences are already
               booked or permanently skipped.
             </p>
           ) : (

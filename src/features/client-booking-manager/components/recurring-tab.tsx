@@ -143,9 +143,10 @@ export function RecurringTab({
             <div>
               <h2 className="text-sm font-semibold text-foreground">Materialize recurring bookings</h2>
               <p className="mt-1 text-sm text-foreground/70">
-                Turn planned recurring slots into real bookings for this client. The system uses a
-                rolling 14-day window — as each day passes, the next week&apos;s classes enter the
-                window automatically (daily cron at 04:00 UTC, or run manually here).
+                Turn planned recurring slots into real bookings for this client. Run materialization
+                now to book every selected session in the three-calendar-month planned window (same
+                range as Planned sessions). The daily cron still advances the rolling 14-day public
+                booking window automatically.
               </p>
             </div>
             <Button

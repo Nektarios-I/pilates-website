@@ -101,6 +101,8 @@ drop function if exists private.time_to_hh24_mi(time) cascade;
 drop function if exists private.schedule_line_end_time(time, integer) cascade;
 drop function if exists private.assert_client_user(uuid) cascade;
 drop function if exists private.assert_recurring_staff() cascade;
+drop function if exists private.staff_materialize_window_end_date() cascade;
+drop function if exists private.recurring_preview_end_date(date) cascade;
 drop function if exists private.recurring_window_end_date() cascade;
 drop function if exists public.list_open_slot_starts_for_day(date, text, integer) cascade;
 drop function if exists private.recurring_blocks_public_booking(date, time, text) cascade;

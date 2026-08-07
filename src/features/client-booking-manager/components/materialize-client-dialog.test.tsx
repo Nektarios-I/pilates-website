@@ -117,6 +117,24 @@ describe('MaterializeClientDialog', () => {
     expect(materialize_mock).not.toHaveBeenCalled();
   });
 
+  it('describes the three-month materialize window in the dialog copy', async () => {
+    render(
+      <MaterializeClientDialog
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/three-calendar-month planned window/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/14-day window/i)).not.toBeInTheDocument();
+  });
+
   it('keeps the dialog open and surfaces errors when materialization fails', async () => {
     const on_close = vi.fn();
     const on_complete = vi.fn();

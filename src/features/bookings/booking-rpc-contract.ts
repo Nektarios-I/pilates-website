@@ -3,6 +3,8 @@
  * 19–21. Used by unit tests to guard public vs staff behavior expectations.
  */
 
+import { add_calendar_months } from '@/lib/schedule/calendar-months';
+
 export const BOOKING_ERROR_CODES = {
   not_authenticated: 'P0001',
   session_not_found: 'P0002',
@@ -108,6 +110,9 @@ export const RECURRING_MATERIALIZATION_HORIZON_DAYS = 14;
 
 export const PUBLIC_BOOKING_HORIZON_DAYS = RECURRING_MATERIALIZATION_HORIZON_DAYS;
 
+/** Staff Materialize Now uses the same three-calendar-month preview as planned sessions. */
+export const STAFF_MATERIALIZE_PREVIEW_MONTHS = 3;
+
 export type RecurringHealthStatus = 'ready' | 'insufficient_tokens' | 'failed';
 
 export type RecurringMaterializationFlags = {
@@ -135,6 +140,18 @@ export function occurrence_within_materialization_window(
   end.setDate(end.getDate() + horizon_days);
   const occurrence = new Date(`${occurrence_date}T00:00:00`);
   return occurrence >= start && occurrence <= end;
+}
+
+/** Inclusive staff Materialize Now window aligned with the three-calendar-month preview. */
+export function occurrence_within_staff_materialize_preview(
+  occurrence_date: string,
+  first_occurrence_date: string,
+  studio_today: string,
+): boolean {
+  if (occurrence_date < studio_today) return false;
+  if (occurrence_date < first_occurrence_date) return false;
+  const end = add_calendar_months(first_occurrence_date, STAFF_MATERIALIZE_PREVIEW_MONTHS);
+  return occurrence_date <= end;
 }
 
 export function recurring_provenance_on_success(log_id: string) {

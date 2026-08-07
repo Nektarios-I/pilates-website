@@ -5,9 +5,11 @@ import {
   PUBLIC_BOOK_SESSION_CORE_FLAGS,
   RECURRING_MATERIALIZATION_FLAGS,
   RECURRING_MATERIALIZATION_HORIZON_DAYS,
+  STAFF_MATERIALIZE_PREVIEW_MONTHS,
   credits_deducted_for_status,
   map_postgres_booking_error,
   occurrence_within_materialization_window,
+  occurrence_within_staff_materialize_preview,
   recurring_provenance_on_success,
   refund_applies_for_cancelled_status,
   staff_manual_book_session_core_flags,
@@ -95,8 +97,24 @@ describe('booking RPC contract — cancellation policy', () => {
 });
 
 describe('recurring prebook contract', () => {
-  it('materialization uses 14-day rolling horizon constant', () => {
+  it('materialization cron uses 14-day rolling horizon constant', () => {
     expect(RECURRING_MATERIALIZATION_HORIZON_DAYS).toBe(14);
+  });
+
+  it('staff Materialize Now uses the three-calendar-month preview window', () => {
+    expect(STAFF_MATERIALIZE_PREVIEW_MONTHS).toBe(3);
+    expect(
+      occurrence_within_staff_materialize_preview('2026-08-24', '2026-08-24', '2026-08-06'),
+    ).toBe(true);
+    expect(
+      occurrence_within_staff_materialize_preview('2026-11-23', '2026-08-24', '2026-08-06'),
+    ).toBe(true);
+    expect(
+      occurrence_within_staff_materialize_preview('2026-11-30', '2026-08-24', '2026-08-06'),
+    ).toBe(false);
+    expect(
+      occurrence_within_staff_materialize_preview('2026-08-10', '2026-08-24', '2026-08-06'),
+    ).toBe(false);
   });
 
   it('recurring flags disable waitlist and use recurring provenance', () => {
