@@ -11,8 +11,15 @@ import {
   type DayBookingsSummary,
 } from '@/features/bookings/day-bookings';
 import {
+  build_month_calendar_overview,
+  map_month_calendar_booking,
+  studio_month_grid_window_bounds,
+  type MonthCalendarOverview,
+} from '@/features/bookings/month-calendar';
+import {
   log_staff_booking_query_error,
   STAFF_DAY_BOOKINGS_SELECT,
+  STAFF_MONTH_CALENDAR_SELECT,
   studio_day_window_bounds,
 } from '@/features/bookings/staff-booking-queries';
 import {
@@ -163,6 +170,65 @@ export async function list_week_day_bookings(
 
   return {
     overview: build_week_sessions_overview({ monday_key, sessions }),
+    error: null,
+  };
+}
+
+export type MonthCalendarListResult = {
+  overview: MonthCalendarOverview;
+  error: string | null;
+};
+
+function empty_month_overview(year: number, month: number): MonthCalendarOverview {
+  return build_month_calendar_overview({ year, month, bookings: [] });
+}
+
+/**
+ * Independent month load for the Month Calendar. Same staff gate and session
+ * statuses as day bookings, but no hour-range filter and a dedicated select
+ * that includes user_id for the client-detail popup.
+ */
+export async function list_month_calendar(
+  year: number,
+  month: number,
+): Promise<MonthCalendarListResult> {
+  const empty: MonthCalendarListResult = {
+    overview: empty_month_overview(year, month),
+    error: null,
+  };
+
+  const caller = await resolve_teaching_staff();
+  if (!caller) return empty;
+
+  if (!Number.isInteger(year) || !Number.isInteger(month) || month < 1 || month > 12) {
+    return { ...empty, error: 'Choose a valid month and year.' };
+  }
+
+  const supabase = await createClient();
+  const { range_start, range_end } = studio_month_grid_window_bounds(year, month);
+
+  const { data: booking_rows, error: bookings_error } = await supabase
+    .from('bookings')
+    .select(STAFF_MONTH_CALENDAR_SELECT)
+    .gte('sessions.starts_at', range_start)
+    .lte('sessions.starts_at', range_end)
+    .in('sessions.status', ['scheduled', 'completed'])
+    .order('booked_at', { ascending: true });
+
+  if (bookings_error) {
+    log_staff_booking_query_error('list_month_calendar', bookings_error);
+    return {
+      ...empty,
+      error: 'Unable to load the month calendar. Please try again.',
+    };
+  }
+
+  const bookings = (booking_rows ?? [])
+    .map((row) => map_month_calendar_booking(row))
+    .filter((row): row is NonNullable<typeof row> => row !== null);
+
+  return {
+    overview: build_month_calendar_overview({ year, month, bookings }),
     error: null,
   };
 }

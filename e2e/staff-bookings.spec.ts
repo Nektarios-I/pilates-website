@@ -188,4 +188,90 @@ test.describe('staff booking pages after profiles FK disambiguation', () => {
     await page.getByRole('button', { name: 'Client Bookings' }).click();
     await expect(page.getByText(/booked/i).first()).toBeVisible({ timeout: 15_000 });
   });
+
+  test('month calendar navigates independently and opens the day detail popup', async ({
+    page,
+  }) => {
+    test.skip(
+      !staff_booking_e2e_configured(),
+      'Set E2E_STAFF_EMAIL, E2E_STAFF_PASSWORD, and Supabase keys.',
+    );
+
+    const date_key = e2e_staff_known_booking_date();
+    const [year, month] = date_key.split('-');
+
+    await login_as_staff(page, '/staff/day-bookings');
+    const calendar = page.getByRole('region', { name: 'Month calendar' });
+    await expect(calendar.getByRole('heading', { name: 'Month calendar' })).toBeVisible();
+
+    const label_before = await calendar.locator('p').filter({ hasText: /\d{4}/ }).first().textContent();
+    await calendar.getByRole('button', { name: 'Next month' }).click();
+    await expect
+      .poll(async () => calendar.locator('p').filter({ hasText: /\d{4}/ }).first().textContent())
+      .not.toBe(label_before);
+    await calendar.getByRole('button', { name: 'Previous month' }).click();
+
+    await calendar.getByLabel('Month').selectOption(String(Number(month)));
+    await calendar.getByLabel('Year').selectOption(year ?? '2026');
+
+    const day_number = String(Number(date_key.slice(-2)));
+    const month_names = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December',
+    ];
+    const month_name = month_names[Number(month) - 1];
+    const day_button = calendar.getByRole('button', {
+      name: new RegExp(`${day_number} ${month_name},`),
+    });
+    await expect(day_button).toBeVisible({ timeout: 15_000 });
+
+    const day_filter_before = await page.getByLabel('Day').inputValue();
+    await day_button.click();
+
+    const dialog = page.getByRole('dialog').first();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText('00', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('23', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Day')).toHaveValue(day_filter_before);
+
+    const booking_box = dialog.getByRole('button').filter({ hasText: /Reformer|Mat/i }).first();
+    await expect(booking_box).toBeVisible({ timeout: 15_000 });
+    await booking_box.click();
+
+    const client_dialog = page.getByRole('dialog').nth(1);
+    await expect(client_dialog.getByRole('heading', { name: 'Memberships' })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(client_dialog.getByText(/credits remaining|Unlimited credits|No active memberships/i)).toBeVisible();
+    await expect(client_dialog.getByRole('heading', { name: 'Other bookings' })).toBeVisible();
+  });
+
+  test('month calendar keeps a seven-column grid on mobile', async ({ page }) => {
+    test.skip(
+      !staff_booking_e2e_configured(),
+      'Set E2E_STAFF_EMAIL, E2E_STAFF_PASSWORD, and Supabase keys.',
+    );
+
+    await page.setViewportSize({ width: 375, height: 844 });
+    await login_as_staff(page, '/staff/day-bookings');
+
+    const calendar = page.getByRole('region', { name: 'Month calendar' });
+    await expect(calendar).toBeVisible();
+    await expect(calendar.getByText('Mon', { exact: true })).toBeVisible();
+    await expect(calendar.getByText('Sun', { exact: true })).toBeVisible();
+
+    const page_scroll_width = await page.evaluate(() => document.documentElement.scrollWidth);
+    const page_client_width = await page.evaluate(() => document.documentElement.clientWidth);
+    expect(page_scroll_width).toBeLessThanOrEqual(page_client_width + 8);
+  });
 });

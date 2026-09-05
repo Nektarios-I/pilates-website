@@ -24,21 +24,27 @@ import {
   shift_date_key_by_days,
   type WeekSessionsOverview,
 } from '@/features/bookings/week-day-bookings';
+import {
+  type MonthCalendarOverview,
+} from '@/features/bookings/month-calendar';
 import { studio_date_key } from '@/lib/schedule/studio-hours';
 
-import { list_day_bookings, list_week_day_bookings } from './actions';
+import { list_day_bookings, list_month_calendar, list_week_day_bookings } from './actions';
 import {
   WeeklySessionsOverview,
   type WeekNavigationDirection,
 } from './weekly-sessions-overview';
+import { MonthCalendarSection } from './month-calendar-section';
 
 type DayBookingsPanelProps = {
   initial_sessions: DayBookingsSession[];
   initial_summary: DayBookingsSummary;
   initial_filters: DayBookingsFilters;
   initial_week_overview: WeekSessionsOverview;
+  initial_month_overview: MonthCalendarOverview;
   initial_error?: string | null;
   initial_week_error?: string | null;
+  initial_month_error?: string | null;
 };
 
 function AttendeeRow({
@@ -148,17 +154,22 @@ export function DayBookingsPanel({
   initial_summary,
   initial_filters,
   initial_week_overview,
+  initial_month_overview,
   initial_error = null,
   initial_week_error = null,
+  initial_month_error = null,
 }: DayBookingsPanelProps) {
   const [sessions, set_sessions] = useState(initial_sessions);
   const [summary, set_summary] = useState(initial_summary);
   const [filters, set_filters] = useState<DayBookingsFilters>(initial_filters);
   const [draft_filters, set_draft_filters] = useState<DayBookingsFilters>(initial_filters);
   const [week_overview, set_week_overview] = useState(initial_week_overview);
+  const [month_overview, set_month_overview] = useState(initial_month_overview);
   const [error, set_error] = useState<string | null>(initial_error);
   const [week_error, set_week_error] = useState<string | null>(initial_week_error);
+  const [month_error, set_month_error] = useState<string | null>(initial_month_error);
   const [is_pending, start_transition] = useTransition();
+  const [is_month_pending, start_month_transition] = useTransition();
 
   function load_for_filters(next_filters: DayBookingsFilters) {
     start_transition(async () => {
@@ -198,8 +209,24 @@ export function DayBookingsPanel({
     });
   }
 
+  function load_month(year: number, month: number) {
+    start_month_transition(async () => {
+      set_month_error(null);
+      const result = await list_month_calendar(year, month);
+      set_month_overview(result.overview);
+      set_month_error(result.error);
+    });
+  }
+
   return (
     <div className="space-y-6">
+      <MonthCalendarSection
+        error={month_error}
+        is_pending={is_month_pending}
+        overview={month_overview}
+        on_navigate_month={load_month}
+      />
+
       <form
         className="grid gap-4 rounded-md border border-border bg-background p-4 sm:grid-cols-2 lg:grid-cols-4"
         onSubmit={(event) => {

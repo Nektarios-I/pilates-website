@@ -7,6 +7,7 @@ import {
   BOOKINGS_CLIENT_PROFILE_EMBED,
   STAFF_BOOKING_HISTORY_SELECT,
   STAFF_DAY_BOOKINGS_SELECT,
+  STAFF_MONTH_CALENDAR_SELECT,
   has_ambiguous_booking_profiles_embed,
   log_staff_booking_query_error,
   studio_day_window_bounds,
@@ -19,11 +20,20 @@ describe('staff booking query contract (post-migration 18)', () => {
     expect(BOOKINGS_CLIENT_PROFILE_EMBED).not.toMatch(/^profiles!inner/);
   });
 
-  it('history and day selects use the explicit client relationship', () => {
-    for (const select of [STAFF_BOOKING_HISTORY_SELECT, STAFF_DAY_BOOKINGS_SELECT]) {
+  it('history, day, and month-calendar selects use the explicit client relationship', () => {
+    for (const select of [
+      STAFF_BOOKING_HISTORY_SELECT,
+      STAFF_DAY_BOOKINGS_SELECT,
+      STAFF_MONTH_CALENDAR_SELECT,
+    ]) {
       expect(uses_explicit_booking_client_profile_embed(select)).toBe(true);
       expect(has_ambiguous_booking_profiles_embed(select)).toBe(false);
     }
+  });
+
+  it('month-calendar select includes user_id and omits instructor embed', () => {
+    expect(STAFF_MONTH_CALENDAR_SELECT).toContain('user_id');
+    expect(STAFF_MONTH_CALENDAR_SELECT).not.toContain('profiles!sessions_instructor_id_fkey');
   });
 
   it('day select keeps the disambiguated instructor embed and capacity', () => {
@@ -64,7 +74,7 @@ describe('staff booking action sources must not use ambiguous embeds', () => {
   it.each(files)('%s uses shared explicit client embed (no bare profiles!inner)', (relative) => {
     const source = readFileSync(resolve(process.cwd(), relative), 'utf8');
 
-    expect(source).toMatch(/STAFF_(BOOKING_HISTORY|DAY_BOOKINGS)_SELECT/);
+    expect(source).toMatch(/STAFF_(BOOKING_HISTORY|DAY_BOOKINGS|MONTH_CALENDAR)_SELECT/);
     expect(source).not.toMatch(/profiles!inner\s*\(/);
     expect(has_ambiguous_booking_profiles_embed(source)).toBe(false);
   });

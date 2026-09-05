@@ -46,6 +46,25 @@ export const STAFF_BOOKING_HISTORY_SELECT = `
 `;
 
 /**
+ * Staff month-calendar select — active-roster rows with client user_id for the
+ * independent Month Calendar / Day Detail view. Intentionally separate from
+ * STAFF_DAY_BOOKINGS_SELECT so the existing day page query stays unchanged.
+ */
+export const STAFF_MONTH_CALENDAR_SELECT = `
+  id,
+  status,
+  user_id,
+  session_id,
+  ${BOOKINGS_CLIENT_PROFILE_EMBED},
+  sessions!inner (
+    id,
+    starts_at,
+    session_type,
+    status
+  )
+`;
+
+/**
  * Staff day-bookings select — bookings joined to sessions with client + instructor.
  */
 export const STAFF_DAY_BOOKINGS_SELECT = `

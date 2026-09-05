@@ -1,9 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { STAFF_DAY_BOOKINGS_SELECT } from '@/features/bookings/staff-booking-queries';
+import {
+  STAFF_DAY_BOOKINGS_SELECT,
+  STAFF_MONTH_CALENDAR_SELECT,
+} from '@/features/bookings/staff-booking-queries';
 import { createClient } from '@/lib/supabase/server';
 
-import { list_day_bookings, list_week_day_bookings } from './actions';
+import { list_day_bookings, list_month_calendar, list_week_day_bookings } from './actions';
 
 vi.mock('@/lib/supabase/server', () => ({
   createClient: vi.fn(),
@@ -17,6 +20,7 @@ const maria_row = {
   booked_at: '2026-07-20T09:00:00.000Z',
   cancelled_at: null,
   session_id: 'session-30-jul',
+  user_id: 'user-maria',
   profiles: {
     full_name: 'MARIA ERAKLEOUS',
     email: 'mariaerakleous6@iclous.com',
@@ -238,6 +242,78 @@ describe('list_week_day_bookings', () => {
     expect(result.error).toBe('Unable to load bookings for this week. Please try again.');
     expect(result.overview.total_sessions).toBe(0);
     expect(console_error).toHaveBeenCalledWith(expect.stringContaining('list_week_day_bookings'));
+
+    console_error.mockRestore();
+  });
+});
+
+describe('list_month_calendar', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('queries the Monday-start month grid with the month-calendar select', async () => {
+    const supabase = staff_supabase();
+    create_client_mock.mockResolvedValue(supabase as never);
+
+    await list_month_calendar(2026, 7);
+
+    expect(supabase._select).toHaveBeenCalledWith(STAFF_MONTH_CALENDAR_SELECT);
+    expect(supabase._last_query.gte).toHaveBeenCalledWith(
+      'sessions.starts_at',
+      '2026-06-29T00:00:00',
+    );
+    expect(supabase._last_query.lte).toHaveBeenCalledWith(
+      'sessions.starts_at',
+      '2026-08-09T23:59:59',
+    );
+  });
+
+  it('counts Maria as an active Reformer booking and ignores hour filters', async () => {
+    create_client_mock.mockResolvedValue(staff_supabase() as never);
+
+    const result = await list_month_calendar(2026, 7);
+
+    expect(result.error).toBeNull();
+    const day = result.overview.days.find((entry) => entry.date_key === '2026-07-30');
+    expect(day?.counts.reformer).toBe(1);
+    expect(day?.total_active).toBe(1);
+    expect(result.overview.bookings[0]).toMatchObject({
+      id: maria_row.id,
+      user_id: 'user-maria',
+      kind: 'reformer',
+    });
+  });
+
+  it('omits cancelled bookings from month counts', async () => {
+    create_client_mock.mockResolvedValue(
+      staff_supabase({
+        bookings_data: [{ ...maria_row, id: 'cancelled-1', status: 'cancelled' }],
+      }) as never,
+    );
+
+    const result = await list_month_calendar(2026, 7);
+    const day = result.overview.days.find((entry) => entry.date_key === '2026-07-30');
+    expect(day?.total_active).toBe(0);
+    expect(result.overview.bookings).toEqual([]);
+  });
+
+  it('returns a friendly month error without leaking PostgREST details', async () => {
+    const console_error = vi.spyOn(console, 'error').mockImplementation(() => {});
+    create_client_mock.mockResolvedValue(
+      staff_supabase({
+        bookings_error: {
+          code: 'PGRST201',
+          message: 'Could not embed because more than one relationship was found',
+        },
+      }) as never,
+    );
+
+    const result = await list_month_calendar(2026, 7);
+
+    expect(result.error).toBe('Unable to load the month calendar. Please try again.');
+    expect(result.overview.bookings).toEqual([]);
+    expect(console_error).toHaveBeenCalledWith(expect.stringContaining('list_month_calendar'));
 
     console_error.mockRestore();
   });

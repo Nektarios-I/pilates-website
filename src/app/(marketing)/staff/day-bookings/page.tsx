@@ -3,10 +3,11 @@ import { redirect } from 'next/navigation';
 
 import { Container } from '@/components/ui/container';
 import { DEFAULT_DAY_BOOKINGS_FILTERS } from '@/features/bookings/day-bookings';
+import { current_studio_year_month } from '@/features/bookings/month-calendar';
 import { createPageMetadata } from '@/lib/metadata';
 import { createClient } from '@/lib/supabase/server';
 
-import { list_day_bookings, list_week_day_bookings } from './actions';
+import { list_day_bookings, list_month_calendar, list_week_day_bookings } from './actions';
 import { DayBookingsPanel } from './day-bookings-panel';
 
 export const metadata = createPageMetadata({
@@ -47,9 +48,11 @@ export default async function StaffDayBookingsPage() {
   const access = await resolve_page_access();
   if (!access.allowed) redirect('/account');
 
-  const [day_result, week_result] = await Promise.all([
+  const studio_month = current_studio_year_month();
+  const [day_result, week_result, month_result] = await Promise.all([
     list_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS),
     list_week_day_bookings(DEFAULT_DAY_BOOKINGS_FILTERS),
+    list_month_calendar(studio_month.year, studio_month.month),
   ]);
 
   return (
@@ -85,6 +88,8 @@ export default async function StaffDayBookingsPage() {
             initial_summary={day_result.summary}
             initial_week_error={week_result.error}
             initial_week_overview={week_result.overview}
+            initial_month_error={month_result.error}
+            initial_month_overview={month_result.overview}
           />
         </div>
       </div>
