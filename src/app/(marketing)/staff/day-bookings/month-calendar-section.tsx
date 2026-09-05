@@ -140,15 +140,17 @@ function SlotRow({
         has_bookings ? 'bg-surface' : 'bg-background/70',
       ].join(' ')}
       data-empty={!has_bookings}
-      data-hour={slot.time_label}
+      data-hour={String(slot.hour).padStart(2, '0')}
     >
       <div
         className={[
-          'sticky left-0 z-10 flex w-11 shrink-0 items-start justify-center border-r border-border/70 px-1 py-3 sm:w-12',
+          'sticky left-0 z-10 flex w-12 shrink-0 items-start justify-end border-r border-border/70 px-1 py-3 sm:w-16 sm:justify-center sm:px-2',
           has_bookings ? 'bg-surface' : 'bg-background',
         ].join(' ')}
       >
-        <span className="text-sm font-semibold tabular-nums text-foreground">{slot.time_label}</span>
+        <span className="whitespace-nowrap text-[11px] font-semibold tabular-nums text-foreground sm:text-sm">
+          {slot.time_label}
+        </span>
       </div>
       <div className="min-w-0 flex-1 py-2 pr-3">
         <p className="text-[11px] font-medium text-foreground/70">
@@ -458,7 +460,7 @@ export function DayDetailPopup({
         >
           {slots.map((slot) => (
             <SlotRow
-              key={slot.time_label}
+              key={slot.hour}
               slot={slot}
               on_select_booking={set_selected_booking}
             />
@@ -503,7 +505,7 @@ function DayCell({
       aria-current={day.is_today ? 'date' : undefined}
       aria-label={accessible_day_label(day)}
       className={[
-        'flex min-h-14 cursor-pointer touch-manipulation flex-col items-start gap-0.5 rounded-md border px-1 py-1.5 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-h-[5.5rem] sm:px-2 sm:py-2',
+        'flex min-h-12 min-w-0 cursor-pointer touch-manipulation flex-col items-start gap-0.5 overflow-hidden rounded-md border px-0.5 py-1 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-h-[5.5rem] sm:px-2 sm:py-2',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
         GRADE_CLASS[day.grade],
         day.is_today ? 'ring-1 ring-accent/50' : '',
@@ -514,20 +516,24 @@ function DayCell({
       type="button"
       onClick={() => on_select(day.date_key)}
     >
-      <span className="flex w-full items-center justify-between gap-1">
-        <span className="text-[10px] font-medium uppercase tracking-wide text-foreground/60">
+      <span className="flex w-full min-w-0 items-center justify-end gap-0.5 sm:justify-between">
+        <span className="hidden min-w-0 truncate text-[10px] font-medium uppercase tracking-wide text-foreground/60 sm:inline">
           {day.weekday_short}
         </span>
-        <span className="text-sm font-semibold tabular-nums text-foreground">{day.day_number}</span>
+        <span className="text-[11px] font-semibold tabular-nums leading-none text-foreground sm:text-sm">
+          {day.day_number}
+        </span>
       </span>
-      <span className="line-clamp-3 text-[9px] font-medium leading-tight text-foreground sm:hidden">
+      <span className="line-clamp-3 w-full min-w-0 overflow-hidden text-[8px] font-medium leading-[1.15] break-words text-foreground sm:hidden">
         {format_compact_type_counts_label(day.counts)}
       </span>
-      <span className="hidden line-clamp-2 text-[11px] font-medium leading-tight text-foreground sm:block">
+      <span className="hidden w-full min-w-0 overflow-hidden text-[11px] font-medium leading-tight text-foreground sm:line-clamp-2 sm:block">
         {format_type_counts_label(day.counts)}
       </span>
       {day.is_today ? (
-        <span className="text-[9px] font-medium uppercase tracking-wide text-accent">Today</span>
+        <span className="hidden text-[9px] font-medium uppercase tracking-wide text-accent sm:inline">
+          Today
+        </span>
       ) : null}
     </button>
   );
@@ -630,17 +636,17 @@ export function MonthCalendarSection({
         <MonthSkeleton />
       ) : (
         <div className="space-y-2">
-          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+          <div className="grid grid-cols-7 gap-0.5 sm:gap-1.5">
             {WEEKDAY_HEADERS.map((label) => (
               <p
-                className="text-center text-[10px] font-medium uppercase tracking-wide text-foreground/55"
+                className="min-w-0 truncate text-center text-[9px] font-medium uppercase tracking-wide text-foreground/55 sm:text-[10px]"
                 key={label}
               >
                 {label}
               </p>
             ))}
           </div>
-          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+          <div className="grid grid-cols-7 gap-0.5 sm:gap-1.5">
             {overview.days.map((day) => (
               <DayCell day={day} key={day.date_key} on_select={set_selected_date_key} />
             ))}

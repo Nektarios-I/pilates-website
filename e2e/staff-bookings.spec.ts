@@ -240,8 +240,9 @@ test.describe('staff booking pages after profiles FK disambiguation', () => {
 
     const dialog = page.getByRole('dialog').first();
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('00', { exact: true })).toBeVisible();
-    await expect(dialog.getByText('23', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('0:00', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('6:00', { exact: true })).toBeVisible();
+    await expect(dialog.getByText('23:00', { exact: true })).toBeVisible();
     await expect(page.getByLabel('Day')).toHaveValue(day_filter_before);
 
     const booking_box = dialog.getByRole('button').filter({ hasText: /Reformer|Mat/i }).first();

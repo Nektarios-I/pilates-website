@@ -8,6 +8,7 @@ import {
   empty_type_counts,
   format_compact_client_name,
   format_compact_type_counts_label,
+  format_hour_clock_label,
   format_slot_counts_label,
   format_type_counts_label,
   grade_session_density,
@@ -107,7 +108,16 @@ describe('format_compact_type_counts_label', () => {
         mat: 1,
       }),
     ).toBe('3R 1M');
-    expect(format_compact_type_counts_label(empty_type_counts())).toBe('No sessions');
+    expect(format_compact_type_counts_label(empty_type_counts())).toBe('None');
+  });
+});
+
+describe('format_hour_clock_label', () => {
+  it('renders 24-hour clock times with minutes', () => {
+    expect(format_hour_clock_label(0)).toBe('0:00');
+    expect(format_hour_clock_label(6)).toBe('6:00');
+    expect(format_hour_clock_label(7)).toBe('7:00');
+    expect(format_hour_clock_label(23)).toBe('23:00');
   });
 });
 
@@ -321,13 +331,13 @@ describe('build_day_hour_slots', () => {
     });
 
     expect(slots).toHaveLength(24);
-    expect(slots[0]?.time_label).toBe('00');
-    expect(slots[23]?.time_label).toBe('23');
+    expect(slots[0]?.time_label).toBe('0:00');
+    expect(slots[23]?.time_label).toBe('23:00');
     expect(slots[0]?.counts).toEqual(empty_type_counts());
     expect(format_slot_counts_label(slots[0]!.counts)).toBe('0 Reformer, 0 Mat');
 
     const six = slots[6];
-    expect(six?.time_label).toBe('06');
+    expect(six?.time_label).toBe('6:00');
     expect(six?.counts).toEqual({
       reformer: 1,
       mat: 1,

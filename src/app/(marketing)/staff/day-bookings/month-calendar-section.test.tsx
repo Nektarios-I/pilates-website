@@ -180,8 +180,9 @@ describe('MonthCalendarSection', () => {
     fireEvent.click(screen.getByRole('button', { name: '5 September, 1 Reformer, 1 Mat' }));
 
     const dialog = await screen.findByRole('dialog', { name: /5 September 2026/i });
-    expect(within(dialog).getByText('00')).toBeInTheDocument();
-    expect(within(dialog).getByText('23')).toBeInTheDocument();
+    expect(within(dialog).getByText('0:00')).toBeInTheDocument();
+    expect(within(dialog).getByText('6:00')).toBeInTheDocument();
+    expect(within(dialog).getByText('23:00')).toBeInTheDocument();
     expect(within(dialog).getAllByText('0 Reformer, 0 Mat').length).toBeGreaterThan(0);
 
     const six = dialog.querySelector('[data-hour="06"]');

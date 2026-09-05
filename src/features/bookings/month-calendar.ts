@@ -132,13 +132,17 @@ export function format_type_counts_label(counts: TypeCounts): string {
 /** Compact counts for narrow month cells. Screen-reader labels stay verbose. */
 export function format_compact_type_counts_label(counts: TypeCounts): string {
   const total = counts.reformer + counts.mat + counts.private + counts.intro + counts.other;
-  if (total === 0) return 'No sessions';
+  if (total === 0) return 'None';
 
   const parts = [`${counts.reformer}R`, `${counts.mat}M`];
   if (counts.private > 0) parts.push(`${counts.private}P`);
   if (counts.intro > 0) parts.push(`${counts.intro}I`);
   if (counts.other > 0) parts.push(`${counts.other}O`);
   return parts.join(' ');
+}
+
+export function format_hour_clock_label(hour: number): string {
+  return `${hour}:00`;
 }
 
 export function format_slot_counts_label(counts: TypeCounts): string {
@@ -307,7 +311,7 @@ export function build_day_hour_slots(options: {
 
     return {
       hour,
-      time_label: String(hour).padStart(2, '0'),
+      time_label: format_hour_clock_label(hour),
       counts,
       reformer,
       mat,
