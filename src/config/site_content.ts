@@ -209,7 +209,7 @@ export const site_content = {
     google_maps_url: 'https://maps.app.goo.gl/foVSeBbNCW9pTwVj7',
     hours: {
       weekday: 'Mon–Fri: 6:00–12:00 & 15:00–20:00',
-      saturday: 'Sat: 7:00–11:00',
+      saturday: 'Sat: 7:00–12:00',
       sunday: 'Closed',
       note: '',
     },

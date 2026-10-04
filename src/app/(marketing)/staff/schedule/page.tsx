@@ -58,7 +58,7 @@ export default async function StudioSchedulePage() {
           </h1>
           <p className="mt-3 text-base leading-7 text-foreground/70">
             Choose a day and set open hours and breaks. Defaults are Mon–Fri 6:00–12:00 & 15:00–20:00,
-            Sat 7:00–11:00, Sun closed.
+            Sat 7:00–12:00, Sun closed.
           </p>
         </div>
 

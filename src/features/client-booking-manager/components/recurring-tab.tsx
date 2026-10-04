@@ -438,7 +438,7 @@ function RuleCard({
             <h3 className="text-sm font-semibold text-foreground">Weekly slots</h3>
             <p className="mt-1 text-xs text-foreground/60">
               Recurring bookings repeat each week at the selected studio slot. Times follow default
-              studio hours (Mon–Fri 06:00–12:00 &amp; 15:00–20:00, Sat 07:00–11:00).
+              studio hours (Mon–Fri 06:00–12:00 &amp; 15:00–20:00, Sat 07:00–12:00).
             </p>
             {active_lines.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No weekly slots added yet.</p>

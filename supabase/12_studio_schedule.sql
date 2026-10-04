@@ -8,7 +8,7 @@
 -- ---------------------------------------------------------------------------
 -- TABLE: studio_day_schedule
 -- Per-calendar-day working hours. When no row exists, app defaults apply:
---   Mon–Fri 06:00–12:00 & 15:00–20:00, Sat 07:00–11:00, Sun closed.
+--   Mon–Fri 06:00–12:00 & 15:00–20:00, Sat 07:00–12:00, Sun closed.
 -- ---------------------------------------------------------------------------
 create table if not exists public.studio_day_schedule (
   schedule_date date        primary key,
@@ -52,7 +52,7 @@ begin
     );
   elsif v_dow = 6 then
     return jsonb_build_array(
-      jsonb_build_object('start', '07:00', 'end', '11:00')
+      jsonb_build_object('start', '07:00', 'end', '12:00')
     );
   else
     return '[]'::jsonb;

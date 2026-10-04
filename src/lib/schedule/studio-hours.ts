@@ -63,7 +63,7 @@ export function get_default_weekly_ranges(date: Date): TimeRange[] {
   }
 
   if (day === 6) {
-    return [{ start: '07:00', end: '11:00' }];
+    return [{ start: '07:00', end: '12:00' }];
   }
 
   return [];

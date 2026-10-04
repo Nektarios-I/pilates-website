@@ -35,7 +35,9 @@ describe('recurring-weekly-slot-options', () => {
       '08:00',
       '09:00',
       '10:00',
+      '11:00',
     ]);
+    expect(saturday?.slots.at(-1)?.end_time).toBe('12:00');
     expect(sunday?.is_closed).toBe(true);
     expect(sunday?.slots).toEqual([]);
   });
@@ -44,5 +46,8 @@ describe('recurring-weekly-slot-options', () => {
     expect(is_valid_recurring_weekly_slot(3, '18:00', 60)).toBe(true);
     expect(is_valid_recurring_weekly_slot(3, '13:00', 60)).toBe(false);
     expect(is_valid_recurring_weekly_slot(7, '09:00', 60)).toBe(false);
+    expect(is_valid_recurring_weekly_slot(6, '08:00', 60)).toBe(true);
+    expect(is_valid_recurring_weekly_slot(6, '11:00', 60)).toBe(true);
+    expect(is_valid_recurring_weekly_slot(6, '12:00', 60)).toBe(false);
   });
 });
