@@ -290,19 +290,6 @@ export function ClientDayPopup({
           {loading ? <p className="text-sm text-foreground/60">Loading client details…</p> : null}
           {error ? <p className="text-sm text-destructive">{error}</p> : null}
           {notice ? <p className="text-sm text-foreground">{notice}</p> : null}
-          {confirm ? (
-            <div className="rounded-md border border-border p-3 text-sm">
-              <p>
-                {confirm.kind === 'cancel'
-                  ? `Cancel ${name}'s ${confirm.booking.session_title} on ${format_session_datetime(confirm.booking.session_starts_at)}? Current cancellation rules will apply.`
-                  : `Mark ${confirm.booking.session_title} on ${format_session_datetime(confirm.booking.session_starts_at)} as Not attended? The original package will not be changed. One replacement credit will be issued.`}
-              </p>
-              <div className="mt-3 flex gap-2">
-                <Button disabled={is_pending} size="sm" type="button" onClick={run_confirmed}>{is_pending ? 'Working…' : 'Confirm'}</Button>
-                <Button disabled={is_pending} size="sm" type="button" variant="secondary" onClick={() => set_confirm(null)}>Back</Button>
-              </div>
-            </div>
-          ) : null}
           {tab === 'bookings' ? (
             <div className="space-y-3" role="tabpanel">
               <Group count={groups.in_progress.length} open title="In progress">{render_page(groups.in_progress, 'history')}</Group>
@@ -362,6 +349,47 @@ export function ClientDayPopup({
           ) : null}
         </div>
       </div>
+      {confirm ? (
+        <div
+          aria-labelledby="confirm-action-title"
+          aria-modal="true"
+          className="fixed inset-0 z-[70] flex items-center justify-center p-4"
+          role="dialog"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              event.stopPropagation();
+              if (!is_pending) set_confirm(null);
+            }
+          }}
+        >
+          <button
+            aria-label="Dismiss confirmation"
+            className="absolute inset-0 bg-inverse/50"
+            disabled={is_pending}
+            type="button"
+            onClick={() => set_confirm(null)}
+          />
+          <div className="relative w-full max-w-sm rounded-lg border border-border bg-background p-4 shadow-lg">
+            <h4 className="text-base font-semibold text-foreground" id="confirm-action-title">
+              {confirm.kind === 'cancel' ? 'Cancel booking?' : 'Mark not attended?'}
+            </h4>
+            <p className="mt-2 text-sm text-foreground/80">
+              {confirm.kind === 'cancel'
+                ? `Cancel ${name}'s ${confirm.booking.session_title} on ${format_session_datetime(confirm.booking.session_starts_at)}? Current cancellation rules will apply.`
+                : `Mark ${confirm.booking.session_title} on ${format_session_datetime(confirm.booking.session_starts_at)} as Not attended? The original package will not be changed. One replacement credit will be issued.`}
+            </p>
+            <div className="mt-4 flex justify-end gap-2">
+              <Button disabled={is_pending} size="sm" type="button" variant="secondary" onClick={() => set_confirm(null)}>
+                Cancel
+              </Button>
+              <Button disabled={is_pending} size="sm" type="button" onClick={run_confirmed}>
+                {is_pending ? 'Working…' : 'Confirm'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
