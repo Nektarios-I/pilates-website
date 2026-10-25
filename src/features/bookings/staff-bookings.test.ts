@@ -128,6 +128,7 @@ describe('staff booking helpers', () => {
 
   it('format_booking_status humanizes values', () => {
     expect(format_booking_status('no_show')).toBe('No Show');
+    expect(format_booking_status('not_attended')).toBe('Not Attended');
     expect(format_booking_status('waitlisted')).toBe('Waitlisted');
     expect(format_booking_status('finished')).toBe('Finished');
   });

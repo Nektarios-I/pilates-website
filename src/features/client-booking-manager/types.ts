@@ -17,6 +17,7 @@ export type ClientBookingRecord = {
   session_starts_at: string;
   session_ends_at: string;
   session_type: string;
+  session_status: string;
   credit_charges: { class_type: string; credits_used: number }[];
 };
 
@@ -100,11 +101,26 @@ export type MaterializationAttentionRow = {
   last_attempted_at: string | null;
 };
 
+export type ClientMembershipRecord = {
+  user_package_id: string;
+  package_name: string;
+  class_type: string;
+  credits_remaining: number | null;
+  expires_at: string | null;
+  status: string;
+  purchased_at: string;
+  is_replacement: boolean;
+  replacement_source_booking_id: string | null;
+};
+
 export type ClientDashboardData = {
   packages: ClientActivePackage[];
+  memberships?: ClientMembershipRecord[];
   bookings: ClientBookingRecord[];
   recurring_rules: RecurringPrebookRule[];
   attention: MaterializationAttentionRow[];
+  client_name?: string | null;
+  client_phone?: string | null;
 };
 
 export type MaterializableOccurrence = {

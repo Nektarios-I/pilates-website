@@ -295,7 +295,9 @@ describe('list_month_calendar', () => {
     const result = await list_month_calendar(2026, 7);
     const day = result.overview.days.find((entry) => entry.date_key === '2026-07-30');
     expect(day?.total_active).toBe(0);
-    expect(result.overview.bookings).toEqual([]);
+    expect(result.overview.bookings).toEqual([
+      expect.objectContaining({ id: 'cancelled-1', counts_as_active: false, status: 'cancelled' }),
+    ]);
   });
 
   it('returns a friendly month error without leaking PostgREST details', async () => {

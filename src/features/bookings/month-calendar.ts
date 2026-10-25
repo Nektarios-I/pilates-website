@@ -27,6 +27,8 @@ export type MonthCalendarBooking = {
   starts_at: string;
   date_key: string;
   hour: number;
+  status: string;
+  counts_as_active: boolean;
 };
 
 export type MonthCalendarSlotBooking = {
@@ -35,6 +37,9 @@ export type MonthCalendarSlotBooking = {
   compact_name: string;
   session_type_label: string;
   kind: MonthCalendarKind;
+  status: string;
+  counts_as_active: boolean;
+  full_name: string;
 };
 
 export type MonthCalendarHourSlot = {
@@ -201,8 +206,10 @@ function increment_count(counts: TypeCounts, kind: MonthCalendarKind): void {
 }
 
 export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalendarBooking | null {
-  if (!row.user_id) return null;
-  if (!is_active_booking_status(row.status)) return null;
+  const counts_as_active = is_active_booking_status(row.status);
+  const visible =
+    counts_as_active || ['cancelled', 'not_attended', 'no_show'].includes(row.status);
+  if (!row.user_id || !visible) return null;
 
   const session = related_row(row.sessions);
   if (!session) return null;
@@ -221,6 +228,8 @@ export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalen
     starts_at: session.starts_at,
     date_key: studio_date_key(new Date(session.starts_at)),
     hour: Number.isFinite(hour) ? hour : 0,
+    status: row.status,
+    counts_as_active,
   };
 }
 
@@ -235,6 +244,7 @@ export function build_month_calendar_days(options: {
   const by_day = new Map<string, TypeCounts>();
 
   for (const item of options.bookings) {
+    if (!item.counts_as_active) continue;
     const current = by_day.get(item.date_key) ?? empty_type_counts();
     increment_count(current, item.kind);
     by_day.set(item.date_key, current);
@@ -281,6 +291,9 @@ function to_slot_booking(item: MonthCalendarBooking): MonthCalendarSlotBooking {
     compact_name: format_compact_client_name(item.client_name),
     session_type_label: format_session_type(item.session_type),
     kind: item.kind,
+    status: item.status,
+    counts_as_active: item.counts_as_active,
+    full_name: item.client_name,
   };
 }
 
@@ -300,7 +313,7 @@ export function build_day_hour_slots(options: {
     const other_bookings: MonthCalendarSlotBooking[] = [];
 
     for (const item of hour_bookings) {
-      increment_count(counts, item.kind);
+      if (item.counts_as_active) increment_count(counts, item.kind);
       const slot_booking = to_slot_booking(item);
       if (item.kind === 'reformer') reformer.push(slot_booking);
       else if (item.kind === 'mat') mat.push(slot_booking);

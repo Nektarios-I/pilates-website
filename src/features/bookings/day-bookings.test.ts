@@ -33,6 +33,8 @@ describe('day booking helpers', () => {
     expect(is_active_booking_status('finished')).toBe(true);
     expect(is_cancelled_booking_status('cancelled')).toBe(true);
     expect(is_cancelled_booking_status('no_show')).toBe(true);
+    expect(is_active_booking_status('not_attended')).toBe(false);
+    expect(is_cancelled_booking_status('not_attended')).toBe(false);
   });
 
   it('map_day_booking_attendee normalizes joined profile rows', () => {

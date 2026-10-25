@@ -29,6 +29,8 @@ function booking(
     kind: 'reformer',
     date_key: '2026-09-05',
     hour: 6,
+    status: 'booked',
+    counts_as_active: true,
     ...partial,
   };
 }
@@ -186,7 +188,7 @@ describe('map_month_calendar_booking', () => {
     });
   });
 
-  it('drops cancelled bookings', () => {
+  it('keeps cancelled bookings out of active counts', () => {
     expect(
       map_month_calendar_booking({
         id: 'b2',
@@ -198,7 +200,7 @@ describe('map_month_calendar_booking', () => {
           session_type: 'mat',
         },
       }),
-    ).toBeNull();
+    ).toMatchObject({ id: 'b2', status: 'cancelled', counts_as_active: false });
   });
 });
 

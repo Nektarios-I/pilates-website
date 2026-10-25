@@ -5,6 +5,7 @@ export const BOOKING_STATUSES = [
   'attended',
   'no_show',
   'finished',
+  'not_attended',
 ] as const;
 
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];

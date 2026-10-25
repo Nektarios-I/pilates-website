@@ -23,7 +23,7 @@ export const metadata = createPageMetadata({
 });
 
 type PageProps = {
-  searchParams: Promise<{ client?: string; tab?: string }>;
+  searchParams: Promise<{ client?: string; tab?: string; return_to?: string }>;
 };
 
 async function resolve_page_access(): Promise<{ allowed: boolean }> {
@@ -55,6 +55,7 @@ export default async function StaffClientBookingsPage({ searchParams }: PageProp
 
   const params = await searchParams;
   const initial_client_id = params.client ?? '';
+  const return_href = params.return_to === '/staff/day-bookings' ? '/staff/day-bookings' : '/account';
   const [clients, session_cards, initial_dashboard] = await Promise.all([
     load_manager_clients(),
     load_manager_session_cards(),
@@ -67,9 +68,9 @@ export default async function StaffClientBookingsPage({ searchParams }: PageProp
         <div className="mb-6">
           <Link
             className="inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-foreground/70 hover:text-foreground"
-            href="/account"
+            href={return_href}
           >
-            Back to account
+            {return_href === '/staff/day-bookings' ? 'Back to day bookings' : 'Back to account'}
           </Link>
         </div>
 

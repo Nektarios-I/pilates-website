@@ -19,6 +19,7 @@ function booking(
     session_title: 'Reformer Flow',
     session_ends_at: '2026-07-10T11:00:00.000Z',
     session_type: 'reformer',
+    session_status: 'scheduled',
     credit_charges: [],
     ...overrides,
   };
@@ -27,9 +28,24 @@ function booking(
 describe('filter_client_bookings', () => {
   const now = new Date('2026-07-10T12:00:00.000Z').getTime();
   const rows = [
-    booking({ id: '1', status: 'booked', session_starts_at: '2026-07-11T10:00:00.000Z' }),
-    booking({ id: '2', status: 'waitlisted', session_starts_at: '2026-07-12T10:00:00.000Z' }),
-    booking({ id: '3', status: 'booked', session_starts_at: '2026-07-09T10:00:00.000Z' }),
+    booking({
+      id: '1',
+      status: 'booked',
+      session_starts_at: '2026-07-11T10:00:00.000Z',
+      session_ends_at: '2026-07-11T11:00:00.000Z',
+    }),
+    booking({
+      id: '2',
+      status: 'waitlisted',
+      session_starts_at: '2026-07-12T10:00:00.000Z',
+      session_ends_at: '2026-07-12T11:00:00.000Z',
+    }),
+    booking({
+      id: '3',
+      status: 'finished',
+      session_starts_at: '2026-07-09T10:00:00.000Z',
+      session_ends_at: '2026-07-09T11:00:00.000Z',
+    }),
     booking({ id: '4', status: 'cancelled', session_starts_at: '2026-07-13T10:00:00.000Z' }),
   ];
 

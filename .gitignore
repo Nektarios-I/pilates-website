@@ -39,6 +39,9 @@ yarn-error.log*
 # vercel
 .vercel
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# recovery exports — never commit database dumps or personal data
+/backups/
+/recovery-exports/
+scripts/recovery/*.sql
+scripts/recovery/*.dump
+*.backup.sql

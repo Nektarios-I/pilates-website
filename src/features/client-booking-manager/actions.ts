@@ -89,12 +89,14 @@ function map_client_booking(row: {
     starts_at: string;
     ends_at: string;
     session_type: string;
+    status?: string;
   } | {
     id: string;
     title: string;
     starts_at: string;
     ends_at: string;
     session_type: string;
+    status?: string;
   }[] | null;
   booking_credit_charges: { class_type: string; credits_used: number }[] | null;
 }): ClientBookingRecord | null {
@@ -114,6 +116,7 @@ function map_client_booking(row: {
     session_starts_at: session.starts_at,
     session_ends_at: session.ends_at,
     session_type: session.session_type,
+    session_status: session.status ?? 'scheduled',
     credit_charges: row.booking_credit_charges ?? [],
   };
 }
@@ -134,6 +137,8 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
     bookings: [],
     recurring_rules: [],
     attention: [],
+    client_name: null,
+    client_phone: null,
   };
 
   const caller = await resolve_caller_staff();
@@ -141,7 +146,7 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
 
   const supabase = await createClient();
 
-  const [packages_result, bookings_result, rules_result, attention_result] = await Promise.all([
+  const [packages_result, bookings_result, rules_result, attention_result, profile_result] = await Promise.all([
     supabase.rpc('get_active_packages', { p_user_id: client_user_id }),
     supabase
       .from('bookings')
@@ -159,7 +164,8 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
           title,
           starts_at,
           ends_at,
-          session_type
+          session_type,
+          status
         ),
         booking_credit_charges (
           class_type,
@@ -169,9 +175,10 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
       )
       .eq('user_id', client_user_id)
       .order('booked_at', { ascending: false })
-      .limit(120),
+      .limit(400),
     supabase.rpc('list_recurring_prebook_rules', { p_client_user_id: client_user_id }),
     supabase.rpc('list_recurring_prebook_attention', { p_client_user_id: client_user_id }),
+    supabase.from('profiles').select('full_name, phone').eq('id', client_user_id).maybeSingle(),
   ]);
 
   const packages = ((packages_result.data ?? []) as ClientActivePackage[]).map((row) => ({
@@ -182,6 +189,39 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
     credits_remaining: row.credits_remaining,
     expires_at: row.expires_at,
   }));
+
+  const { data: membership_rows } = await supabase
+    .from('user_packages')
+    .select(
+      'id, purchased_at, credits_remaining, expires_at, status, replacement_source_booking_id, packages(name, class_type, is_replacement)',
+    )
+    .eq('user_id', client_user_id);
+
+  const memberships = ((membership_rows ?? []) as {
+    id: string;
+    purchased_at: string;
+    credits_remaining: number | null;
+    expires_at: string | null;
+    status: string;
+    replacement_source_booking_id: string | null;
+    packages:
+      | { name: string; class_type: string; is_replacement?: boolean }
+      | { name: string; class_type: string; is_replacement?: boolean }[]
+      | null;
+  }[]).map((row) => {
+    const catalog = Array.isArray(row.packages) ? row.packages[0] : row.packages;
+    return {
+      user_package_id: row.id,
+      package_name: catalog?.name ?? 'Package',
+      class_type: catalog?.class_type ?? 'reformer',
+      credits_remaining: row.credits_remaining,
+      expires_at: row.expires_at,
+      status: row.status,
+      purchased_at: row.purchased_at,
+      is_replacement: catalog?.is_replacement === true || row.replacement_source_booking_id !== null,
+      replacement_source_booking_id: row.replacement_source_booking_id,
+    };
+  });
 
   const bookings = (bookings_result.data ?? [])
     .map((row) => map_client_booking(row))
@@ -216,7 +256,15 @@ export async function load_client_dashboard(client_user_id: string): Promise<Cli
     last_attempted_at: row.last_attempted_at,
   }));
 
-  return { packages, bookings, recurring_rules: rules_with_forecast, attention };
+  return {
+    packages,
+    memberships,
+    bookings,
+    recurring_rules: rules_with_forecast,
+    attention,
+    client_name: profile_result.data?.full_name ?? null,
+    client_phone: profile_result.data?.phone ?? null,
+  };
 }
 
 async function enrich_recurring_rules(
@@ -376,6 +424,24 @@ export async function staff_manual_book_slot(
     reformer_package_id,
     mat_package_id,
   );
+}
+
+export async function staff_mark_booking_not_attended(booking_id: string): Promise<ActionResult> {
+  const caller = await resolve_caller_staff();
+  if (!caller) return { success: false, error: 'You must be signed in as staff.' };
+
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('mark_booking_not_attended', {
+    p_booking_id: booking_id,
+  });
+
+  if (error) {
+    return { success: false, error: map_staff_rpc_error(error.message) };
+  }
+
+  revalidatePath(MANAGER_PATH);
+  revalidatePath('/staff/day-bookings');
+  return { success: true };
 }
 
 export async function staff_cancel_client_booking(booking_id: string): Promise<ActionResult> {

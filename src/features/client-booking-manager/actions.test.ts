@@ -10,6 +10,7 @@ import {
   staff_manual_book_session,
   staff_manual_book_slot,
 } from '@/features/client-booking-manager/actions';
+import { studio_date_key } from '@/lib/schedule/studio-hours';
 
 const { create_client_mock, revalidate_path_mock } = vi.hoisted(() => ({
   create_client_mock: vi.fn(),
@@ -61,11 +62,22 @@ function staff_supabase(options?: {
 
     return {
       select: vi.fn(() => ({
-        eq: vi.fn(() => ({
-          order: vi.fn(() => ({
-            limit: vi.fn(async () => ({ data: [], error: null })),
-          })),
-        })),
+        eq: vi.fn(() => {
+          const result = { data: [], error: null };
+          const chain = {
+            order: vi.fn(() => chain),
+            limit: vi.fn(async () => result),
+            maybeSingle: vi.fn(async () => ({
+              data: { full_name: 'Alex Client', phone: null },
+              error: null,
+            })),
+            then: (
+              on_fulfilled: (value: { data: unknown[]; error: null }) => unknown,
+              on_rejected?: (reason: unknown) => unknown,
+            ) => Promise.resolve(result).then(on_fulfilled, on_rejected),
+          };
+          return chain;
+        }),
         in: vi.fn(async () => ({ data: [], error: null })),
       })),
     };
@@ -218,7 +230,7 @@ describe('client booking manager actions', () => {
 
     const result = await staff_manual_book_slot(
       'client-1',
-      '2026-08-20',
+      studio_date_key(new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)),
       '09:00',
       '10:00',
       'card-1',

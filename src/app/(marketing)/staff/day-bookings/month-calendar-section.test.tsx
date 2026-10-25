@@ -30,6 +30,8 @@ const overview = build_month_calendar_overview({
       starts_at: '2026-09-05T03:00:00.000Z',
       date_key: '2026-09-05',
       hour: 6,
+      status: 'booked',
+      counts_as_active: true,
     },
     {
       id: 'b-mat',
@@ -40,6 +42,8 @@ const overview = build_month_calendar_overview({
       starts_at: '2026-09-05T03:05:00.000Z',
       date_key: '2026-09-05',
       hour: 6,
+      status: 'booked',
+      counts_as_active: true,
     },
   ],
 });
@@ -69,6 +73,7 @@ const dashboard: ClientDashboardData = {
       session_starts_at: '2026-09-05T03:00:00.000Z',
       session_ends_at: '2026-09-05T04:00:00.000Z',
       session_type: 'reformer',
+      session_status: 'scheduled',
       credit_charges: [],
     },
     {
@@ -84,6 +89,7 @@ const dashboard: ClientDashboardData = {
       session_starts_at: '2027-09-14T03:00:00.000Z',
       session_ends_at: '2027-09-14T04:00:00.000Z',
       session_type: 'mat',
+      session_status: 'scheduled',
       credit_charges: [],
     },
   ],
@@ -102,6 +108,9 @@ describe('BookingBox', () => {
           compact_name: 'Maria Pap',
           session_type_label: 'Reformer',
           kind: 'reformer',
+          status: 'booked',
+          counts_as_active: true,
+          full_name: 'Maria Papadou',
         }}
         on_select={on_select}
       />,
@@ -210,12 +219,14 @@ describe('MonthCalendarSection', () => {
     fireEvent.click(screen.getByRole('button', { name: '5 September, 1 Reformer, 1 Mat' }));
     fireEvent.click(await screen.findByRole('button', { name: /Maria Pap/i }));
 
-    expect(await screen.findByRole('heading', { name: 'Maria Pap' })).toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Maria Papadou' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('tab', { name: 'Memberships' }));
     expect(await screen.findByText('10 Pack')).toBeInTheDocument();
     expect(screen.getByText('4 credits remaining')).toBeInTheDocument();
-    expect(screen.getByText('Monday Mat')).toBeInTheDocument();
-    expect(screen.queryByText('Saturday Reformer')).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /cancel|edit/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Add booking' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('client=user-maria'),
+    );
     expect(screen.getByRole('button', { name: 'Close client details' })).toBeInTheDocument();
   });
 });

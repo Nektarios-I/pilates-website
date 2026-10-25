@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useId, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
@@ -19,10 +19,7 @@ import {
   type MonthCalendarOverview,
   type MonthCalendarSlotBooking,
 } from '@/features/bookings/month-calendar';
-import { load_client_dashboard } from '@/features/client-booking-manager/actions';
-import { filter_client_bookings } from '@/features/client-booking-manager/booking-filters';
-import { format_session_datetime } from '@/features/client-booking-manager/format';
-import type { ClientDashboardData } from '@/features/client-booking-manager/types';
+import { ClientDayPopup } from '@/app/(marketing)/staff/day-bookings/client-day-popup';
 
 const MONTH_OPTIONS = [
   { value: 1, label: 'January' },
@@ -118,6 +115,7 @@ export function BookingBox({
       <span className="block truncate text-sm font-medium text-foreground">{booking.compact_name}</span>
       <span className="mt-0.5 block text-[11px] uppercase tracking-wide text-foreground/70">
         {booking.session_type_label}
+        {booking.counts_as_active ? '' : ` · ${booking.status.replaceAll('_', ' ')}`}
       </span>
     </button>
   );
@@ -196,173 +194,6 @@ function SlotRow({
         </div>
       </div>
     </div>
-  );
-}
-
-function BookingClientDetailPopup({
-  booking,
-  on_close,
-}: {
-  booking: MonthCalendarSlotBooking;
-  on_close: () => void;
-}) {
-  const title_id = useId();
-  const dialog_ref = useRef<HTMLDivElement>(null);
-  const [dashboard, set_dashboard] = useState<ClientDashboardData | null>(null);
-  const [error, set_error] = useState<string | null>(null);
-  const [loading, set_loading] = useState(true);
-
-  useEffect(() => {
-    const root = dialog_ref.current;
-    if (!root) return;
-    const previously = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const items = focusable_elements(root);
-    const initial = items.find((element) => element.dataset.dialogInitialFocus === 'true') ?? items[0];
-    initial?.focus();
-    return () => {
-      previously?.focus();
-    };
-  }, []);
-
-  useEffect(() => {
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-
-    function on_keydown(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        on_close();
-      }
-    }
-
-    document.addEventListener('keydown', on_keydown, true);
-    return () => {
-      document.body.style.overflow = previous;
-      document.removeEventListener('keydown', on_keydown, true);
-    };
-  }, [on_close]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    void load_client_dashboard(booking.user_id)
-      .then((data) => {
-        if (cancelled) return;
-        set_dashboard(data);
-        set_loading(false);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        set_error('Unable to load client details.');
-        set_loading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [booking.user_id]);
-
-  const upcoming = dashboard ? filter_client_bookings(dashboard.bookings, 'upcoming') : [];
-  const finished = dashboard ? filter_client_bookings(dashboard.bookings, 'finished') : [];
-  const other_bookings = [...upcoming, ...finished].filter((item) => item.id !== booking.id);
-
-  if (typeof document === 'undefined') return null;
-
-  return createPortal(
-    <div
-      aria-labelledby={title_id}
-      aria-modal="true"
-      className="fixed inset-0 z-[60] flex items-end justify-center bg-inverse/40 p-0 sm:items-center sm:p-4"
-      role="dialog"
-      onKeyDown={trap_dialog_tab}
-    >
-      <button
-        aria-label="Close client details backdrop"
-        className="absolute inset-0 cursor-default"
-        tabIndex={-1}
-        type="button"
-        onClick={on_close}
-      />
-      <div
-        className="relative flex max-h-[96vh] w-full max-w-lg flex-col overscroll-contain rounded-t-lg border border-border bg-background shadow-lg sm:max-h-[92vh] sm:rounded-lg"
-        ref={dialog_ref}
-      >
-        <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-4">
-          <div>
-            <h3 className="text-base font-semibold text-foreground" id={title_id}>
-              {booking.compact_name}
-            </h3>
-            <p className="mt-0.5 text-sm text-foreground/70">{booking.session_type_label}</p>
-          </div>
-          <Button
-            aria-label="Close client details"
-            data-dialog-initial-focus="true"
-            size="sm"
-            type="button"
-            variant="secondary"
-            onClick={on_close}
-          >
-            Close
-          </Button>
-        </div>
-        <div className="min-h-0 flex-1 space-y-5 overflow-y-auto px-4 py-4">
-          {loading ? <p className="text-sm text-foreground/60">Loading client details…</p> : null}
-          {error ? <p className="text-sm text-destructive">{error}</p> : null}
-          {dashboard ? (
-            <>
-              <section>
-                <h4 className="text-sm font-semibold text-foreground">Memberships</h4>
-                {dashboard.packages.length === 0 ? (
-                  <p className="mt-2 text-sm text-foreground/60">No active memberships.</p>
-                ) : (
-                  <ul className="mt-2 space-y-2">
-                    {dashboard.packages.map((pkg) => (
-                      <li
-                        className="rounded-md border border-border px-3 py-2 text-sm"
-                        key={pkg.user_package_id}
-                      >
-                        <p className="font-medium text-foreground">{pkg.package_name}</p>
-                        <p className="mt-0.5 text-xs text-foreground/65">
-                          {pkg.class_type} · {pkg.package_type}
-                        </p>
-                        <p className="mt-1 text-sm text-foreground/80">
-                          {pkg.credits_remaining === null
-                            ? 'Unlimited credits'
-                            : `${pkg.credits_remaining} credits remaining`}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-              <section>
-                <h4 className="text-sm font-semibold text-foreground">Other bookings</h4>
-                {other_bookings.length === 0 ? (
-                  <p className="mt-2 text-sm text-foreground/60">No other bookings.</p>
-                ) : (
-                  <ul className="mt-2 space-y-2">
-                    {other_bookings.slice(0, 12).map((item) => (
-                      <li
-                        className="rounded-md border border-border/70 px-3 py-2 text-sm text-foreground/80"
-                        key={item.id}
-                      >
-                        <p className="font-medium text-foreground">{item.session_title}</p>
-                        <p className="mt-0.5">{format_session_datetime(item.session_starts_at)}</p>
-                        <p className="mt-0.5 text-xs uppercase tracking-wide text-foreground/60">
-                          {item.status} · {item.session_type}
-                        </p>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </section>
-            </>
-          ) : null}
-        </div>
-      </div>
-    </div>,
-    document.body,
   );
 }
 
@@ -468,7 +299,7 @@ export function DayDetailPopup({
         </div>
       </div>
       {selected_booking ? (
-        <BookingClientDetailPopup
+        <ClientDayPopup
           booking={selected_booking}
           key={selected_booking.id}
           on_close={() => set_selected_booking(null)}

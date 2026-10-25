@@ -24,6 +24,7 @@ const upcoming_booking = {
   session_starts_at: '2026-12-01T10:00:00.000Z',
   session_ends_at: '2026-12-01T11:00:00.000Z',
   session_type: 'reformer',
+  session_status: 'scheduled',
   credit_charges: [{ class_type: 'reformer', credits_used: 1 }],
 };
 

@@ -1,28 +1,29 @@
+import { group_client_booking } from '@/features/bookings/not-attended';
 import type { ClientBookingRecord } from './types';
 
-export type ClientBookingFilter = 'upcoming' | 'cancelled' | 'finished';
+export type ClientBookingFilter =
+  | 'upcoming'
+  | 'in_progress'
+  | 'finished'
+  | 'cancelled'
+  | 'no_show'
+  | 'not_attended';
 
 export function filter_client_bookings(
   bookings: ClientBookingRecord[],
   filter: ClientBookingFilter,
   now = Date.now(),
 ): ClientBookingRecord[] {
-  if (filter === 'cancelled') {
-    return bookings.filter((booking) => booking.status === 'cancelled');
-  }
-
-  if (filter === 'finished') {
-    return bookings.filter((booking) => {
-      if (booking.status === 'cancelled') return false;
-      return new Date(booking.session_starts_at).getTime() < now;
+  const now_date = new Date(now);
+  return bookings.filter((booking) => {
+    const group = group_client_booking({
+      status: booking.status,
+      session_starts_at: booking.session_starts_at,
+      session_ends_at: booking.session_ends_at || booking.session_starts_at,
+      now: now_date,
     });
-  }
-
-  return bookings.filter(
-    (booking) =>
-      ['booked', 'waitlisted'].includes(booking.status) &&
-      new Date(booking.session_starts_at).getTime() >= now,
-  );
+    return group === filter;
+  });
 }
 
 export function summarize_recurring_health(
