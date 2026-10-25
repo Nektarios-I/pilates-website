@@ -1,11 +1,15 @@
 'use client';
 
 import { useEffect, useId, useState, useTransition, type ReactNode } from 'react';
-import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
+import { list_membership_packages, type MembershipPackage } from '@/app/(marketing)/staff/membership/actions';
+import { apply_membership } from '@/app/(marketing)/staff/membership/actions';
+import type { SessionCard } from '@/app/(marketing)/book/schedule-actions';
+import { ManualBookingTab } from '@/features/client-booking-manager/components/manual-booking-tab';
 import {
   load_client_dashboard,
+  load_manager_session_cards,
   staff_cancel_client_booking,
   staff_mark_booking_not_attended,
 } from '@/features/client-booking-manager/actions';
@@ -22,7 +26,7 @@ import {
 
 const PAGE_SIZE = 20;
 
-type PopupTab = 'bookings' | 'memberships';
+type PopupTab = 'bookings' | 'add_booking' | 'memberships';
 
 function can_mark_not_attended(booking: ClientBookingRecord, now: Date): boolean {
   return evaluate_not_attended_eligibility({
@@ -74,6 +78,9 @@ export function ClientDayPopup({
   const [confirm, set_confirm] = useState<{ kind: 'cancel' | 'absent'; booking: ClientBookingRecord } | null>(null);
   const [loaded_at, set_loaded_at] = useState(() => new Date());
   const [is_pending, start_transition] = useTransition();
+  const [session_cards, set_session_cards] = useState<SessionCard[] | null>(null);
+  const [catalog, set_catalog] = useState<MembershipPackage[] | null>(null);
+  const [package_id, set_package_id] = useState('');
 
   function reload() {
     set_loading(true);
@@ -140,7 +147,32 @@ export function ClientDayPopup({
     now,
   );
   const name = dashboard?.client_name || booking.full_name || booking.compact_name;
-  const add_booking_href = `/staff/client-bookings?client=${encodeURIComponent(booking.user_id)}&return_to=${encodeURIComponent('/staff/day-bookings')}`;
+
+  function open_tab(next: PopupTab) {
+    set_tab(next);
+    if (next === 'add_booking' && !session_cards) {
+      void load_manager_session_cards().then(set_session_cards);
+    }
+    if (next === 'memberships' && !catalog) {
+      void list_membership_packages().then(set_catalog);
+    }
+  }
+
+  function apply_selected_membership() {
+    if (!package_id) return;
+    start_transition(async () => {
+      set_error(null);
+      set_notice(null);
+      const result = await apply_membership(booking.user_id, package_id);
+      if (!result.success) {
+        set_error(result.error);
+        return;
+      }
+      set_package_id('');
+      set_notice('Membership added.');
+      reload();
+    });
+  }
 
   function run_confirmed() {
     if (!confirm) return;
@@ -220,19 +252,38 @@ export function ClientDayPopup({
         <div className="sticky top-0 z-10 border-b border-border bg-background px-4 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="truncate text-lg font-semibold text-foreground" id={title_id}>{name}</h3>
-              {dashboard?.client_phone ? <p className="mt-0.5 break-all text-sm text-foreground/70">{dashboard.client_phone}</p> : null}
+              <p className="text-[11px] font-medium uppercase tracking-[0.22em] text-foreground/45">Client</p>
+              <h3 className="mt-1 truncate text-2xl font-semibold tracking-tight text-foreground" id={title_id}>{name}</h3>
+              {dashboard?.client_phone ? <p className="mt-1 break-all text-sm text-foreground/70">{dashboard.client_phone}</p> : null}
             </div>
             <Button aria-label="Close client details" data-dialog-initial-focus="true" size="sm" type="button" variant="secondary" onClick={on_close}>
               Close
             </Button>
           </div>
-          <Link className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-foreground underline" href={add_booking_href}>
-            Add booking
-          </Link>
-          <div className="mt-3 flex gap-2" role="tablist">
-            <button aria-selected={tab === 'bookings'} className="min-h-11 rounded-md px-3 text-sm font-medium" role="tab" type="button" onClick={() => set_tab('bookings')}>Bookings</button>
-            <button aria-selected={tab === 'memberships'} className="min-h-11 rounded-md px-3 text-sm font-medium" role="tab" type="button" onClick={() => set_tab('memberships')}>Memberships</button>
+          <div className="mt-4 grid grid-cols-3 gap-2" role="tablist">
+            {(
+              [
+                ['bookings', 'Bookings'],
+                ['add_booking', 'Add booking'],
+                ['memberships', 'Memberships'],
+              ] as const
+            ).map(([value, label]) => (
+              <button
+                aria-selected={tab === value}
+                className={[
+                  'min-h-11 rounded-md px-2 text-sm font-medium transition-colors duration-200 motion-reduce:transition-none',
+                  tab === value
+                    ? 'bg-foreground text-background shadow-sm'
+                    : 'border border-border bg-surface text-foreground/70',
+                ].join(' ')}
+                key={value}
+                role="tab"
+                type="button"
+                onClick={() => open_tab(value)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
         <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4">
@@ -261,9 +312,54 @@ export function ClientDayPopup({
               <Group count={groups.no_show.length} title="No show">{render_page(groups.no_show, 'history')}</Group>
               <Group count={groups.not_attended.length} title="Not attended">{render_page(groups.not_attended, 'history')}</Group>
             </div>
-          ) : (
-            <MembershipGroups groups={lifecycle} />
-          )}
+          ) : null}
+          {tab === 'add_booking' ? (
+            <div role="tabpanel">
+              {session_cards ? (
+                <ManualBookingTab
+                  client_user_id={booking.user_id}
+                  packages={dashboard?.packages ?? []}
+                  session_cards={session_cards}
+                  on_success={() => {
+                    set_notice('Booking created.');
+                    set_tab('bookings');
+                    reload();
+                  }}
+                />
+              ) : (
+                <p className="text-sm text-foreground/60">Loading booking options…</p>
+              )}
+            </div>
+          ) : null}
+          {tab === 'memberships' ? (
+            <div className="space-y-3" role="tabpanel">
+              <details className="rounded-md border border-border" open>
+                <summary className="cursor-pointer px-3 py-3 text-sm font-medium">Add membership</summary>
+                <div className="space-y-3 border-t border-border px-3 py-3">
+                  <label className="block text-sm font-medium" htmlFor="popup-package">
+                    Package
+                  </label>
+                  <select
+                    className="block w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                    id="popup-package"
+                    value={package_id}
+                    onChange={(event) => set_package_id(event.target.value)}
+                  >
+                    <option value="">Select a package</option>
+                    {(catalog ?? []).map((item) => (
+                      <option key={item.id} value={item.id}>
+                        {item.name} · {item.class_type}
+                      </option>
+                    ))}
+                  </select>
+                  <Button disabled={is_pending || !package_id} size="sm" type="button" onClick={apply_selected_membership}>
+                    {is_pending ? 'Adding…' : 'Add membership'}
+                  </Button>
+                </div>
+              </details>
+              <MembershipGroups groups={lifecycle} />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

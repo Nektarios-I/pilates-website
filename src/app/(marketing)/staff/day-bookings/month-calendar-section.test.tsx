@@ -14,6 +14,14 @@ const load_client_dashboard_mock = vi.hoisted(() => vi.fn());
 
 vi.mock('@/features/client-booking-manager/actions', () => ({
   load_client_dashboard: load_client_dashboard_mock,
+  load_manager_session_cards: vi.fn(async () => []),
+  staff_cancel_client_booking: vi.fn(),
+  staff_mark_booking_not_attended: vi.fn(),
+}));
+
+vi.mock('@/app/(marketing)/staff/membership/actions', () => ({
+  list_membership_packages: vi.fn(async () => []),
+  apply_membership: vi.fn(),
 }));
 
 const overview = build_month_calendar_overview({
@@ -220,13 +228,13 @@ describe('MonthCalendarSection', () => {
     fireEvent.click(await screen.findByRole('button', { name: /Maria Pap/i }));
 
     expect(await screen.findByRole('heading', { name: 'Maria Papadou' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Bookings' })).toHaveAttribute('aria-selected', 'true');
     fireEvent.click(screen.getByRole('tab', { name: 'Memberships' }));
+    expect(screen.getByRole('tab', { name: 'Memberships' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByRole('tab', { name: 'Bookings' })).toHaveAttribute('aria-selected', 'false');
     expect(await screen.findByText('10 Pack')).toBeInTheDocument();
     expect(screen.getByText('4 credits remaining')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Add booking' })).toHaveAttribute(
-      'href',
-      expect.stringContaining('client=user-maria'),
-    );
+    expect(screen.getByRole('tab', { name: 'Add booking' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Close client details' })).toBeInTheDocument();
   });
 });
