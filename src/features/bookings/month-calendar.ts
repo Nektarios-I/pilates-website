@@ -206,9 +206,9 @@ function increment_count(counts: TypeCounts, kind: MonthCalendarKind): void {
 }
 
 export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalendarBooking | null {
+  if (row.status === 'cancelled') return null;
   const counts_as_active = is_active_booking_status(row.status);
-  const visible =
-    counts_as_active || ['cancelled', 'not_attended', 'no_show'].includes(row.status);
+  const visible = counts_as_active || ['not_attended', 'no_show'].includes(row.status);
   if (!row.user_id || !visible) return null;
 
   const session = related_row(row.sessions);

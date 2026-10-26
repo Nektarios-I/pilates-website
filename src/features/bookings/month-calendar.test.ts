@@ -188,7 +188,7 @@ describe('map_month_calendar_booking', () => {
     });
   });
 
-  it('keeps cancelled bookings out of active counts', () => {
+  it('omits cancelled bookings from the calendar', () => {
     expect(
       map_month_calendar_booking({
         id: 'b2',
@@ -200,7 +200,7 @@ describe('map_month_calendar_booking', () => {
           session_type: 'mat',
         },
       }),
-    ).toMatchObject({ id: 'b2', status: 'cancelled', counts_as_active: false });
+    ).toBeNull();
   });
 });
 

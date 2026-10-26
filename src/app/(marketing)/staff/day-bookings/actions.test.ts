@@ -46,6 +46,7 @@ function staff_supabase(options?: {
   const last_query: {
     gte?: ReturnType<typeof vi.fn>;
     lte?: ReturnType<typeof vi.fn>;
+    neq?: ReturnType<typeof vi.fn>;
     in?: ReturnType<typeof vi.fn>;
     order?: ReturnType<typeof vi.fn>;
   } = {};
@@ -59,6 +60,7 @@ function staff_supabase(options?: {
 
     query.gte = vi.fn(() => query);
     query.lte = vi.fn(() => query);
+    query.neq = vi.fn(() => query);
     query.in = vi.fn(() => query);
     query.order = vi.fn(() => query);
     query.then = (resolve: (value: unknown) => unknown, reject?: (reason: unknown) => unknown) =>
@@ -66,6 +68,7 @@ function staff_supabase(options?: {
 
     last_query.gte = query.gte as ReturnType<typeof vi.fn>;
     last_query.lte = query.lte as ReturnType<typeof vi.fn>;
+    last_query.neq = query.neq as ReturnType<typeof vi.fn>;
     last_query.in = query.in as ReturnType<typeof vi.fn>;
     last_query.order = query.order as ReturnType<typeof vi.fn>;
 
@@ -285,19 +288,21 @@ describe('list_month_calendar', () => {
     });
   });
 
-  it('omits cancelled bookings from month counts', async () => {
-    create_client_mock.mockResolvedValue(
-      staff_supabase({
-        bookings_data: [{ ...maria_row, id: 'cancelled-1', status: 'cancelled' }],
-      }) as never,
-    );
+  it('omits cancelled bookings from the month calendar', async () => {
+    const supabase = staff_supabase({
+      bookings_data: [{ ...maria_row, id: 'cancelled-1', status: 'cancelled' }],
+    });
+    create_client_mock.mockResolvedValue(supabase as never);
 
     const result = await list_month_calendar(2026, 7);
     const day = result.overview.days.find((entry) => entry.date_key === '2026-07-30');
-    expect(day?.total_active).toBe(0);
-    expect(result.overview.bookings).toEqual([
-      expect.objectContaining({ id: 'cancelled-1', counts_as_active: false, status: 'cancelled' }),
+    expect(supabase._last_query.neq).toHaveBeenCalledWith('status', 'cancelled');
+    expect(supabase._last_query.in).toHaveBeenCalledWith('sessions.status', [
+      'scheduled',
+      'completed',
     ]);
+    expect(day?.total_active).toBe(0);
+    expect(result.overview.bookings).toEqual([]);
   });
 
   it('returns a friendly month error without leaking PostgREST details', async () => {

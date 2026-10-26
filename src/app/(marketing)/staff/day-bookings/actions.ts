@@ -212,6 +212,7 @@ export async function list_month_calendar(
     .select(STAFF_MONTH_CALENDAR_SELECT)
     .gte('sessions.starts_at', range_start)
     .lte('sessions.starts_at', range_end)
+    .neq('status', 'cancelled')
     .in('sessions.status', ['scheduled', 'completed'])
     .order('booked_at', { ascending: true });
 
