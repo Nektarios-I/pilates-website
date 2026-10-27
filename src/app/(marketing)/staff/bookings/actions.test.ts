@@ -132,25 +132,45 @@ describe('list_staff_bookings', () => {
     });
   });
 
-  it('filters finished status to finished/attended/no_show rows', async () => {
+  it('filters finished status to finished rows only', async () => {
     const finished_row = { ...maria_row, id: 'finished-1', status: 'finished' };
     const supabase = admin_supabase({ bookings_data: [finished_row] });
     create_client_mock.mockResolvedValue(supabase as never);
 
     const result = await list_staff_bookings({
       status: 'finished',
-      search: '',
+      client_user_id: '',
       session_start_date: '',
       session_end_date: '',
     });
 
     expect(result.error).toBeNull();
     expect(result.bookings[0]?.status).toBe('finished');
-    expect(supabase._select.mock.results[0]?.value.in).toHaveBeenCalledWith('status', [
-      'finished',
-      'attended',
-      'no_show',
-    ]);
+    expect(supabase._select.mock.results[0]?.value.eq).toHaveBeenCalledWith('status', 'finished');
+  });
+
+  it('filters not_attended status exactly and by client', async () => {
+    const row = { ...maria_row, id: 'na-1', status: 'not_attended' };
+    const supabase = admin_supabase({ bookings_data: [row] });
+    create_client_mock.mockResolvedValue(supabase as never);
+
+    const result = await list_staff_bookings({
+      status: 'not_attended',
+      client_user_id: 'user-maria',
+      session_start_date: '',
+      session_end_date: '',
+    });
+
+    expect(result.error).toBeNull();
+    expect(result.bookings[0]?.status).toBe('not_attended');
+    expect(supabase._select.mock.results[0]?.value.eq).toHaveBeenCalledWith(
+      'status',
+      'not_attended',
+    );
+    expect(supabase._select.mock.results[0]?.value.eq).toHaveBeenCalledWith(
+      'user_id',
+      'user-maria',
+    );
   });
 
   it('maps cancelled bookings and keeps friendly load errors', async () => {
@@ -167,7 +187,7 @@ describe('list_staff_bookings', () => {
 
     const result = await list_staff_bookings({
       status: 'cancelled',
-      search: '',
+      client_user_id: '',
       session_start_date: '',
       session_end_date: '',
     });

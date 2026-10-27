@@ -10,9 +10,11 @@ import {
   format_booking_status,
   format_booking_time,
   format_session_type,
+  format_staff_booking_client_option,
   format_staff_booking_history_status,
   STAFF_BOOKING_HISTORY_STATUSES,
   STAFF_BOOKINGS_LIMIT,
+  type StaffBookingClientOption,
   type StaffBookingFilters,
   type StaffBookingRecord,
 } from '@/features/bookings/staff-bookings';
@@ -23,6 +25,7 @@ type BookingHistoryPanelProps = {
   initial_bookings: StaffBookingRecord[];
   initial_error?: string | null;
   initial_filters: StaffBookingFilters;
+  clients: StaffBookingClientOption[];
 };
 
 function BookingRow({ booking }: { booking: StaffBookingRecord }) {
@@ -95,12 +98,15 @@ export function BookingHistoryPanel({
   initial_bookings,
   initial_error = null,
   initial_filters,
+  clients,
 }: BookingHistoryPanelProps) {
   const [bookings, set_bookings] = useState(initial_bookings);
   const [filters, set_filters] = useState<StaffBookingFilters>(initial_filters);
   const [draft_filters, set_draft_filters] = useState<StaffBookingFilters>(initial_filters);
   const [error, set_error] = useState<string | null>(initial_error);
   const [is_pending, start_transition] = useTransition();
+
+  const selected_client = clients.find((client) => client.id === filters.client_user_id) ?? null;
 
   function apply_filters() {
     start_transition(async () => {
@@ -183,16 +189,24 @@ export function BookingHistoryPanel({
         </label>
 
         <label className="block text-sm sm:col-span-2 lg:col-span-2">
-          <span className="font-medium text-foreground">Client search</span>
-          <input
+          <span className="font-medium text-foreground">Client</span>
+          <select
             className="mt-2 w-full rounded-md border border-border bg-surface px-3 py-2 text-sm text-foreground"
-            placeholder="Name, email, or phone"
-            type="search"
-            value={draft_filters.search}
+            value={draft_filters.client_user_id}
             onChange={(event) =>
-              set_draft_filters((prev) => ({ ...prev, search: event.target.value }))
+              set_draft_filters((prev) => ({
+                ...prev,
+                client_user_id: event.target.value,
+              }))
             }
-          />
+          >
+            <option value="">All clients</option>
+            {clients.map((client) => (
+              <option key={client.id} value={client.id}>
+                {format_staff_booking_client_option(client)}
+              </option>
+            ))}
+          </select>
         </label>
 
         <div className="flex flex-wrap items-end gap-2">
@@ -208,7 +222,9 @@ export function BookingHistoryPanel({
       <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-foreground/70">
         <p>
           Showing {bookings.length} booking{bookings.length === 1 ? '' : 's'}
-          {filters.search.trim() ? ` matching “${filters.search.trim()}”` : ''}
+          {selected_client
+            ? ` for ${format_staff_booking_client_option(selected_client)}`
+            : ''}
           {filters.session_start_date || filters.session_end_date
             ? ` · sessions ${filters.session_start_date || '…'} – ${filters.session_end_date || '…'}`
             : ''}

@@ -6,12 +6,12 @@ import { DEFAULT_STAFF_BOOKING_FILTERS } from '@/features/bookings/staff-booking
 import { createPageMetadata } from '@/lib/metadata';
 import { createClient } from '@/lib/supabase/server';
 
-import { list_staff_bookings } from './actions';
+import { list_booking_history_clients, list_staff_bookings } from './actions';
 import { BookingHistoryPanel } from './booking-history-panel';
 
 export const metadata = createPageMetadata({
   title: 'Booking History',
-  description: 'Search and review client bookings across the studio schedule.',
+  description: 'Review client bookings across the studio schedule.',
   path: '/staff/bookings',
 });
 
@@ -39,7 +39,10 @@ export default async function StaffBookingHistoryPage() {
   if (!user) redirect('/login');
   if (!(await is_admin_or_owner())) redirect('/account');
 
-  const { bookings, error } = await list_staff_bookings(DEFAULT_STAFF_BOOKING_FILTERS);
+  const [{ bookings, error }, clients] = await Promise.all([
+    list_staff_bookings(DEFAULT_STAFF_BOOKING_FILTERS),
+    list_booking_history_clients(),
+  ]);
 
   return (
     <Container>
@@ -62,12 +65,13 @@ export default async function StaffBookingHistoryPage() {
           </h1>
           <p className="mt-3 text-base leading-7 text-foreground/70">
             Review client bookings across the studio schedule. Filter by status, session
-            dates, or client name and email.
+            dates, or client.
           </p>
         </div>
 
         <div className="rounded-md border border-border bg-surface p-6 sm:p-8">
           <BookingHistoryPanel
+            clients={clients}
             initial_bookings={bookings}
             initial_error={error}
             initial_filters={DEFAULT_STAFF_BOOKING_FILTERS}

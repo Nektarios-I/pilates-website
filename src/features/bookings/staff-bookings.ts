@@ -13,15 +13,20 @@ export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 export const STAFF_BOOKING_HISTORY_STATUSES = [
   'all',
   'booked',
-  'cancelled',
+  'waitlisted',
   'finished',
+  'attended',
+  'not_attended',
+  'no_show',
+  'cancelled',
 ] as const;
 
 export type StaffBookingHistoryStatus = (typeof STAFF_BOOKING_HISTORY_STATUSES)[number];
 
 export type StaffBookingFilters = {
   status: StaffBookingHistoryStatus;
-  search: string;
+  /** Empty string = all clients */
+  client_user_id: string;
   /** YYYY-MM-DD; empty string = not applied */
   session_start_date: string;
   /** YYYY-MM-DD; empty string = not applied */
@@ -30,10 +35,27 @@ export type StaffBookingFilters = {
 
 export const DEFAULT_STAFF_BOOKING_FILTERS: StaffBookingFilters = {
   status: 'all',
-  search: '',
+  client_user_id: '',
   session_start_date: '',
   session_end_date: '',
 };
+
+export type StaffBookingClientOption = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+};
+
+export function format_staff_booking_client_option(
+  client: StaffBookingClientOption,
+): string {
+  const name = client.full_name?.trim();
+  if (name) return name;
+  if (client.email?.trim()) return client.email.trim();
+  if (client.phone?.trim()) return client.phone.trim();
+  return 'Unnamed client';
+}
 
 /** Cap for owner/admin booking history queries (newest sessions first). */
 export const STAFF_BOOKINGS_LIMIT = 250;
@@ -120,29 +142,6 @@ export function sort_staff_bookings_by_session_start(
   );
 }
 
-export function filter_staff_bookings_by_search(
-  bookings: StaffBookingRecord[],
-  search: string,
-): StaffBookingRecord[] {
-  const query = search.trim().toLowerCase();
-  if (!query) return bookings;
-
-  return bookings.filter((booking) => {
-    const name = booking.client_name?.toLowerCase() ?? '';
-    const email = booking.client_email?.toLowerCase() ?? '';
-    const phone = booking.client_phone?.toLowerCase() ?? '';
-    const phone_digits = phone.replace(/\D/g, '');
-    const query_digits = query.replace(/\D/g, '');
-
-    return (
-      name.includes(query) ||
-      email.includes(query) ||
-      phone.includes(query) ||
-      (query_digits.length >= 3 && phone_digits.includes(query_digits))
-    );
-  });
-}
-
 export function format_booking_client_contact(
   booking: Pick<StaffBookingRecord, 'client_email' | 'client_phone'>,
 ): string {
@@ -159,7 +158,6 @@ export function format_booking_status(status: BookingStatus): string {
 
 export function format_staff_booking_history_status(status: StaffBookingHistoryStatus): string {
   if (status === 'all') return 'All statuses';
-  if (status === 'finished') return 'Finished';
   return format_booking_status(status as BookingStatus);
 }
 

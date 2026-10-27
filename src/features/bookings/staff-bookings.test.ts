@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import {
-  filter_staff_bookings_by_search,
   format_booking_status,
+  format_staff_booking_client_option,
   format_staff_booking_history_status,
   is_valid_session_date_range,
   map_staff_booking,
   sort_staff_bookings_by_session_start,
+  STAFF_BOOKING_HISTORY_STATUSES,
 } from './staff-bookings';
 
 const sample_row = {
@@ -81,16 +82,6 @@ describe('staff booking helpers', () => {
     expect(sorted.map((row) => row.id)).toEqual(['later', 'earlier']);
   });
 
-  it('filter_staff_bookings_by_search matches client name, email, or phone', () => {
-    const mapped = map_staff_booking(sample_row)!;
-
-    expect(filter_staff_bookings_by_search([mapped], 'maria')).toHaveLength(1);
-    expect(filter_staff_bookings_by_search([mapped], 'papadou')).toHaveLength(1);
-    expect(filter_staff_bookings_by_search([mapped], 'example.com')).toHaveLength(1);
-    expect(filter_staff_bookings_by_search([mapped], '99000000')).toHaveLength(1);
-    expect(filter_staff_bookings_by_search([mapped], 'unknown')).toHaveLength(0);
-  });
-
   it('map_staff_booking maps a finished booking with client name', () => {
     const mapped = map_staff_booking({
       ...sample_row,
@@ -137,6 +128,45 @@ describe('staff booking helpers', () => {
     expect(format_staff_booking_history_status('all')).toBe('All statuses');
     expect(format_staff_booking_history_status('finished')).toBe('Finished');
     expect(format_staff_booking_history_status('booked')).toBe('Booked');
+    expect(format_staff_booking_history_status('not_attended')).toBe('Not Attended');
+    expect(format_staff_booking_history_status('no_show')).toBe('No Show');
+    expect(STAFF_BOOKING_HISTORY_STATUSES).toEqual([
+      'all',
+      'booked',
+      'waitlisted',
+      'finished',
+      'attended',
+      'not_attended',
+      'no_show',
+      'cancelled',
+    ]);
+  });
+
+  it('format_staff_booking_client_option prefers name then email then phone', () => {
+    expect(
+      format_staff_booking_client_option({
+        id: '1',
+        full_name: 'Maria Papadou',
+        email: 'maria@example.com',
+        phone: '+357',
+      }),
+    ).toBe('Maria Papadou');
+    expect(
+      format_staff_booking_client_option({
+        id: '2',
+        full_name: null,
+        email: 'maria@example.com',
+        phone: '+357',
+      }),
+    ).toBe('maria@example.com');
+    expect(
+      format_staff_booking_client_option({
+        id: '3',
+        full_name: '  ',
+        email: null,
+        phone: '+357 99',
+      }),
+    ).toBe('+357 99');
   });
 
   it('is_valid_session_date_range accepts empty or ordered dates', () => {

@@ -1,8 +1,8 @@
 'use server';
 
 import {
+  BOOKING_STATUSES,
   DEFAULT_STAFF_BOOKING_FILTERS,
-  filter_staff_bookings_by_search,
   is_valid_session_date_range,
   map_staff_booking,
   sort_staff_bookings_by_session_start,
@@ -16,6 +16,11 @@ import {
   studio_day_window_bounds,
 } from '@/features/bookings/staff-booking-queries';
 import { createClient } from '@/lib/supabase/server';
+
+import {
+  list_manageable_clients,
+  type ManageableClient,
+} from '../membership/actions';
 
 export type StaffBookingsListResult = {
   bookings: StaffBookingRecord[];
@@ -70,13 +75,12 @@ export async function list_staff_bookings(
     .order('starts_at', { foreignTable: 'sessions', ascending: false })
     .limit(STAFF_BOOKINGS_LIMIT);
 
-  if (filters.status === 'booked') {
-    query = query.eq('status', 'booked');
-  } else if (filters.status === 'cancelled') {
-    query = query.eq('status', 'cancelled');
-  } else if (filters.status === 'finished') {
-    // Completed sessions: auto-finished plus staff attendance / no-show marks.
-    query = query.in('status', ['finished', 'attended', 'no_show']);
+  if (filters.status !== 'all' && (BOOKING_STATUSES as readonly string[]).includes(filters.status)) {
+    query = query.eq('status', filters.status);
+  }
+
+  if (filters.client_user_id) {
+    query = query.eq('user_id', filters.client_user_id);
   }
 
   if (filters.session_start_date) {
@@ -107,10 +111,13 @@ export async function list_staff_bookings(
     .map((row) => map_staff_booking(row))
     .filter((row): row is StaffBookingRecord => row !== null);
 
-  const searched = filter_staff_bookings_by_search(mapped, filters.search);
-
   return {
-    bookings: sort_staff_bookings_by_session_start(searched),
+    bookings: sort_staff_bookings_by_session_start(mapped),
     error: null,
   };
+}
+
+export async function list_booking_history_clients(): Promise<ManageableClient[]> {
+  if (!(await resolve_admin_or_owner())) return [];
+  return list_manageable_clients();
 }
