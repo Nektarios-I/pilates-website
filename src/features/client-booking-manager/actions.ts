@@ -8,8 +8,14 @@ import {
   normalize_occurrence_time,
 } from '@/features/client-booking-manager/format';
 import { TEACHING_STAFF_ROLES } from '@/features/client-booking-manager/staff-access';
+import {
+  group_active_recurring_overview,
+  type RawActiveRecurringRuleRow,
+} from '@/features/client-booking-manager/recurring-rules-overview';
+import { sum_credit_pool } from '@/features/client-booking-manager/materialize-selection';
 import type {
   ActionResult,
+  ActiveRecurringClientOverview,
   BookableSessionOption,
   ClientActivePackage,
   ClientBookingRecord,
@@ -17,6 +23,7 @@ import type {
   MaterializationAttentionRow,
   MaterializableOccurrence,
   MaterializeClientResult,
+  MaterializeCreditPools,
   MaterializeSelectionPayload,
   RecurringForecastRow,
   RecurringPrebookRule,
@@ -791,10 +798,95 @@ export async function retry_materialization(log_id: string): Promise<ActionResul
   return { success: true };
 }
 
+async function load_recurring_credit_pools(
+  client_user_id: string,
+): Promise<MaterializeCreditPools> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from('user_packages')
+    .select('credits_remaining, expires_at, status, packages(class_type, is_replacement)')
+    .eq('user_id', client_user_id)
+    .eq('status', 'active');
+
+  const reformer_values: Array<number | null> = [];
+  const mat_values: Array<number | null> = [];
+  const now = Date.now();
+
+  for (const row of (data ?? []) as {
+    credits_remaining: number | null;
+    expires_at: string | null;
+    packages:
+      | { class_type: string; is_replacement?: boolean }
+      | { class_type: string; is_replacement?: boolean }[]
+      | null;
+  }[]) {
+    if (row.expires_at && new Date(row.expires_at).getTime() <= now) continue;
+    const catalog = related_row(row.packages);
+    if (!catalog || catalog.is_replacement) continue;
+    if (catalog.class_type === 'mat') {
+      mat_values.push(row.credits_remaining);
+    } else if (catalog.class_type === 'reformer') {
+      reformer_values.push(row.credits_remaining);
+    }
+  }
+
+  return {
+    reformer: sum_credit_pool(reformer_values),
+    mat: sum_credit_pool(mat_values),
+  };
+}
+
+async function enrich_materializable_credit_requirements(
+  rows: MaterializableOccurrence[],
+): Promise<MaterializableOccurrence[]> {
+  if (rows.length === 0) return rows;
+  if (
+    rows.every(
+      (row) =>
+        typeof row.reformer_credits_required === 'number' &&
+        typeof row.mat_credits_required === 'number',
+    )
+  ) {
+    return rows;
+  }
+
+  const supabase = await createClient();
+  const rule_ids = [...new Set(rows.map((row) => row.rule_id))];
+  const { data } = await supabase
+    .from('recurring_prebook_rules')
+    .select('id, session_cards(reformer_credits_required, mat_credits_required)')
+    .in('id', rule_ids);
+
+  const by_rule = new Map<string, { reformer: number; mat: number }>();
+  for (const row of (data ?? []) as {
+    id: string;
+    session_cards:
+      | { reformer_credits_required: number | null; mat_credits_required: number | null }
+      | { reformer_credits_required: number | null; mat_credits_required: number | null }[]
+      | null;
+  }[]) {
+    const card = related_row(row.session_cards);
+    by_rule.set(row.id, {
+      reformer: card?.reformer_credits_required ?? 0,
+      mat: card?.mat_credits_required ?? 0,
+    });
+  }
+
+  return rows.map((row) => {
+    const credits = by_rule.get(row.rule_id);
+    return {
+      ...row,
+      reformer_credits_required: row.reformer_credits_required ?? credits?.reformer ?? 0,
+      mat_credits_required: row.mat_credits_required ?? credits?.mat ?? 0,
+    };
+  });
+}
+
 export async function list_client_materializable_occurrences(
   client_user_id: string,
 ): Promise<
-  { success: true; rows: MaterializableOccurrence[] } | { success: false; error: string }
+  | { success: true; rows: MaterializableOccurrence[]; pools: MaterializeCreditPools }
+  | { success: false; error: string }
 > {
   const caller = await resolve_caller_staff();
   if (!caller) {
@@ -826,7 +918,60 @@ export async function list_client_materializable_occurrences(
     };
   }
 
-  return { success: true, rows: (data ?? []) as MaterializableOccurrence[] };
+  const [rows, pools] = await Promise.all([
+    enrich_materializable_credit_requirements((data ?? []) as MaterializableOccurrence[]),
+    load_recurring_credit_pools(client_user_id),
+  ]);
+
+  return { success: true, rows, pools };
+}
+
+export async function list_active_recurring_rules_overview(): Promise<
+  | { success: true; clients: ActiveRecurringClientOverview[] }
+  | { success: false; error: string }
+> {
+  const caller = await resolve_caller_staff();
+  if (!caller) {
+    return { success: false, error: 'You must be signed in as staff.' };
+  }
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('recurring_prebook_rules')
+    .select(
+      `
+      id,
+      client_user_id,
+      label,
+      status,
+      session_card_id,
+      session_cards ( title, session_type ),
+      profiles:client_user_id ( full_name, email, phone ),
+      recurring_prebook_schedule_lines (
+        id,
+        day_of_week,
+        start_time,
+        duration_minutes,
+        first_occurrence_date,
+        is_active
+      )
+    `,
+    )
+    .eq('status', 'active')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('[list_active_recurring_rules_overview]', error.message);
+    return {
+      success: false,
+      error: 'Could not load active recurring rules. Please try again.',
+    };
+  }
+
+  return {
+    success: true,
+    clients: group_active_recurring_overview((data ?? []) as RawActiveRecurringRuleRow[]),
+  };
 }
 
 function extract_uuid_array(value: unknown): string[] {

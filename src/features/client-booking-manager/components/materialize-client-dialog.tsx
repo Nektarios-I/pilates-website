@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { Button } from '@/components/ui/button';
@@ -9,18 +9,29 @@ import {
   materialize_client_recurring_prebooks,
 } from '@/features/client-booking-manager/actions';
 import {
+  format_session_date,
   format_session_datetime,
   materializable_occurrence_key,
   token_health_badge_class,
   token_health_label,
 } from '@/features/client-booking-manager/format';
-import type {
-  MaterializableOccurrence,
-  MaterializeClientResult,
-} from '@/features/client-booking-manager/types';
+import {
+  build_credit_based_default_selection,
+  evaluate_selection_funding,
+  occurrence_matches_scope,
+  QUICK_SELECT_COUNTS,
+  selection_has_unfunded_rows,
+  try_quick_select_sessions,
+  zero_credits_message,
+  type MaterializeClassScope,
+  type MaterializeCreditPools,
+  type SelectableMaterializeOccurrence,
+} from '@/features/client-booking-manager/materialize-selection';
+import type { MaterializeClientResult } from '@/features/client-booking-manager/types';
 
 type MaterializeClientDialogProps = {
   client_user_id: string;
+  client_name?: string | null;
   open: boolean;
   on_close: () => void;
   on_complete: (message: string) => void;
@@ -33,49 +44,64 @@ function build_materialize_summary(result: MaterializeClientResult): string {
   return `Materialization complete (${result.window_start} to ${result.window_end}): ${count} booking${count === 1 ? '' : 's'} created. Credits have been deducted from the client balance.`;
 }
 
+function to_selectable(rows: SelectableMaterializeOccurrence[]): SelectableMaterializeOccurrence[] {
+  return rows.map((row) => ({
+    ...row,
+    reformer_credits_required: row.reformer_credits_required ?? 0,
+    mat_credits_required: row.mat_credits_required ?? 0,
+  }));
+}
+
 export function MaterializeClientDialog({
   client_user_id,
+  client_name,
   open,
   on_close,
   on_complete,
   on_error,
   on_refresh,
 }: MaterializeClientDialogProps) {
-  const [occurrences, set_occurrences] = useState<MaterializableOccurrence[]>([]);
+  const [occurrences, set_occurrences] = useState<SelectableMaterializeOccurrence[]>([]);
+  const [pools, set_pools] = useState<MaterializeCreditPools>({ reformer: 0, mat: 0 });
   const [included_keys, set_included_keys] = useState<Set<string>>(new Set());
   const [loading, set_loading] = useState(false);
   const [load_error, set_load_error] = useState('');
   const [is_submitting, set_is_submitting] = useState(false);
   const [action_error, set_action_error] = useState('');
+  const [quick_select_error, set_quick_select_error] = useState('');
+  const [scope, set_scope] = useState<MaterializeClassScope>('all');
+  const request_id_ref = useRef(0);
 
   useEffect(() => {
     if (!open) return;
 
+    const request_id = ++request_id_ref.current;
     let cancelled = false;
 
     async function load() {
       set_loading(true);
       set_load_error('');
       set_action_error('');
+      set_quick_select_error('');
+      set_scope('all');
+
       const response = await list_client_materializable_occurrences(client_user_id);
-      if (cancelled) return;
+      if (cancelled || request_id !== request_id_ref.current) return;
 
       if (!response.success) {
         set_occurrences([]);
+        set_pools({ reformer: 0, mat: 0 });
         set_included_keys(new Set());
         set_load_error(response.error);
         set_loading(false);
         return;
       }
 
-      set_occurrences(response.rows);
-      set_included_keys(
-        new Set(
-          response.rows.map((row) =>
-            materializable_occurrence_key(row.rule_id, row.occurrence_date, row.start_time),
-          ),
-        ),
-      );
+      const rows = to_selectable(response.rows as SelectableMaterializeOccurrence[]);
+      const next_pools = response.pools;
+      set_occurrences(rows);
+      set_pools(next_pools);
+      set_included_keys(build_credit_based_default_selection(rows, next_pools));
       set_loading(false);
     }
 
@@ -106,6 +132,11 @@ export function MaterializeClientDialog({
     };
   }, [open, is_submitting, on_close]);
 
+  const funding = useMemo(
+    () => evaluate_selection_funding(occurrences, included_keys, pools),
+    [included_keys, occurrences, pools],
+  );
+
   const selected_occurrences = useMemo(
     () =>
       occurrences
@@ -123,24 +154,43 @@ export function MaterializeClientDialog({
     [included_keys, occurrences],
   );
 
-  const has_insufficient_selected = useMemo(
-    () =>
-      occurrences.some(
-        (row) =>
-          included_keys.has(
-            materializable_occurrence_key(row.rule_id, row.occurrence_date, row.start_time),
-          ) && row.token_health === 'insufficient_tokens',
-      ),
-    [included_keys, occurrences],
-  );
+  const has_unfunded_selected = selection_has_unfunded_rows(occurrences, included_keys, pools);
 
-  const token_block_message = has_insufficient_selected
-    ? 'Not enough credits for all selected classes. Uncheck rows marked “Not enough slots” or add credits before materializing.'
+  const date_range_label =
+    occurrences.length > 0
+      ? `${occurrences[0]?.occurrence_date} – ${occurrences[occurrences.length - 1]?.occurrence_date}`
+      : null;
+
+  const earliest_selected = useMemo(() => {
+    const selected_rows = occurrences.filter((row) =>
+      included_keys.has(
+        materializable_occurrence_key(row.rule_id, row.occurrence_date, row.start_time),
+      ),
+    );
+    return selected_rows[0] ?? null;
+  }, [included_keys, occurrences]);
+
+  const available_scopes = useMemo(() => {
+    const scopes: MaterializeClassScope[] = ['all'];
+    if (occurrences.some((row) => occurrence_matches_scope(row, 'reformer'))) {
+      scopes.push('reformer');
+    }
+    if (occurrences.some((row) => occurrence_matches_scope(row, 'mat'))) {
+      scopes.push('mat');
+    }
+    return scopes;
+  }, [occurrences]);
+
+  const empty_credits_message = zero_credits_message(occurrences, pools);
+
+  const token_block_message = has_unfunded_selected
+    ? 'Not enough credits for all selected classes. Uncheck rows marked “Not enough credits” or add credits before materializing.'
     : '';
 
   if (!open || typeof document === 'undefined') return null;
 
   function toggle_key(key: string) {
+    set_quick_select_error('');
     set_included_keys((current) => {
       const next = new Set(current);
       if (next.has(key)) {
@@ -152,8 +202,32 @@ export function MaterializeClientDialog({
     });
   }
 
+  function reset_to_credit_defaults() {
+    set_quick_select_error('');
+    set_action_error('');
+    set_included_keys(build_credit_based_default_selection(occurrences, pools));
+  }
+
+  function handle_quick_select(count: number) {
+    const result = try_quick_select_sessions({
+      occurrences,
+      pools,
+      scope,
+      requested_count: count,
+      current_selection: included_keys,
+    });
+
+    if (!result.ok) {
+      set_quick_select_error(result.message);
+      return;
+    }
+
+    set_quick_select_error('');
+    set_included_keys(result.selection);
+  }
+
   async function handle_confirm() {
-    if (is_submitting || has_insufficient_selected || selected_occurrences.length === 0) return;
+    if (is_submitting || has_unfunded_selected || selected_occurrences.length === 0) return;
 
     set_is_submitting(true);
     set_action_error('');
@@ -197,21 +271,48 @@ export function MaterializeClientDialog({
       <div
         aria-labelledby="materialize-dialog-title"
         aria-modal="true"
-        className="max-h-[85vh] w-full max-w-2xl overflow-hidden rounded-lg border border-border bg-background shadow-lg"
+        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background shadow-lg sm:max-h-[85vh]"
         role="dialog"
       >
         <div className="border-b border-border px-5 py-4">
           <h2 className="text-base font-semibold text-foreground" id="materialize-dialog-title">
-            Run materialization now
+            Materialize planned bookings
           </h2>
           <p className="mt-1 text-sm text-foreground/70">
-            Book recurring classes across the same three-calendar-month planned window used in the
-            recurring preview. Uncheck any occurrence to exclude it from this run. All selected
-            classes must have enough credits — materialization is all-or-nothing.
+            Across all active recurring rules
+            {client_name ? ` for ${client_name}` : ''}. Book selected sessions in the three-calendar-month
+            planned window. Credits are checked per class category.
           </p>
+          <dl className="mt-3 grid gap-2 text-xs text-foreground/70 sm:grid-cols-2">
+            <div>
+              <dt className="font-medium uppercase tracking-wide text-foreground/50">Client</dt>
+              <dd className="mt-0.5 text-sm text-foreground">{client_name || 'Selected client'}</dd>
+            </div>
+            <div>
+              <dt className="font-medium uppercase tracking-wide text-foreground/50">Date range</dt>
+              <dd className="mt-0.5 text-sm text-foreground">{date_range_label ?? '—'}</dd>
+            </div>
+            <div>
+              <dt className="font-medium uppercase tracking-wide text-foreground/50">
+                Earliest selected
+              </dt>
+              <dd className="mt-0.5 text-sm font-semibold text-foreground">
+                {earliest_selected
+                  ? format_session_date(earliest_selected.occurrence_date)
+                  : 'None selected'}
+              </dd>
+            </div>
+            <div>
+              <dt className="font-medium uppercase tracking-wide text-foreground/50">Selected</dt>
+              <dd className="mt-0.5 text-sm text-foreground">
+                {selected_occurrences.length} session
+                {selected_occurrences.length === 1 ? '' : 's'}
+              </dd>
+            </div>
+          </dl>
         </div>
 
-        <div className="max-h-[50vh] overflow-y-auto px-5 py-4">
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
           {loading ? (
             <p className="text-sm text-foreground/60">Loading upcoming occurrences…</p>
           ) : load_error ? (
@@ -223,60 +324,118 @@ export function MaterializeClientDialog({
             </p>
           ) : (
             <>
-              <p className="mb-3 text-xs text-foreground/60">
-                Showing {occurrences.length} materializable session
-                {occurrences.length === 1 ? '' : 's'}
-                {occurrences.length > 0
-                  ? ` · ${occurrences[0]?.occurrence_date} – ${occurrences[occurrences.length - 1]?.occurrence_date}`
-                  : ''}
-                . This list uses the three-calendar-month planned window (requires Supabase
-                migration 42).
-              </p>
-            <ul className="space-y-2">
-              {occurrences.map((row) => {
-                const key = materializable_occurrence_key(
-                  row.rule_id,
-                  row.occurrence_date,
-                  row.start_time,
-                );
-                const checked = included_keys.has(key);
-
-                return (
-                  <li
-                    key={key}
-                    className="flex items-start gap-3 rounded-md border border-border/70 px-3 py-2"
+              <div className="mb-4 space-y-3 rounded-md border border-border/80 bg-muted/40 p-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-xs font-medium uppercase tracking-wide text-foreground/60">
+                    Quick select sessions
+                  </p>
+                  <div className="flex flex-wrap gap-1">
+                    {available_scopes.map((value) => (
+                      <button
+                        key={value}
+                        className={[
+                          'rounded-full px-3 py-1 text-xs font-medium',
+                          scope === value
+                            ? 'bg-foreground text-background'
+                            : 'border border-border bg-background text-foreground/70',
+                        ].join(' ')}
+                        onClick={() => set_scope(value)}
+                        type="button"
+                      >
+                        {value === 'all' ? 'All classes' : value === 'reformer' ? 'Reformer' : 'Mat'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {QUICK_SELECT_COUNTS.map((count) => (
+                    <Button
+                      key={count}
+                      onClick={() => handle_quick_select(count)}
+                      size="sm"
+                      type="button"
+                      variant="secondary"
+                    >
+                      {count}
+                    </Button>
+                  ))}
+                  <Button
+                    onClick={reset_to_credit_defaults}
+                    size="sm"
+                    type="button"
+                    variant="ghost"
                   >
-                    <input
-                      checked={checked}
-                      className="mt-1"
-                      id={`materialize-${key}`}
-                      onChange={() => toggle_key(key)}
-                      type="checkbox"
-                    />
-                    <label className="flex-1 cursor-pointer text-sm" htmlFor={`materialize-${key}`}>
-                      <span className="font-medium text-foreground">
-                        {format_session_datetime(row.occurrence_starts_at)}
-                      </span>
-                      <span className="mt-0.5 block text-xs text-foreground/60">
-                        {row.rule_label} · {row.session_card_title}
-                        {row.booking_state === 'failed' && row.failure_message
-                          ? ` · Previous failure: ${row.failure_message}`
-                          : ''}
-                      </span>
-                      {row.token_health ? (
-                        <span
-                          className={`mt-1 inline-block ${token_health_badge_class(row.token_health)}`}
-                        >
-                          {token_health_label(row.token_health)}
+                    Reset to credit-based selection
+                  </Button>
+                </div>
+                {empty_credits_message ? (
+                  <p className="text-sm text-foreground/70">{empty_credits_message}</p>
+                ) : null}
+              </div>
+
+              <ul className="space-y-2">
+                {occurrences.map((row) => {
+                  const key = materializable_occurrence_key(
+                    row.rule_id,
+                    row.occurrence_date,
+                    row.start_time,
+                  );
+                  const checked = included_keys.has(key);
+                  const row_funding = funding.get(key);
+                  const hard_blocked = row.token_health === 'package_expires_before';
+                  const badge_health =
+                    hard_blocked
+                      ? ('package_expires_before' as const)
+                      : checked && row_funding && !row_funding.fundable
+                        ? ('insufficient_tokens' as const)
+                        : !checked &&
+                            empty_credits_message === null &&
+                            (row.reformer_credits_required ?? 0) + (row.mat_credits_required ?? 0) > 0
+                          ? ('insufficient_tokens' as const)
+                          : null;
+
+                  return (
+                    <li
+                      key={key}
+                      className="flex items-start gap-3 rounded-md border border-border/70 px-3 py-2"
+                    >
+                      <input
+                        checked={checked}
+                        className="mt-1"
+                        disabled={hard_blocked}
+                        id={`materialize-${key}`}
+                        onChange={() => toggle_key(key)}
+                        type="checkbox"
+                      />
+                      <label className="flex-1 cursor-pointer text-sm" htmlFor={`materialize-${key}`}>
+                        <span className="font-medium text-foreground">
+                          {format_session_datetime(row.occurrence_starts_at)}
                         </span>
-                      ) : null}
-                    </label>
-                  </li>
-                );
-              })}
-            </ul>
+                        <span className="mt-0.5 block text-xs text-foreground/60">
+                          {row.rule_label} · {row.session_card_title}
+                          {row.booking_state === 'failed' && row.failure_message
+                            ? ` · Previous failure: ${row.failure_message}`
+                            : ''}
+                        </span>
+                        {badge_health ? (
+                          <span
+                            className={`mt-1 inline-block ${token_health_badge_class(badge_health)}`}
+                          >
+                            {token_health_label(badge_health) || 'Not enough credits'}
+                          </span>
+                        ) : null}
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
             </>
           )}
+          {quick_select_error ? (
+            <p className="mt-3 text-sm text-danger-foreground" role="alert">
+              {quick_select_error}
+            </p>
+          ) : null}
           {token_block_message ? (
             <p className="mt-3 text-sm text-danger-foreground" role="alert">
               {token_block_message}
@@ -299,7 +458,7 @@ export function MaterializeClientDialog({
               loading ||
               Boolean(load_error) ||
               selected_occurrences.length === 0 ||
-              has_insufficient_selected
+              has_unfunded_selected
             }
             onClick={() => void handle_confirm()}
             size="sm"

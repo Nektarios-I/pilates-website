@@ -114,5 +114,9 @@ export function matches_client_search(
     .join(' ')
     .toLowerCase();
 
-  return haystack.includes(normalized) || haystack.includes(normalize_phone_digits(normalized));
+  const phone_digits = normalize_phone_digits(normalized);
+  return (
+    haystack.includes(normalized) ||
+    (phone_digits.length > 0 && haystack.includes(phone_digits))
+  );
 }

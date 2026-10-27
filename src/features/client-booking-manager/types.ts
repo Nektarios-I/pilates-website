@@ -134,6 +134,43 @@ export type MaterializableOccurrence = {
   booking_state: string;
   token_health: RecurringTokenHealth | null;
   failure_message: string | null;
+  reformer_credits_required?: number;
+  mat_credits_required?: number;
+};
+
+export type MaterializeCreditPools = {
+  reformer: number;
+  mat: number;
+};
+
+export type MaterializableOccurrencesPayload = {
+  rows: MaterializableOccurrence[];
+  pools: MaterializeCreditPools;
+};
+
+export type ActiveRecurringScheduleLineOverview = {
+  id: string;
+  day_of_week: number;
+  start_time: string;
+  duration_minutes: number;
+  first_occurrence_date: string;
+};
+
+export type ActiveRecurringRuleOverview = {
+  id: string;
+  label: string | null;
+  session_card_title: string;
+  session_type: string;
+  lines: ActiveRecurringScheduleLineOverview[];
+};
+
+export type ActiveRecurringClientOverview = {
+  client_user_id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  active_rule_count: number;
+  rules: ActiveRecurringRuleOverview[];
 };
 
 export type MaterializeClientFailure = {

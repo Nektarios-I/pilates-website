@@ -30,7 +30,9 @@ test.describe('staff client bookings recurring UX', () => {
       test.skip(true, 'Staff session not available');
     }
 
-    const recurring_control = page.getByRole('button', { name: /recurring/i });
+    await expect(page.getByRole('button', { name: 'Recurring rules' })).toBeVisible();
+
+    const recurring_control = page.getByRole('button', { name: 'Recurring Prebooks' });
     if (await recurring_control.count()) {
       await recurring_control.click();
     }

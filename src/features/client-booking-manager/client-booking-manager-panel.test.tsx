@@ -34,7 +34,12 @@ vi.mock('@/features/client-booking-manager/actions', () => ({
   list_recurring_skips: vi.fn(async () => []),
   add_recurring_skip: vi.fn(),
   remove_recurring_skip: vi.fn(),
-  list_client_materializable_occurrences: vi.fn(async () => ({ success: true, rows: [] })),
+  list_client_materializable_occurrences: vi.fn(async () => ({
+    success: true,
+    rows: [],
+    pools: { reformer: 0, mat: 0 },
+  })),
+  list_active_recurring_rules_overview: vi.fn(async () => ({ success: true, clients: [] })),
   materialize_client_recurring_prebooks: vi.fn(),
   load_recurring_forecast: vi.fn(async () => []),
   list_weekly_slot_patterns_for_card: vi.fn(async () => []),
@@ -93,6 +98,14 @@ describe('ClientBookingManagerPanel', () => {
     expect(
       screen.getByText('Select a client to manage bookings and recurring prebooks.'),
     ).toBeInTheDocument();
+  });
+
+  it('offers the recurring rules overview without a selected client', () => {
+    render(<ClientBookingManagerPanel clients={clients} session_cards={session_cards} />);
+
+    expect(screen.getByRole('button', { name: 'Recurring rules' })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Recurring rules' }));
+    expect(screen.getByRole('dialog', { name: /recurring rules/i })).toBeInTheDocument();
   });
 
   it('filters clients in the selector and loads dashboard data on selection', async () => {

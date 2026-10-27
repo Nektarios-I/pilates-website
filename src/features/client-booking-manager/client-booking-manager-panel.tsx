@@ -5,6 +5,7 @@ import { Suspense, useCallback, useState, useTransition } from 'react';
 
 import type { SessionCard } from '@/app/(marketing)/book/schedule-actions';
 import type { ManageableClient } from '@/app/(marketing)/staff/membership/actions';
+import { Button } from '@/components/ui/button';
 import { load_client_dashboard } from '@/features/client-booking-manager/actions';
 import { AttentionTab } from '@/features/client-booking-manager/components/attention-tab';
 import { BookingsTab } from '@/features/client-booking-manager/components/bookings-tab';
@@ -12,6 +13,7 @@ import { ClientSelector } from '@/features/client-booking-manager/components/cli
 import { ManualBookingTab } from '@/features/client-booking-manager/components/manual-booking-tab';
 import { ManagerTabNav } from '@/features/client-booking-manager/components/manager-tab-nav';
 import { OverviewTab } from '@/features/client-booking-manager/components/overview-tab';
+import { RecurringRulesOverviewDialog } from '@/features/client-booking-manager/components/recurring-rules-overview-dialog';
 import { RecurringTab } from '@/features/client-booking-manager/components/recurring-tab';
 import {
   parse_manager_tab,
@@ -66,6 +68,7 @@ function ClientBookingManagerPanelInner({
     type: 'success' | 'error';
     message: string;
   } | null>(null);
+  const [overview_open, set_overview_open] = useState(false);
   const [, start_transition] = useTransition();
 
   const sync_url = useCallback(
@@ -109,15 +112,21 @@ function ClientBookingManagerPanelInner({
     [],
   );
 
-  function handle_client_select(client_id: string) {
+  function handle_client_select(client_id: string, tab: ClientBookingManagerTab = active_tab) {
     set_selected_client_id(client_id);
-    sync_url(client_id, active_tab);
+    set_active_tab(tab);
+    sync_url(client_id, tab);
     void refresh_dashboard(client_id);
   }
 
   function handle_tab_change(tab: ClientBookingManagerTab) {
     set_active_tab(tab);
     sync_url(selected_client_id, tab);
+  }
+
+  function handle_open_client_from_overview(client_id: string) {
+    set_overview_open(false);
+    handle_client_select(client_id, 'recurring');
   }
 
   function handle_operation_feedback(feedback: { type: 'success' | 'error'; message: string }) {
@@ -131,12 +140,35 @@ function ClientBookingManagerPanelInner({
     });
   }
 
+  const selected_client = clients.find((client) => client.id === selected_client_id) ?? null;
+
   return (
     <div className="space-y-6">
-      <ClientSelector
-        clients={clients}
-        on_select={handle_client_select}
-        selected_client_id={selected_client_id}
+      <div className="space-y-3">
+        <ClientSelector
+          clients={clients}
+          on_select={(client_id) => handle_client_select(client_id)}
+          selected_client_id={selected_client_id}
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onClick={() => set_overview_open(true)}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            Recurring rules
+          </Button>
+          <p className="text-xs text-foreground/60">
+            Browse active recurring prebooks across clients without selecting one first.
+          </p>
+        </div>
+      </div>
+
+      <RecurringRulesOverviewDialog
+        on_close={() => set_overview_open(false)}
+        on_open_client={handle_open_client_from_overview}
+        open={overview_open}
       />
 
       {!selected_client_id ? (
@@ -198,6 +230,9 @@ function ClientBookingManagerPanelInner({
               ) : null}
               {active_tab === 'recurring' ? (
                 <RecurringTab
+                  client_name={
+                    dashboard.client_name ?? selected_client?.full_name ?? selected_client?.email
+                  }
                   client_user_id={selected_client_id}
                   on_operation_feedback={handle_operation_feedback}
                   on_refresh={handle_refresh}

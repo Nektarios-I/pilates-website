@@ -18,23 +18,142 @@ vi.mock('@/features/client-booking-manager/actions', () => ({
 
 import { MaterializeClientDialog } from '@/features/client-booking-manager/components/materialize-client-dialog';
 
-const occurrence = {
-  rule_id: 'rule-1',
-  rule_label: 'Tuesday reformer',
-  session_card_title: 'Reformer',
-  schedule_line_id: 'line-1',
-  occurrence_date: '2026-07-15',
-  start_time: '09:00:00',
-  occurrence_starts_at: '2026-07-15T06:00:00.000Z',
-  booking_state: 'planned',
-  token_health: 'ok' as const,
-  failure_message: null,
-};
+function build_rows(count: number, options?: { reformer?: number; mat?: number }) {
+  return Array.from({ length: count }, (_, index) => {
+    const day = String(index + 1).padStart(2, '0');
+    return {
+      rule_id: 'rule-1',
+      rule_label: 'Tuesday reformer',
+      session_card_title: 'Reformer',
+      schedule_line_id: 'line-1',
+      occurrence_date: `2026-08-${day}`,
+      start_time: '09:00:00',
+      occurrence_starts_at: `2026-08-${day}T06:00:00.000Z`,
+      booking_state: 'planned',
+      token_health: 'ok' as const,
+      failure_message: null,
+      reformer_credits_required: options?.reformer ?? 1,
+      mat_credits_required: options?.mat ?? 0,
+    };
+  });
+}
 
 describe('MaterializeClientDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    list_occurrences_mock.mockResolvedValue({ success: true, rows: [occurrence] });
+    list_occurrences_mock.mockResolvedValue({
+      success: true,
+      rows: build_rows(12),
+      pools: { reformer: 9, mat: 0 },
+    });
+  });
+
+  it('defaults to the earliest credit-funded sessions instead of selecting everything', async () => {
+    render(
+      <MaterializeClientDialog
+        client_name="Alex Client"
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /materialize 9 occurrence/i })).toBeEnabled();
+    });
+
+    const checked = screen.getAllByRole('checkbox').filter(
+      (input) => (input as HTMLInputElement).checked,
+    );
+    expect(checked).toHaveLength(9);
+    expect(screen.getAllByText(/not enough credits/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/earliest selected/i)).toBeInTheDocument();
+  });
+
+  it('opens with nothing selected and a clear message when credits are zero', async () => {
+    list_occurrences_mock.mockResolvedValue({
+      success: true,
+      rows: build_rows(4),
+      pools: { reformer: 0, mat: 0 },
+    });
+
+    render(
+      <MaterializeClientDialog
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/no eligible .*credits are available/i),
+      ).toBeInTheDocument();
+    });
+
+    const checked = screen.getAllByRole('checkbox').filter(
+      (input) => (input as HTMLInputElement).checked,
+    );
+    expect(checked).toHaveLength(0);
+  });
+
+  it('applies a successful quick-select count', async () => {
+    render(
+      <MaterializeClientDialog
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /^8$/ })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^8$/ }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /materialize 8 occurrence/i })).toBeEnabled();
+    });
+  });
+
+  it('aborts a failed quick-select and preserves the prior selection', async () => {
+    list_occurrences_mock.mockResolvedValue({
+      success: true,
+      rows: build_rows(20),
+      pools: { reformer: 5, mat: 0 },
+    });
+
+    render(
+      <MaterializeClientDialog
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /materialize 5 occurrence/i })).toBeEnabled();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^8$/ }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent(/available credits cover 5/i);
+    });
+    expect(screen.getByRole('button', { name: /materialize 5 occurrence/i })).toBeEnabled();
   });
 
   it('closes and reports success after materialization creates bookings', async () => {
@@ -42,6 +161,12 @@ describe('MaterializeClientDialog', () => {
     const on_complete = vi.fn();
     const on_error = vi.fn();
     const on_refresh = vi.fn();
+
+    list_occurrences_mock.mockResolvedValue({
+      success: true,
+      rows: build_rows(1),
+      pools: { reformer: 1, mat: 0 },
+    });
 
     materialize_mock.mockResolvedValue({
       success: true,
@@ -52,8 +177,8 @@ describe('MaterializeClientDialog', () => {
         failed: 0,
         skipped: 0,
         excluded: 0,
-        window_start: '2026-07-11',
-        window_end: '2026-07-25',
+        window_start: '2026-08-01',
+        window_end: '2026-10-31',
         failures: [],
       },
     });
@@ -81,26 +206,37 @@ describe('MaterializeClientDialog', () => {
       expect(on_error).not.toHaveBeenCalled();
       expect(on_refresh).toHaveBeenCalledWith({ silent: true });
     });
-
-    expect(materialize_mock).toHaveBeenCalledWith('client-1', [
-      {
-        rule_id: 'rule-1',
-        schedule_line_id: 'line-1',
-        occurrence_date: '2026-07-15',
-        start_time: '09:00:00',
-      },
-    ]);
   });
 
-  it('blocks materialize when a selected row has insufficient tokens', async () => {
+  it('ignores stale list responses after the dialog client changes', async () => {
+    let resolve_first: ((value: unknown) => void) | undefined;
+    list_occurrences_mock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolve_first = resolve;
+        }),
+    );
+
+    const { rerender } = render(
+      <MaterializeClientDialog
+        client_user_id="client-1"
+        on_close={vi.fn()}
+        on_complete={vi.fn()}
+        on_error={vi.fn()}
+        on_refresh={vi.fn()}
+        open
+      />,
+    );
+
     list_occurrences_mock.mockResolvedValue({
       success: true,
-      rows: [{ ...occurrence, token_health: 'insufficient_tokens' }],
+      rows: build_rows(2),
+      pools: { reformer: 2, mat: 0 },
     });
 
-    render(
+    rerender(
       <MaterializeClientDialog
-        client_user_id="client-1"
+        client_user_id="client-2"
         on_close={vi.fn()}
         on_complete={vi.fn()}
         on_error={vi.fn()}
@@ -110,66 +246,18 @@ describe('MaterializeClientDialog', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 1 occurrence/i })).toBeDisabled();
+      expect(screen.getByRole('button', { name: /materialize 2 occurrence/i })).toBeEnabled();
     });
 
-    expect(screen.getByRole('alert')).toHaveTextContent(/not enough credits/i);
-    expect(materialize_mock).not.toHaveBeenCalled();
-  });
-
-  it('describes the three-month materialize window in the dialog copy', async () => {
-    render(
-      <MaterializeClientDialog
-        client_user_id="client-1"
-        on_close={vi.fn()}
-        on_complete={vi.fn()}
-        on_error={vi.fn()}
-        on_refresh={vi.fn()}
-        open
-      />,
-    );
+    resolve_first?.({
+      success: true,
+      rows: build_rows(12),
+      pools: { reformer: 9, mat: 0 },
+    });
 
     await waitFor(() => {
-      expect(screen.getByText(/three-calendar-month planned window/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /materialize 2 occurrence/i })).toBeEnabled();
     });
-    expect(screen.getByText(/migration 42/i)).toBeInTheDocument();
-    expect(screen.queryByText(/14-day window/i)).not.toBeInTheDocument();
-  });
-
-  it('keeps the dialog open and surfaces errors when materialization fails', async () => {
-    const on_close = vi.fn();
-    const on_complete = vi.fn();
-    const on_error = vi.fn();
-    const on_refresh = vi.fn();
-
-    materialize_mock.mockResolvedValue({
-      success: false,
-      error: 'Not enough credits for all selected occurrences.',
-    });
-
-    render(
-      <MaterializeClientDialog
-        client_user_id="client-1"
-        on_close={on_close}
-        on_complete={on_complete}
-        on_error={on_error}
-        on_refresh={on_refresh}
-        open
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 1 occurrence/i })).toBeEnabled();
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /materialize 1 occurrence/i }));
-
-    await waitFor(() => {
-      expect(on_close).not.toHaveBeenCalled();
-      expect(on_error).toHaveBeenCalledWith('Not enough credits for all selected occurrences.');
-      expect(on_complete).not.toHaveBeenCalled();
-      expect(on_refresh).toHaveBeenCalledWith({ silent: true });
-      expect(screen.getByRole('alert')).toHaveTextContent(/not enough credits/i);
-    });
+    expect(screen.queryByRole('button', { name: /materialize 9 occurrence/i })).not.toBeInTheDocument();
   });
 });

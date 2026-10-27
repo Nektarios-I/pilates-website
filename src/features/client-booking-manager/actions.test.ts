@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   add_recurring_skip,
+  list_active_recurring_rules_overview,
   list_client_materializable_occurrences,
   load_client_dashboard,
   materialize_client_recurring_prebooks,
@@ -61,25 +62,24 @@ function staff_supabase(options?: {
     }
 
     return {
-      select: vi.fn(() => ({
-        eq: vi.fn(() => {
-          const result = { data: [], error: null };
-          const chain = {
-            order: vi.fn(() => chain),
-            limit: vi.fn(async () => result),
-            maybeSingle: vi.fn(async () => ({
-              data: { full_name: 'Alex Client', phone: null },
-              error: null,
-            })),
-            then: (
-              on_fulfilled: (value: { data: unknown[]; error: null }) => unknown,
-              on_rejected?: (reason: unknown) => unknown,
-            ) => Promise.resolve(result).then(on_fulfilled, on_rejected),
-          };
-          return chain;
-        }),
-        in: vi.fn(async () => ({ data: [], error: null })),
-      })),
+      select: vi.fn(() => {
+        const result = { data: [], error: null };
+        const chain = {
+          eq: vi.fn(() => chain),
+          order: vi.fn(() => chain),
+          limit: vi.fn(async () => result),
+          maybeSingle: vi.fn(async () => ({
+            data: { full_name: 'Alex Client', phone: null },
+            error: null,
+          })),
+          in: vi.fn(async () => result),
+          then: (
+            on_fulfilled: (value: { data: unknown[]; error: null }) => unknown,
+            on_rejected?: (reason: unknown) => unknown,
+          ) => Promise.resolve(result).then(on_fulfilled, on_rejected),
+        };
+        return chain;
+      }),
     };
   });
 
@@ -473,6 +473,19 @@ describe('client booking manager actions', () => {
     if (!result.success) {
       expect(result.error).toContain('Not enough credits');
     }
+  });
+
+  it('rejects overview listing for unauthenticated callers', async () => {
+    create_client_mock.mockResolvedValue({
+      auth: { getUser: vi.fn(async () => ({ data: { user: null } })) },
+      from: vi.fn(),
+      rpc: vi.fn(),
+    });
+
+    await expect(list_active_recurring_rules_overview()).resolves.toEqual({
+      success: false,
+      error: 'You must be signed in as staff.',
+    });
   });
 
   it('surfaces list materializable RPC errors', async () => {

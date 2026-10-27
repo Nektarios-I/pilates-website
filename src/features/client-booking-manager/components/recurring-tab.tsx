@@ -50,6 +50,7 @@ import { studio_date_key } from '@/lib/schedule/studio-hours';
 
 type RecurringTabProps = {
   client_user_id: string;
+  client_name?: string | null;
   rules: RecurringPrebookRule[];
   session_cards: SessionCard[];
   on_refresh: (options?: { silent?: boolean }) => void;
@@ -58,6 +59,7 @@ type RecurringTabProps = {
 
 export function RecurringTab({
   client_user_id,
+  client_name,
   rules,
   session_cards,
   on_refresh,
@@ -90,9 +92,12 @@ export function RecurringTab({
   }
 
   return (
-    <div className="space-y-6">
-      <section className="rounded-md border border-border bg-background p-5">
-        <h2 className="text-sm font-semibold text-foreground">Create recurring rule</h2>
+    <div className="space-y-8">
+      <section className="rounded-md border border-border bg-muted/50 p-5 shadow-sm ring-1 ring-border/60">
+        <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
+          Create
+        </p>
+        <h2 className="mt-1 text-sm font-semibold text-foreground">Create recurring rule</h2>
         <p className="mt-1 text-sm text-foreground/70">
           Choose a class, then add weekly slots for each day using the studio&apos;s default hours.
         </p>
@@ -142,12 +147,17 @@ export function RecurringTab({
         <section className="rounded-md border border-border bg-background p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-foreground">Materialize recurring bookings</h2>
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
+                Materialize
+              </p>
+              <h2 className="mt-1 text-sm font-semibold text-foreground">
+                Materialize planned bookings
+              </h2>
               <p className="mt-1 text-sm text-foreground/70">
-                Turn planned recurring slots into real bookings for this client. Run materialization
-                now to book every selected session in the three-calendar-month planned window (same
-                range as Planned sessions). The daily cron still advances the rolling 14-day public
-                booking window automatically.
+                Across all active recurring rules
+                {client_name ? ` for ${client_name}` : ''}. Turn planned slots into real bookings in
+                the three-calendar-month planned window. The daily cron still advances the rolling
+                14-day public booking window automatically.
               </p>
             </div>
             <Button
@@ -159,13 +169,14 @@ export function RecurringTab({
               }}
               size="sm"
             >
-              Run materialization now
+              Materialize planned bookings
             </Button>
           </div>
         </section>
       ) : null}
 
       <MaterializeClientDialog
+        client_name={client_name}
         client_user_id={client_user_id}
         on_close={() => set_materialize_open(false)}
         on_complete={(summary) => {
@@ -183,23 +194,35 @@ export function RecurringTab({
         open={materialize_open}
       />
 
-      {rules.length === 0 ? (
-        <p className="py-8 text-center text-sm text-foreground/60">
-          No recurring rules for this client yet.
-        </p>
-      ) : (
-        <div className="space-y-4">
-          {rules.map((rule) => (
-            <RuleCard
-              key={rule.id}
-              forecast_revision={forecast_revision}
-              on_refresh={on_refresh}
-              rule={rule}
-              session_cards={session_cards}
-            />
-          ))}
+      <section className="space-y-4">
+        <div>
+          <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
+            Existing rules
+          </p>
+          <h2 className="mt-1 text-sm font-semibold text-foreground">Recurring rules for this client</h2>
+          <p className="mt-1 text-sm text-foreground/70">
+            Review weekly slots, first session dates, skips, and near-term credit status.
+          </p>
         </div>
-      )}
+
+        {rules.length === 0 ? (
+          <p className="py-6 text-center text-sm text-foreground/60">
+            No recurring rules for this client yet.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {rules.map((rule) => (
+              <RuleCard
+                key={rule.id}
+                forecast_revision={forecast_revision}
+                on_refresh={on_refresh}
+                rule={rule}
+                session_cards={session_cards}
+              />
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -339,7 +362,7 @@ function RuleCard({
   }
 
   return (
-    <article className="rounded-md border border-border bg-background p-5">
+    <article className="rounded-md border border-border/80 bg-background/80 p-5">
       <div className="flex flex-col gap-3 border-b border-border pb-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-foreground">
@@ -450,10 +473,15 @@ function RuleCard({
                     className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-border/70 px-3 py-2 text-sm"
                   >
                     <span>
-                      {ISO_WEEKDAY_OPTIONS.find((day) => day.value === line.day_of_week)?.label}{' '}
-                      {format_time_value(line.start_time)} · {line.duration_minutes} min
-                      <span className="mt-1 block text-xs text-foreground/60">
-                        Starts {format_session_date(line.first_occurrence_date)}
+                      <span className="inline-flex rounded-full bg-muted px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-foreground ring-1 ring-border">
+                        {ISO_WEEKDAY_OPTIONS.find((day) => day.value === line.day_of_week)?.label}
+                      </span>{' '}
+                      <span className="font-medium text-foreground">
+                        {format_time_value(line.start_time)}
+                      </span>{' '}
+                      · {line.duration_minutes} min
+                      <span className="mt-1 block text-xs font-semibold text-foreground">
+                        First session {format_session_date(line.first_occurrence_date)}
                       </span>
                     </span>
                     <Button
