@@ -103,7 +103,7 @@ describe('MaterializeClientDialog', () => {
     expect(checked).toHaveLength(0);
   });
 
-  it('applies a successful quick-select count', async () => {
+  it('applies a successful quick-select count and labels unchecked rows as not selected', async () => {
     render(
       <MaterializeClientDialog
         client_user_id="client-1"
@@ -124,9 +124,11 @@ describe('MaterializeClientDialog', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Book 8 occurrence/i })).toBeEnabled();
     });
+    expect(screen.getAllByText(/^Not selected$/i).length).toBeGreaterThan(0);
+    expect(screen.queryAllByText(/^Not enough credits$/i)).toHaveLength(0);
   });
 
-  it('aborts a failed quick-select and preserves the prior selection', async () => {
+  it('shows a popup and preserves the prior selection when quick-select exceeds availability', async () => {
     list_occurrences_mock.mockResolvedValue({
       success: true,
       rows: build_rows(20),
@@ -151,9 +153,15 @@ describe('MaterializeClientDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: /^8$/ }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/available credits cover 5/i);
+      expect(screen.getByRole('alertdialog')).toHaveTextContent(/available credits cover 5/i);
     });
+    expect(screen.getByRole('heading', { name: /cannot select that many sessions/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Book 5 occurrence/i })).toBeEnabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /^OK$/i }));
+    await waitFor(() => {
+      expect(screen.queryByRole('alertdialog')).not.toBeInTheDocument();
+    });
   });
 
   it('closes and reports success after materialization creates bookings', async () => {

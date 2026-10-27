@@ -68,7 +68,8 @@ export function MaterializeClientDialog({
   const [load_error, set_load_error] = useState('');
   const [is_submitting, set_is_submitting] = useState(false);
   const [action_error, set_action_error] = useState('');
-  const [quick_select_error, set_quick_select_error] = useState('');
+  const [quick_select_alert, set_quick_select_alert] = useState('');
+  const [selection_mode, set_selection_mode] = useState<'credit' | 'quick'>('credit');
   const [scope, set_scope] = useState<MaterializeClassScope>('all');
   const request_id_ref = useRef(0);
 
@@ -82,7 +83,8 @@ export function MaterializeClientDialog({
       set_loading(true);
       set_load_error('');
       set_action_error('');
-      set_quick_select_error('');
+      set_quick_select_alert('');
+      set_selection_mode('credit');
       set_scope('all');
 
       const response = await list_client_materializable_occurrences(client_user_id);
@@ -102,6 +104,7 @@ export function MaterializeClientDialog({
       set_occurrences(rows);
       set_pools(next_pools);
       set_included_keys(build_credit_based_default_selection(rows, next_pools));
+      set_selection_mode('credit');
       set_loading(false);
     }
 
@@ -190,7 +193,6 @@ export function MaterializeClientDialog({
   if (!open || typeof document === 'undefined') return null;
 
   function toggle_key(key: string) {
-    set_quick_select_error('');
     set_included_keys((current) => {
       const next = new Set(current);
       if (next.has(key)) {
@@ -203,8 +205,9 @@ export function MaterializeClientDialog({
   }
 
   function reset_to_credit_defaults() {
-    set_quick_select_error('');
+    set_quick_select_alert('');
     set_action_error('');
+    set_selection_mode('credit');
     set_included_keys(build_credit_based_default_selection(occurrences, pools));
   }
 
@@ -218,11 +221,12 @@ export function MaterializeClientDialog({
     });
 
     if (!result.ok) {
-      set_quick_select_error(result.message);
+      set_quick_select_alert(result.message);
       return;
     }
 
-    set_quick_select_error('');
+    set_quick_select_alert('');
+    set_selection_mode('quick');
     set_included_keys(result.selection);
   }
 
@@ -271,7 +275,7 @@ export function MaterializeClientDialog({
       <div
         aria-labelledby="materialize-dialog-title"
         aria-modal="true"
-        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background shadow-lg sm:max-h-[85vh]"
+        className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-border bg-background shadow-lg sm:max-h-[85vh]"
         role="dialog"
       >
         <div className="border-b border-border px-5 py-4">
@@ -382,16 +386,28 @@ export function MaterializeClientDialog({
                   const checked = included_keys.has(key);
                   const row_funding = funding.get(key);
                   const hard_blocked = row.token_health === 'package_expires_before';
-                  const badge_health =
-                    hard_blocked
-                      ? ('package_expires_before' as const)
-                      : checked && row_funding && !row_funding.fundable
-                        ? ('insufficient_tokens' as const)
-                        : !checked &&
-                            empty_credits_message === null &&
-                            (row.reformer_credits_required ?? 0) + (row.mat_credits_required ?? 0) > 0
-                          ? ('insufficient_tokens' as const)
-                          : null;
+                  let badge_label: string | null = null;
+                  let badge_class = '';
+
+                  if (hard_blocked) {
+                    badge_label = token_health_label('package_expires_before');
+                    badge_class = token_health_badge_class('package_expires_before');
+                  } else if (checked && row_funding && !row_funding.fundable) {
+                    badge_label = 'Not enough credits';
+                    badge_class = token_health_badge_class('insufficient_tokens');
+                  } else if (!checked && selection_mode === 'quick') {
+                    badge_label = 'Not selected';
+                    badge_class =
+                      'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium text-foreground/70 ring-1 ring-border';
+                  } else if (
+                    !checked &&
+                    selection_mode === 'credit' &&
+                    empty_credits_message === null &&
+                    (row.reformer_credits_required ?? 0) + (row.mat_credits_required ?? 0) > 0
+                  ) {
+                    badge_label = 'Not enough credits';
+                    badge_class = token_health_badge_class('insufficient_tokens');
+                  }
 
                   return (
                     <li
@@ -416,12 +432,8 @@ export function MaterializeClientDialog({
                             ? ` · Previous failure: ${row.failure_message}`
                             : ''}
                         </span>
-                        {badge_health ? (
-                          <span
-                            className={`mt-1 inline-block ${token_health_badge_class(badge_health)}`}
-                          >
-                            {token_health_label(badge_health) || 'Not enough credits'}
-                          </span>
+                        {badge_label ? (
+                          <span className={`mt-1 inline-block ${badge_class}`}>{badge_label}</span>
                         ) : null}
                       </label>
                     </li>
@@ -430,11 +442,6 @@ export function MaterializeClientDialog({
               </ul>
             </>
           )}
-          {quick_select_error ? (
-            <p className="mt-3 text-sm text-danger-foreground" role="alert">
-              {quick_select_error}
-            </p>
-          ) : null}
           {token_block_message ? (
             <p className="mt-3 text-sm text-danger-foreground" role="alert">
               {token_block_message}
@@ -467,6 +474,43 @@ export function MaterializeClientDialog({
               : `Book ${selected_occurrences.length} occurrence(s)`}
           </Button>
         </div>
+
+        {quick_select_alert ? (
+          <div
+            className="absolute inset-0 z-[110] flex items-center justify-center bg-black/45 p-4"
+            role="presentation"
+          >
+            <div
+              aria-describedby="quick-select-alert-message"
+              aria-labelledby="quick-select-alert-title"
+              aria-modal="true"
+              className="w-full max-w-md rounded-lg border border-border bg-background p-5 shadow-lg"
+              role="alertdialog"
+            >
+              <h3
+                className="text-base font-semibold text-foreground"
+                id="quick-select-alert-title"
+              >
+                Cannot select that many sessions
+              </h3>
+              <p
+                className="mt-2 text-sm text-foreground/80"
+                id="quick-select-alert-message"
+              >
+                {quick_select_alert}
+              </p>
+              <div className="mt-4 flex justify-end">
+                <Button
+                  onClick={() => set_quick_select_alert('')}
+                  size="sm"
+                  type="button"
+                >
+                  OK
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
     </div>,
     document.body,
