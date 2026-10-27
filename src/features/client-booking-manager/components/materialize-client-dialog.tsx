@@ -276,12 +276,11 @@ export function MaterializeClientDialog({
       >
         <div className="border-b border-border px-5 py-4">
           <h2 className="text-base font-semibold text-foreground" id="materialize-dialog-title">
-            Materialize planned bookings
+            Book now
           </h2>
           <p className="mt-1 text-sm text-foreground/70">
-            Across all active recurring rules
-            {client_name ? ` for ${client_name}` : ''}. Book selected sessions in the three-calendar-month
-            planned window. Credits are checked per class category.
+            Choose the exact prebook sessions to create the actual bookings now
+            {client_name ? ` for ${client_name}` : ''}. Credits are checked per class category.
           </p>
           <dl className="mt-3 grid gap-2 text-xs text-foreground/70 sm:grid-cols-2">
             <div>
@@ -464,8 +463,8 @@ export function MaterializeClientDialog({
             size="sm"
           >
             {is_submitting
-              ? 'Materializing…'
-              : `Materialize ${selected_occurrences.length} occurrence(s)`}
+              ? 'Booking…'
+              : `Book ${selected_occurrences.length} occurrence(s)`}
           </Button>
         </div>
       </div>

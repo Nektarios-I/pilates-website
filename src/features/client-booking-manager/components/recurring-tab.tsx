@@ -92,12 +92,14 @@ export function RecurringTab({
   }
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-md border border-border bg-muted/50 p-5 shadow-sm ring-1 ring-border/60">
-        <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
-          Create
-        </p>
-        <h2 className="mt-1 text-sm font-semibold text-foreground">Create recurring rule</h2>
+    <div className="space-y-0">
+      <section className="rounded-lg border border-[#CDD2C9] bg-[#E8E2D0]/70 p-5 sm:p-6">
+        <div className="inline-flex rounded-md bg-[#2D3A1F] px-3 py-1.5 shadow-sm">
+          <h2 className="text-base font-bold uppercase tracking-[0.12em] text-[#F4F1E8] sm:text-lg">
+            Create
+          </h2>
+        </div>
+        <p className="mt-3 text-sm font-semibold text-foreground">Create a recurring rule</p>
         <p className="mt-1 text-sm text-foreground/70">
           Choose a class, then add weekly slots for each day using the studio&apos;s default hours.
         </p>
@@ -140,39 +142,54 @@ export function RecurringTab({
         </div>
       </section>
 
-      {message ? <p className="text-sm text-success">{message}</p> : null}
-      {error ? <p className="text-sm text-danger-foreground">{error}</p> : null}
+      <div className="my-5 flex items-center gap-3" aria-hidden="true">
+        <div className="h-px flex-1 bg-[#CDD2C9]" />
+        <div className="h-1.5 w-1.5 rounded-full bg-[#B8A678]" />
+        <div className="h-px flex-1 bg-[#CDD2C9]" />
+      </div>
+
+      {message ? <p className="mb-4 text-sm text-success">{message}</p> : null}
+      {error ? <p className="mb-4 text-sm text-danger-foreground">{error}</p> : null}
 
       {rules.some((rule) => rule.status === 'active') ? (
-        <section className="rounded-md border border-border bg-background p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
-                Materialize
-              </p>
-              <h2 className="mt-1 text-sm font-semibold text-foreground">
-                Materialize planned bookings
-              </h2>
-              <p className="mt-1 text-sm text-foreground/70">
-                Across all active recurring rules
-                {client_name ? ` for ${client_name}` : ''}. Turn planned slots into real bookings in
-                the three-calendar-month planned window. The daily cron still advances the rolling
-                14-day public booking window automatically.
-              </p>
+        <>
+          <section className="rounded-lg border border-[#B8C4B0] bg-[#D8E0D2]/75 p-5 sm:p-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="min-w-0">
+                <div className="inline-flex rounded-md bg-[#2D3A1F] px-3 py-1.5 shadow-sm">
+                  <h2 className="text-base font-bold uppercase tracking-[0.12em] text-[#F4F1E8] sm:text-lg">
+                    Book now
+                  </h2>
+                </div>
+                <p className="mt-3 text-sm font-semibold text-foreground">
+                  Choose the exact prebook sessions to create the actual bookings now
+                  {client_name ? ` for ${client_name}` : ''}.
+                </p>
+                <p className="mt-2 text-sm text-foreground/70">
+                  Note: by default, the system books every matching prebook day in the next 14 days.
+                  Use Book now when you want to pick the sessions yourself.
+                </p>
+              </div>
+              <Button
+                disabled={is_pending}
+                onClick={() => {
+                  set_message('');
+                  set_error('');
+                  set_materialize_open(true);
+                }}
+                size="sm"
+              >
+                Book now
+              </Button>
             </div>
-            <Button
-              disabled={is_pending}
-              onClick={() => {
-                set_message('');
-                set_error('');
-                set_materialize_open(true);
-              }}
-              size="sm"
-            >
-              Materialize planned bookings
-            </Button>
+          </section>
+
+          <div className="my-5 flex items-center gap-3" aria-hidden="true">
+            <div className="h-px flex-1 bg-[#CDD2C9]" />
+            <div className="h-1.5 w-1.5 rounded-full bg-[#B8A678]" />
+            <div className="h-px flex-1 bg-[#CDD2C9]" />
           </div>
-        </section>
+        </>
       ) : null}
 
       <MaterializeClientDialog
@@ -194,23 +211,23 @@ export function RecurringTab({
         open={materialize_open}
       />
 
-      <section className="space-y-4">
-        <div>
-          <p className="text-xs font-medium uppercase tracking-[0.14em] text-foreground/55">
+      <section className="rounded-lg border border-[#D2C8B4] bg-[#F3EEE3]/90 p-5 sm:p-6">
+        <div className="inline-flex rounded-md bg-[#2D3A1F] px-3 py-1.5 shadow-sm">
+          <h2 className="text-base font-bold uppercase tracking-[0.12em] text-[#F4F1E8] sm:text-lg">
             Existing rules
-          </p>
-          <h2 className="mt-1 text-sm font-semibold text-foreground">Recurring rules for this client</h2>
-          <p className="mt-1 text-sm text-foreground/70">
-            Review weekly slots, first session dates, skips, and near-term credit status.
-          </p>
+          </h2>
         </div>
+        <p className="mt-3 text-sm font-semibold text-foreground">Recurring rules for this client</p>
+        <p className="mt-1 text-sm text-foreground/70">
+          Review weekly slots, first session dates, skips, and near-term credit status.
+        </p>
 
         {rules.length === 0 ? (
           <p className="py-6 text-center text-sm text-foreground/60">
             No recurring rules for this client yet.
           </p>
         ) : (
-          <div className="space-y-4">
+          <div className="mt-4 space-y-4">
             {rules.map((rule) => (
               <RuleCard
                 key={rule.id}
@@ -666,8 +683,8 @@ function RuleCard({
             </h3>
             <p className="mt-1 text-xs text-foreground/60">
               Operational status inside the public booking window (credits and materialization
-              health). Planned sessions, skips, and Materialize Now use the three-calendar-month
-              window above.
+              health). Planned sessions, skips, and Book now use the three-calendar-month window
+              above.
             </p>
             {forecast.length === 0 ? (
               <p className="mt-2 text-sm text-foreground/60">No forecast occurrences in window.</p>

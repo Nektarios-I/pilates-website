@@ -34,9 +34,13 @@ export function RecurringWeeklySlotPicker({
   const [selected_by_day, set_selected_by_day] = useState<
     Record<number, { start_time: string; first_occurrence_date: string }>
   >({});
+  const [expanded_day, set_expanded_day] = useState<number | null>(null);
 
   return (
-    <div className="mt-4 space-y-3">
+    <div className="mt-4 space-y-2">
+      <p className="text-xs text-foreground/60">
+        Choose a day to add a weekly slot. Only one day is open at a time.
+      </p>
       {day_options.map((day) => {
         const added_times = new Set(
           active_lines
@@ -66,118 +70,144 @@ export function RecurringWeeklySlotPicker({
           Boolean(selected.first_occurrence_date) &&
           validation?.ok === true;
         const selected_slot = available_slots.find((slot) => slot.start_time === selected.start_time);
+        const is_expanded = expanded_day === day.day_of_week;
+        const slot_summary = day.is_closed
+          ? 'Closed'
+          : available_slots.length === 0
+            ? 'All slots added'
+            : `${available_slots.length} slot${available_slots.length === 1 ? '' : 's'} available`;
 
         return (
-          <div key={day.day_of_week} className="space-y-3 rounded-md border border-border/60 px-3 py-3">
-            <p className="text-sm font-medium text-foreground">{day.weekday_label}</p>
+          <div
+            key={day.day_of_week}
+            className="overflow-hidden rounded-md border border-border/70 bg-background/80"
+          >
+            <button
+              aria-expanded={is_expanded}
+              className="flex w-full items-center justify-between gap-3 px-3 py-3 text-left transition-colors hover:bg-muted/40"
+              onClick={() =>
+                set_expanded_day((current) => (current === day.day_of_week ? null : day.day_of_week))
+              }
+              type="button"
+            >
+              <span className="text-sm font-semibold text-foreground">{day.weekday_label}</span>
+              <span className="flex items-center gap-2 text-xs text-foreground/60">
+                <span>{slot_summary}</span>
+                <span aria-hidden="true">{is_expanded ? '▾' : '▸'}</span>
+              </span>
+            </button>
 
-            {day.is_closed ? (
-              <p className="text-sm text-foreground/60">Studio closed</p>
-            ) : available_slots.length === 0 ? (
-              <p className="text-sm text-foreground/60">
-                All default slots for this day are already on the rule.
-              </p>
-            ) : (
-              <>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-foreground"
-                      htmlFor={`recurring-slot-${day.day_of_week}`}
-                    >
-                      Session slot
-                    </label>
-                    <select
-                      className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                      id={`recurring-slot-${day.day_of_week}`}
-                      onChange={(event) =>
+            {is_expanded ? (
+              <div className="space-y-3 border-t border-border/60 px-3 py-3">
+                {day.is_closed ? (
+                  <p className="text-sm text-foreground/60">Studio closed</p>
+                ) : available_slots.length === 0 ? (
+                  <p className="text-sm text-foreground/60">
+                    All default slots for this day are already on the rule.
+                  </p>
+                ) : (
+                  <>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      <div>
+                        <label
+                          className="block text-sm font-medium text-foreground"
+                          htmlFor={`recurring-slot-${day.day_of_week}`}
+                        >
+                          Session slot
+                        </label>
+                        <select
+                          className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                          id={`recurring-slot-${day.day_of_week}`}
+                          onChange={(event) =>
+                            set_selected_by_day((current) => ({
+                              ...current,
+                              [day.day_of_week]: {
+                                start_time: event.target.value,
+                                first_occurrence_date:
+                                  current[day.day_of_week]?.first_occurrence_date ?? '',
+                              },
+                            }))
+                          }
+                          value={selected.start_time}
+                        >
+                          <option value="">Select time</option>
+                          {available_slots.map((slot) => (
+                            <option key={slot.start_time} value={slot.start_time}>
+                              {slot.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label
+                          className="block text-sm font-medium text-foreground"
+                          htmlFor={`recurring-first-${day.day_of_week}`}
+                        >
+                          First session date
+                        </label>
+                        <select
+                          className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
+                          disabled={!selected.start_time}
+                          id={`recurring-first-${day.day_of_week}`}
+                          onChange={(event) =>
+                            set_selected_by_day((current) => ({
+                              ...current,
+                              [day.day_of_week]: {
+                                start_time: current[day.day_of_week]?.start_time ?? '',
+                                first_occurrence_date: event.target.value,
+                              },
+                            }))
+                          }
+                          value={selected.first_occurrence_date}
+                        >
+                          <option value="">Select first date</option>
+                          {first_date_options.map((date_key) => (
+                            <option key={date_key} value={date_key}>
+                              {parse_date_key(date_key).toLocaleDateString('en-GB', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric',
+                              })}
+                            </option>
+                          ))}
+                        </select>
+                        <p className="mt-1 text-xs text-foreground/60">
+                          Choose the first session this recurring booking should apply to.
+                        </p>
+                      </div>
+                    </div>
+
+                    {validation && !validation.ok ? (
+                      <p className="text-sm text-danger-foreground">{validation.error}</p>
+                    ) : null}
+
+                    <RecurringPlannedSessionsPreview
+                      day_of_week={selected.start_time ? day.day_of_week : null}
+                      end_time={selected_slot?.end_time}
+                      first_occurrence_date={selected.first_occurrence_date}
+                      session_title={session_title}
+                      start_time={selected.start_time}
+                    />
+
+                    <Button
+                      disabled={disabled || !can_add}
+                      onClick={() => {
+                        if (!can_add) return;
+                        on_add(day.day_of_week, selected.start_time, selected.first_occurrence_date);
                         set_selected_by_day((current) => ({
                           ...current,
-                          [day.day_of_week]: {
-                            start_time: event.target.value,
-                            first_occurrence_date:
-                              current[day.day_of_week]?.first_occurrence_date ?? '',
-                          },
-                        }))
-                      }
-                      value={selected.start_time}
+                          [day.day_of_week]: { start_time: '', first_occurrence_date: '' },
+                        }));
+                      }}
+                      size="sm"
                     >
-                      <option value="">Select time</option>
-                      {available_slots.map((slot) => (
-                        <option key={slot.start_time} value={slot.start_time}>
-                          {slot.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label
-                      className="block text-sm font-medium text-foreground"
-                      htmlFor={`recurring-first-${day.day_of_week}`}
-                    >
-                      First session date
-                    </label>
-                    <select
-                      className="mt-2 block w-full rounded-md border border-border bg-background px-3 py-2 text-sm"
-                      disabled={!selected.start_time}
-                      id={`recurring-first-${day.day_of_week}`}
-                      onChange={(event) =>
-                        set_selected_by_day((current) => ({
-                          ...current,
-                          [day.day_of_week]: {
-                            start_time: current[day.day_of_week]?.start_time ?? '',
-                            first_occurrence_date: event.target.value,
-                          },
-                        }))
-                      }
-                      value={selected.first_occurrence_date}
-                    >
-                      <option value="">Select first date</option>
-                      {first_date_options.map((date_key) => (
-                        <option key={date_key} value={date_key}>
-                          {parse_date_key(date_key).toLocaleDateString('en-GB', {
-                            weekday: 'long',
-                            day: 'numeric',
-                            month: 'long',
-                            year: 'numeric',
-                          })}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="mt-1 text-xs text-foreground/60">
-                      Choose the first session this recurring booking should apply to.
-                    </p>
-                  </div>
-                </div>
-
-                {validation && !validation.ok ? (
-                  <p className="text-sm text-danger-foreground">{validation.error}</p>
-                ) : null}
-
-                <RecurringPlannedSessionsPreview
-                  day_of_week={selected.start_time ? day.day_of_week : null}
-                  end_time={selected_slot?.end_time}
-                  first_occurrence_date={selected.first_occurrence_date}
-                  session_title={session_title}
-                  start_time={selected.start_time}
-                />
-
-                <Button
-                  disabled={disabled || !can_add}
-                  onClick={() => {
-                    if (!can_add) return;
-                    on_add(day.day_of_week, selected.start_time, selected.first_occurrence_date);
-                    set_selected_by_day((current) => ({
-                      ...current,
-                      [day.day_of_week]: { start_time: '', first_occurrence_date: '' },
-                    }));
-                  }}
-                  size="sm"
-                >
-                  Add slot
-                </Button>
-              </>
-            )}
+                      Add slot
+                    </Button>
+                  </>
+                )}
+              </div>
+            ) : null}
           </div>
         );
       })}

@@ -62,7 +62,7 @@ describe('MaterializeClientDialog', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 9 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 9 occurrence/i })).toBeEnabled();
     });
 
     const checked = screen.getAllByRole('checkbox').filter(
@@ -122,7 +122,7 @@ describe('MaterializeClientDialog', () => {
     fireEvent.click(screen.getByRole('button', { name: /^8$/ }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 8 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 8 occurrence/i })).toBeEnabled();
     });
   });
 
@@ -145,7 +145,7 @@ describe('MaterializeClientDialog', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 5 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 5 occurrence/i })).toBeEnabled();
     });
 
     fireEvent.click(screen.getByRole('button', { name: /^8$/ }));
@@ -153,7 +153,7 @@ describe('MaterializeClientDialog', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/available credits cover 5/i);
     });
-    expect(screen.getByRole('button', { name: /materialize 5 occurrence/i })).toBeEnabled();
+    expect(screen.getByRole('button', { name: /Book 5 occurrence/i })).toBeEnabled();
   });
 
   it('closes and reports success after materialization creates bookings', async () => {
@@ -195,10 +195,10 @@ describe('MaterializeClientDialog', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 1 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 1 occurrence/i })).toBeEnabled();
     });
 
-    fireEvent.click(screen.getByRole('button', { name: /materialize 1 occurrence/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Book 1 occurrence/i }));
 
     await waitFor(() => {
       expect(on_close).toHaveBeenCalledTimes(1);
@@ -246,7 +246,7 @@ describe('MaterializeClientDialog', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 2 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 2 occurrence/i })).toBeEnabled();
     });
 
     resolve_first?.({
@@ -256,8 +256,8 @@ describe('MaterializeClientDialog', () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /materialize 2 occurrence/i })).toBeEnabled();
+      expect(screen.getByRole('button', { name: /Book 2 occurrence/i })).toBeEnabled();
     });
-    expect(screen.queryByRole('button', { name: /materialize 9 occurrence/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Book 9 occurrence/i })).not.toBeInTheDocument();
   });
 });
