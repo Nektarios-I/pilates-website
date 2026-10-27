@@ -5,7 +5,8 @@
 - category: implementation
 - topic: recurring-prebooks-ui-materialize-defaults
 - related plan: logs/planning/2026-10-27_0918Z__cursor__planning__recurring-prebooks-ui-materialize-defaults.md
-- status: implementation complete; verification in progress; production release pending
+- status: shipped to git + production SQL; Vercel deployment confirmation pending team auth
+- commit: 8ae59568816283a5dd4b6854dfebd0c1eb51cf5d
 
 ## What changed
 
@@ -15,16 +16,18 @@
 4. Migration `47_materialize_selection_credit_aware.sql`: selected-only credit validation.
 5. Client search phone-digit empty-string match bugfix.
 
-## Verification so far
+## Verification
 
 - `npm run test` — 405 passed
 - `npm run typecheck` — passed
 - `npm run lint` — passed
 - `npm run build` — passed
+- Authenticated browser smoke blocked at login (no staff session in automation)
+- Production SQL: migration applied on project `xzlirjwzpmvugkbhtzxw`; function comment verified
+- Git: `origin/master` at `8ae5956`
+- Vercel status: team authorization required to confirm READY deploy
 
-## Next
+## Owner follow-up
 
-- Browser smoke on `/staff/client-bookings`
-- Commit relevant files
-- Apply migration 47 to production
-- Deploy and production smoke (read-only / designated test client)
+1. Approve Vercel team access if prompted, then confirm production deploy READY for `8ae5956`.
+2. Staff login → `/staff/client-bookings` smoke: Recurring rules overview, hierarchy, Materialize defaults (no real materialize unless designated test client).
