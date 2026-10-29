@@ -186,7 +186,8 @@ function empty_month_overview(year: number, month: number): MonthCalendarOvervie
 /**
  * Independent month load for the Month Calendar. Same staff gate and session
  * statuses as day bookings, but no hour-range filter and a dedicated select
- * that includes user_id for the client-detail popup.
+ * that includes user_id for the client-detail popup. Cancelled bookings are
+ * included so day detail can show a CANCELLED summary card per session.
  */
 export async function list_month_calendar(
   year: number,
@@ -212,7 +213,6 @@ export async function list_month_calendar(
     .select(STAFF_MONTH_CALENDAR_SELECT)
     .gte('sessions.starts_at', range_start)
     .lte('sessions.starts_at', range_end)
-    .neq('status', 'cancelled')
     .in('sessions.status', ['scheduled', 'completed'])
     .order('booked_at', { ascending: true });
 

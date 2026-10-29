@@ -31,8 +31,12 @@ describe('staff booking query contract (post-migration 18)', () => {
     }
   });
 
-  it('month-calendar select includes user_id and omits instructor embed', () => {
+  it('month-calendar select includes user_id, cancel actor, and omits instructor embed', () => {
     expect(STAFF_MONTH_CALENDAR_SELECT).toContain('user_id');
+    expect(STAFF_MONTH_CALENDAR_SELECT).toContain('cancelled_by_user_id');
+    expect(STAFF_MONTH_CALENDAR_SELECT).toContain(
+      'profiles!bookings_cancelled_by_user_id_fkey',
+    );
     expect(STAFF_MONTH_CALENDAR_SELECT).not.toContain('profiles!sessions_instructor_id_fkey');
   });
 

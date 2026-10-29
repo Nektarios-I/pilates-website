@@ -9,11 +9,13 @@ import {
   accessible_day_label,
   build_day_hour_slots,
   current_studio_year_month,
+  format_cancelled_at_label,
   format_compact_type_counts_label,
   format_slot_counts_label,
   format_type_counts_label,
   shift_year_month,
   year_dropdown_options,
+  type MonthCalendarCancelledGroup,
   type MonthCalendarDay,
   type MonthCalendarHourSlot,
   type MonthCalendarOverview,
@@ -86,12 +88,21 @@ const BOOKING_KIND_CLASS: Record<MonthCalendarSlotBooking['kind'], string> = {
   other: 'border-warning-border bg-warning-surface',
 };
 
+const NOT_ATTENDED_CLASS = 'border-warning-border bg-warning-surface text-warning-foreground';
+const CANCELLED_CARD_CLASS =
+  'border-destructive-border bg-destructive-surface text-destructive';
+
 type MonthCalendarSectionProps = {
   overview: MonthCalendarOverview;
   is_pending: boolean;
   error?: string | null;
   on_navigate_month: (year: number, month: number) => void;
 };
+
+function booking_box_class(booking: MonthCalendarSlotBooking): string {
+  if (booking.status === 'not_attended') return NOT_ATTENDED_CLASS;
+  return BOOKING_KIND_CLASS[booking.kind];
+}
 
 export function BookingBox({
   booking,
@@ -100,15 +111,18 @@ export function BookingBox({
   booking: MonthCalendarSlotBooking;
   on_select: (booking: MonthCalendarSlotBooking) => void;
 }) {
+  const is_not_attended = booking.status === 'not_attended';
+
   return (
     <button
       className={[
         'min-h-11 min-w-[6.75rem] shrink-0 cursor-pointer rounded-md border px-3 py-2 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-w-[7.5rem]',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
-        BOOKING_KIND_CLASS[booking.kind],
+        booking_box_class(booking),
       ].join(' ')}
-      aria-label={`${booking.compact_name}, ${booking.session_type_label}`}
+      aria-label={`${booking.compact_name}, ${booking.session_type_label}${is_not_attended ? ', not attended' : ''}`}
       data-kind={booking.kind}
+      data-status={booking.status}
       type="button"
       onClick={() => on_select(booking)}
     >
@@ -121,29 +135,159 @@ export function BookingBox({
   );
 }
 
+export function CancelledSessionCard({
+  group,
+  on_select,
+}: {
+  group: MonthCalendarCancelledGroup;
+  on_select: (group: MonthCalendarCancelledGroup) => void;
+}) {
+  const count_label = group.count === 1 ? '1 cancelled' : `${group.count} cancelled`;
+
+  return (
+    <button
+      className={[
+        'min-h-11 min-w-[6.75rem] shrink-0 cursor-pointer rounded-md border px-3 py-2 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-w-[7.5rem]',
+        'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
+        CANCELLED_CARD_CLASS,
+      ].join(' ')}
+      aria-label={`Cancelled, ${count_label}, ${group.session_type_label}`}
+      data-cancelled-session={group.session_id}
+      type="button"
+      onClick={() => on_select(group)}
+    >
+      <span className="block text-sm font-semibold uppercase tracking-wide">Cancelled</span>
+      <span className="mt-0.5 block text-[11px] uppercase tracking-wide opacity-90">
+        {count_label} · {group.session_type_label}
+      </span>
+    </button>
+  );
+}
+
+export function CancelledBookingsPopup({
+  group,
+  on_close,
+}: {
+  group: MonthCalendarCancelledGroup;
+  on_close: () => void;
+}) {
+  const title_id = useId();
+  const dialog_ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const root = dialog_ref.current;
+    if (!root) return;
+    const previously = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const items = focusable_elements(root);
+    const initial = items.find((element) => element.dataset.dialogInitialFocus === 'true') ?? items[0];
+    initial?.focus();
+    return () => {
+      previously?.focus();
+    };
+  }, []);
+
+  useEffect(() => {
+    function on_keydown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        on_close();
+      }
+    }
+    document.addEventListener('keydown', on_keydown);
+    return () => document.removeEventListener('keydown', on_keydown);
+  }, [on_close]);
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
+    <div
+      aria-labelledby={title_id}
+      aria-modal="true"
+      className="fixed inset-0 z-[60] flex items-end justify-center bg-inverse/40 p-0 sm:items-center sm:p-4"
+      role="dialog"
+      onKeyDown={trap_dialog_tab}
+    >
+      <button
+        aria-label="Close cancelled bookings backdrop"
+        className="absolute inset-0 cursor-default"
+        tabIndex={-1}
+        type="button"
+        onClick={on_close}
+      />
+      <div
+        className="relative flex max-h-[85vh] w-full max-w-lg flex-col overscroll-contain rounded-t-lg border border-destructive-border bg-background shadow-lg sm:rounded-lg"
+        ref={dialog_ref}
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-4">
+          <div>
+            <h2 className="text-base font-semibold text-destructive" id={title_id}>
+              Cancelled bookings
+            </h2>
+            <p className="mt-0.5 text-sm text-foreground/70">
+              {group.session_type_label} · {group.count}{' '}
+              {group.count === 1 ? 'cancellation' : 'cancellations'}
+            </p>
+          </div>
+          <Button
+            aria-label="Close cancelled bookings"
+            data-dialog-initial-focus="true"
+            size="sm"
+            type="button"
+            variant="secondary"
+            onClick={on_close}
+          >
+            Close
+          </Button>
+        </div>
+        <ul className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-4 py-4">
+          {group.cancellations.map((entry) => (
+            <li
+              className="rounded-md border border-destructive-border/70 bg-destructive-surface/60 px-3 py-2"
+              key={entry.booking_id}
+            >
+              <p className="text-sm font-medium text-foreground">{entry.client_name}</p>
+              <p className="mt-1 text-xs text-foreground/75">
+                Cancelled {format_cancelled_at_label(entry.cancelled_at)}
+              </p>
+              <p className="mt-0.5 text-xs text-foreground/75">
+                By {entry.cancelled_by_label}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 function SlotRow({
   slot,
   on_select_booking,
+  on_select_cancelled,
 }: {
   slot: MonthCalendarHourSlot;
   on_select_booking: (booking: MonthCalendarSlotBooking) => void;
+  on_select_cancelled: (group: MonthCalendarCancelledGroup) => void;
 }) {
-  const has_bookings =
+  const has_active =
     slot.reformer.length + slot.mat.length + slot.other.length > 0;
+  const has_cancelled = slot.cancelled_groups.length > 0;
+  const has_content = has_active || has_cancelled;
 
   return (
     <div
       className={[
         'flex min-h-[4.75rem] border-b border-border/70',
-        has_bookings ? 'bg-surface' : 'bg-background/70',
+        has_content ? 'bg-surface' : 'bg-background/70',
       ].join(' ')}
-      data-empty={!has_bookings}
+      data-empty={!has_content}
       data-hour={String(slot.hour).padStart(2, '0')}
     >
       <div
         className={[
           'sticky left-0 z-10 flex w-12 shrink-0 items-start justify-end border-r border-border/70 px-1 py-3 sm:w-16 sm:justify-center sm:px-2',
-          has_bookings ? 'bg-surface' : 'bg-background',
+          has_content ? 'bg-surface' : 'bg-background',
         ].join(' ')}
       >
         <span className="whitespace-nowrap text-[11px] font-semibold tabular-nums text-foreground sm:text-sm">
@@ -153,9 +297,12 @@ function SlotRow({
       <div className="min-w-0 flex-1 py-2 pr-3">
         <p className="text-[11px] font-medium text-foreground/70">
           {format_slot_counts_label(slot.counts)}
+          {has_cancelled
+            ? ` · ${slot.cancelled_groups.reduce((sum, group) => sum + group.count, 0)} cancelled`
+            : ''}
         </p>
         <div className="relative mt-2">
-          {has_bookings ? (
+          {has_content ? (
             <div className="flex gap-2 overflow-x-auto overscroll-x-contain pb-1 pr-8 [scrollbar-width:thin]">
               {slot.reformer.length > 0 ? (
                 <p className="sr-only">Reformer bookings</p>
@@ -181,11 +328,24 @@ function SlotRow({
               {slot.other.map((booking) => (
                 <BookingBox booking={booking} key={booking.id} on_select={on_select_booking} />
               ))}
+              {has_cancelled && has_active ? (
+                <div
+                  aria-hidden="true"
+                  className="mx-1 w-px shrink-0 self-stretch bg-destructive-border"
+                />
+              ) : null}
+              {slot.cancelled_groups.map((group) => (
+                <CancelledSessionCard
+                  group={group}
+                  key={group.session_id}
+                  on_select={on_select_cancelled}
+                />
+              ))}
             </div>
           ) : (
             <p className="text-xs text-foreground/50">No bookings in this hour.</p>
           )}
-          {has_bookings ? (
+          {has_content ? (
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-surface to-transparent"
@@ -209,11 +369,14 @@ export function DayDetailPopup({
   const title_id = useId();
   const dialog_ref = useRef<HTMLDivElement>(null);
   const [selected_booking, set_selected_booking] = useState<MonthCalendarSlotBooking | null>(null);
+  const [selected_cancelled, set_selected_cancelled] =
+    useState<MonthCalendarCancelledGroup | null>(null);
   const slots = useMemo(
     () => build_day_hour_slots({ date_key, bookings: overview.bookings }),
     [date_key, overview.bookings],
   );
   const heading = format_day_heading(date_key);
+  const overlay_open = Boolean(selected_booking || selected_cancelled);
 
   useEffect(() => {
     const root = dialog_ref.current;
@@ -232,7 +395,7 @@ export function DayDetailPopup({
     document.body.style.overflow = 'hidden';
 
     function on_keydown(event: KeyboardEvent) {
-      if (event.key === 'Escape' && !selected_booking) {
+      if (event.key === 'Escape' && !overlay_open) {
         event.preventDefault();
         on_close();
       }
@@ -243,7 +406,7 @@ export function DayDetailPopup({
       document.body.style.overflow = previous;
       document.removeEventListener('keydown', on_keydown);
     };
-  }, [on_close, selected_booking]);
+  }, [on_close, overlay_open]);
 
   if (typeof document === 'undefined') return null;
 
@@ -264,7 +427,7 @@ export function DayDetailPopup({
       />
       <div
         className="relative flex h-[96vh] w-full max-w-5xl flex-col overscroll-contain rounded-t-lg border border-border bg-background shadow-lg sm:h-auto sm:max-h-[92vh] sm:rounded-lg"
-        inert={selected_booking ? true : undefined}
+        inert={overlay_open ? true : undefined}
         ref={dialog_ref}
       >
         <div className="flex items-start justify-between gap-3 border-b border-border px-4 py-4">
@@ -294,6 +457,7 @@ export function DayDetailPopup({
               key={slot.hour}
               slot={slot}
               on_select_booking={set_selected_booking}
+              on_select_cancelled={set_selected_cancelled}
             />
           ))}
         </div>
@@ -303,6 +467,13 @@ export function DayDetailPopup({
           booking={selected_booking}
           key={selected_booking.id}
           on_close={() => set_selected_booking(null)}
+        />
+      ) : null}
+      {selected_cancelled ? (
+        <CancelledBookingsPopup
+          group={selected_cancelled}
+          key={selected_cancelled.session_id}
+          on_close={() => set_selected_cancelled(null)}
         />
       ) : null}
     </div>,

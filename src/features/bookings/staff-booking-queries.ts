@@ -46,15 +46,23 @@ export const STAFF_BOOKING_HISTORY_SELECT = `
 `;
 
 /**
- * Staff month-calendar select — active-roster rows with client user_id for the
- * independent Month Calendar / Day Detail view. Intentionally separate from
- * STAFF_DAY_BOOKINGS_SELECT so the existing day page query stays unchanged.
+ * Staff month-calendar select — roster rows with client user_id for the
+ * independent Month Calendar / Day Detail view. Includes cancelled bookings so
+ * the day detail can show a CANCELLED summary card per session. Intentionally
+ * separate from STAFF_DAY_BOOKINGS_SELECT so the existing day page query stays
+ * unchanged.
  */
 export const STAFF_MONTH_CALENDAR_SELECT = `
   id,
   status,
   user_id,
   session_id,
+  cancelled_at,
+  cancellation_actor_note,
+  cancelled_by_user_id,
+  cancelled_by:profiles!bookings_cancelled_by_user_id_fkey (
+    full_name
+  ),
   ${BOOKINGS_CLIENT_PROFILE_EMBED},
   sessions!inner (
     id,
@@ -101,6 +109,7 @@ export function has_ambiguous_booking_profiles_embed(select: string): boolean {
   const without_safe = select
     .replace(/profiles!bookings_user_id_fkey(?:!inner)?/g, '')
     .replace(/profiles!bookings_created_by_user_id_fkey(?:!inner)?/g, '')
+    .replace(/profiles!bookings_cancelled_by_user_id_fkey(?:!inner)?/g, '')
     .replace(/profiles!sessions_instructor_id_fkey(?:!inner)?/g, '');
 
   return /profiles!inner/.test(without_safe) || /(?:^|[^!])profiles\s*\(/.test(without_safe);

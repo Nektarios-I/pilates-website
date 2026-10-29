@@ -2,10 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   accessible_day_label,
+  build_cancelled_groups,
   build_day_hour_slots,
   build_month_calendar_days,
   classify_session_type,
   empty_type_counts,
+  format_cancelled_by_label,
   format_compact_client_name,
   format_compact_type_counts_label,
   format_hour_clock_label,
@@ -24,6 +26,7 @@ function booking(
 ): MonthCalendarBooking {
   return {
     user_id: 'user-1',
+    session_id: 'session-1',
     client_name: 'Maria Papadou',
     session_type: 'reformer',
     kind: 'reformer',
@@ -31,6 +34,9 @@ function booking(
     hour: 6,
     status: 'booked',
     counts_as_active: true,
+    cancelled_at: null,
+    cancelled_by_name: null,
+    cancellation_actor_note: null,
     ...partial,
   };
 }
@@ -170,9 +176,11 @@ describe('map_month_calendar_booking', () => {
     const mapped = map_month_calendar_booking({
       id: 'b1',
       user_id: 'user-maria',
+      session_id: 'session-1',
       status: 'booked',
       profiles: { full_name: 'Maria Papadou', email: 'maria@example.com', phone: null },
       sessions: {
+        id: 'session-1',
         starts_at: '2026-09-05T03:00:00.000Z',
         session_type: 'reformer',
       },
@@ -181,6 +189,7 @@ describe('map_month_calendar_booking', () => {
     expect(mapped).toMatchObject({
       id: 'b1',
       user_id: 'user-maria',
+      session_id: 'session-1',
       client_name: 'Maria Papadou',
       kind: 'reformer',
       date_key: '2026-09-05',
@@ -188,19 +197,30 @@ describe('map_month_calendar_booking', () => {
     });
   });
 
-  it('omits cancelled bookings from the calendar', () => {
-    expect(
-      map_month_calendar_booking({
-        id: 'b2',
-        user_id: 'user-2',
-        status: 'cancelled',
-        profiles: { full_name: 'Alex', email: 'a@example.com', phone: null },
-        sessions: {
-          starts_at: '2026-09-05T03:00:00.000Z',
-          session_type: 'mat',
-        },
-      }),
-    ).toBeNull();
+  it('keeps cancelled bookings for the CANCELLED summary card', () => {
+    const mapped = map_month_calendar_booking({
+      id: 'b2',
+      user_id: 'user-2',
+      session_id: 'session-2',
+      status: 'cancelled',
+      cancelled_at: '2026-09-04T10:00:00.000Z',
+      cancellation_actor_note: null,
+      cancelled_by: { full_name: 'Owner Staff' },
+      profiles: { full_name: 'Alex', email: 'a@example.com', phone: null },
+      sessions: {
+        id: 'session-2',
+        starts_at: '2026-09-05T03:00:00.000Z',
+        session_type: 'mat',
+      },
+    });
+
+    expect(mapped).toMatchObject({
+      id: 'b2',
+      status: 'cancelled',
+      counts_as_active: false,
+      cancelled_by_name: 'Owner Staff',
+      cancelled_at: '2026-09-04T10:00:00.000Z',
+    });
   });
 });
 
@@ -354,5 +374,105 @@ describe('build_day_hour_slots', () => {
     expect(six?.mat[0]?.session_type_label).toBe('Mat');
     expect(six?.other[0]?.session_type_label).toBe('Private');
     expect(six?.other[1]?.session_type_label).toBe('Intro');
+    expect(six?.cancelled_groups).toEqual([]);
+  });
+
+  it('groups cancelled bookings into one CANCELLED card per session', () => {
+    const slots = build_day_hour_slots({
+      date_key: '2026-09-05',
+      bookings: [
+        booking({
+          id: 'active-1',
+          session_id: 'session-ref',
+          starts_at: '2026-09-05T03:00:00.000Z',
+          hour: 6,
+        }),
+        booking({
+          id: 'cancel-1',
+          session_id: 'session-ref',
+          starts_at: '2026-09-05T03:00:00.000Z',
+          hour: 6,
+          status: 'cancelled',
+          counts_as_active: false,
+          client_name: 'Alex Cancelled',
+          cancelled_at: '2026-09-04T10:00:00.000Z',
+          cancelled_by_name: 'Owner Staff',
+        }),
+        booking({
+          id: 'cancel-2',
+          session_id: 'session-ref',
+          starts_at: '2026-09-05T03:00:00.000Z',
+          hour: 6,
+          status: 'cancelled',
+          counts_as_active: false,
+          client_name: 'Ben Cancelled',
+          cancelled_at: '2026-09-04T11:00:00.000Z',
+          cancelled_by_name: 'Owner Staff',
+        }),
+      ],
+    });
+
+    const six = slots[6];
+    expect(six?.reformer.map((item) => item.id)).toEqual(['active-1']);
+    expect(six?.cancelled_groups).toHaveLength(1);
+    expect(six?.cancelled_groups[0]).toMatchObject({
+      session_id: 'session-ref',
+      count: 2,
+    });
+    expect(six?.cancelled_groups[0]?.cancellations.map((entry) => entry.client_name)).toEqual([
+      'Alex Cancelled',
+      'Ben Cancelled',
+    ]);
+  });
+});
+
+describe('format_cancelled_by_label', () => {
+  it('prefers account name, then note, then not recorded', () => {
+    expect(
+      format_cancelled_by_label({
+        cancelled_by_name: 'Owner Staff',
+        cancellation_actor_note: 'Not recorded before 2026-10-26',
+      }),
+    ).toBe('Owner Staff');
+    expect(
+      format_cancelled_by_label({
+        cancelled_by_name: null,
+        cancellation_actor_note: 'Not recorded before 2026-10-26',
+      }),
+    ).toBe('Not recorded before 2026-10-26');
+    expect(
+      format_cancelled_by_label({
+        cancelled_by_name: null,
+        cancellation_actor_note: null,
+      }),
+    ).toBe('Not recorded');
+  });
+});
+
+describe('build_cancelled_groups', () => {
+  it('keeps separate groups for different sessions in the same hour', () => {
+    const groups = build_cancelled_groups([
+      booking({
+        id: 'c1',
+        session_id: 'session-a',
+        starts_at: '2026-09-05T03:00:00.000Z',
+        status: 'cancelled',
+        counts_as_active: false,
+        client_name: 'A',
+      }),
+      booking({
+        id: 'c2',
+        session_id: 'session-b',
+        starts_at: '2026-09-05T03:00:00.000Z',
+        status: 'cancelled',
+        counts_as_active: false,
+        kind: 'mat',
+        session_type: 'mat',
+        client_name: 'B',
+      }),
+    ]);
+
+    expect(groups).toHaveLength(2);
+    expect(groups.map((group) => group.session_id)).toEqual(['session-a', 'session-b']);
   });
 });

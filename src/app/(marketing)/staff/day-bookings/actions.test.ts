@@ -288,21 +288,36 @@ describe('list_month_calendar', () => {
     });
   });
 
-  it('omits cancelled bookings from the month calendar', async () => {
+  it('includes cancelled bookings for CANCELLED cards without counting them as active', async () => {
     const supabase = staff_supabase({
-      bookings_data: [{ ...maria_row, id: 'cancelled-1', status: 'cancelled' }],
+      bookings_data: [
+        {
+          ...maria_row,
+          id: 'cancelled-1',
+          status: 'cancelled',
+          cancelled_at: '2026-07-29T10:00:00.000Z',
+          cancellation_actor_note: null,
+          cancelled_by: { full_name: 'Owner Staff' },
+        },
+      ],
     });
     create_client_mock.mockResolvedValue(supabase as never);
 
     const result = await list_month_calendar(2026, 7);
     const day = result.overview.days.find((entry) => entry.date_key === '2026-07-30');
-    expect(supabase._last_query.neq).toHaveBeenCalledWith('status', 'cancelled');
+    expect(supabase._last_query.neq).not.toHaveBeenCalled();
     expect(supabase._last_query.in).toHaveBeenCalledWith('sessions.status', [
       'scheduled',
       'completed',
     ]);
     expect(day?.total_active).toBe(0);
-    expect(result.overview.bookings).toEqual([]);
+    expect(result.overview.bookings).toHaveLength(1);
+    expect(result.overview.bookings[0]).toMatchObject({
+      id: 'cancelled-1',
+      status: 'cancelled',
+      counts_as_active: false,
+      cancelled_by_name: 'Owner Staff',
+    });
   });
 
   it('returns a friendly month error without leaking PostgREST details', async () => {

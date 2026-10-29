@@ -6,6 +6,7 @@ import type { ClientDashboardData } from '@/features/client-booking-manager/type
 
 import {
   BookingBox,
+  CancelledSessionCard,
   DayDetailPopup,
   MonthCalendarSection,
 } from './month-calendar-section';
@@ -32,6 +33,7 @@ const overview = build_month_calendar_overview({
     {
       id: 'b-ref',
       user_id: 'user-maria',
+      session_id: 'session-ref',
       client_name: 'Maria Papadou',
       session_type: 'reformer',
       kind: 'reformer',
@@ -40,10 +42,14 @@ const overview = build_month_calendar_overview({
       hour: 6,
       status: 'booked',
       counts_as_active: true,
+      cancelled_at: null,
+      cancelled_by_name: null,
+      cancellation_actor_note: null,
     },
     {
       id: 'b-mat',
       user_id: 'user-elena',
+      session_id: 'session-mat',
       client_name: 'Elena Matou',
       session_type: 'mat',
       kind: 'mat',
@@ -52,6 +58,41 @@ const overview = build_month_calendar_overview({
       hour: 6,
       status: 'booked',
       counts_as_active: true,
+      cancelled_at: null,
+      cancelled_by_name: null,
+      cancellation_actor_note: null,
+    },
+    {
+      id: 'b-cancel-1',
+      user_id: 'user-alex',
+      session_id: 'session-ref',
+      client_name: 'Alex Cancelled',
+      session_type: 'reformer',
+      kind: 'reformer',
+      starts_at: '2026-09-05T03:00:00.000Z',
+      date_key: '2026-09-05',
+      hour: 6,
+      status: 'cancelled',
+      counts_as_active: false,
+      cancelled_at: '2026-09-04T10:00:00.000Z',
+      cancelled_by_name: 'Owner Staff',
+      cancellation_actor_note: null,
+    },
+    {
+      id: 'b-na',
+      user_id: 'user-nia',
+      session_id: 'session-ref',
+      client_name: 'Nia Absent',
+      session_type: 'reformer',
+      kind: 'reformer',
+      starts_at: '2026-09-04T03:00:00.000Z',
+      date_key: '2026-09-04',
+      hour: 6,
+      status: 'not_attended',
+      counts_as_active: false,
+      cancelled_at: null,
+      cancelled_by_name: null,
+      cancellation_actor_note: null,
     },
   ],
 });
@@ -127,6 +168,64 @@ describe('BookingBox', () => {
     fireEvent.click(screen.getByRole('button', { name: /Maria Pap/i }));
     expect(on_select).toHaveBeenCalled();
     expect(screen.getByText('Reformer')).toBeInTheDocument();
+  });
+
+  it('styles not attended bookings in yellow', () => {
+    render(
+      <BookingBox
+        booking={{
+          id: 'b-na',
+          user_id: 'user-nia',
+          compact_name: 'Nia Abs',
+          session_type_label: 'Reformer',
+          kind: 'reformer',
+          status: 'not_attended',
+          counts_as_active: false,
+          full_name: 'Nia Absent',
+        }}
+        on_select={vi.fn()}
+      />,
+    );
+
+    const box = screen.getByRole('button', { name: /Nia Abs/i });
+    expect(box).toHaveAttribute('data-status', 'not_attended');
+    expect(box.className).toContain('bg-warning-surface');
+  });
+});
+
+describe('CancelledSessionCard', () => {
+  it('shows cancelled count and opens via click', () => {
+    const on_select = vi.fn();
+    render(
+      <CancelledSessionCard
+        group={{
+          session_id: 'session-ref',
+          session_type_label: 'Reformer',
+          kind: 'reformer',
+          count: 2,
+          cancellations: [
+            {
+              booking_id: 'c1',
+              client_name: 'Alex Cancelled',
+              cancelled_at: '2026-09-04T10:00:00.000Z',
+              cancelled_by_label: 'Owner Staff',
+            },
+            {
+              booking_id: 'c2',
+              client_name: 'Ben Cancelled',
+              cancelled_at: '2026-09-04T11:00:00.000Z',
+              cancelled_by_label: 'Owner Staff',
+            },
+          ],
+        }}
+        on_select={on_select}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Cancelled, 2 cancelled, Reformer/i }));
+    expect(on_select).toHaveBeenCalled();
+    expect(screen.getByText('Cancelled')).toBeInTheDocument();
+    expect(screen.getByText(/2 cancelled/i)).toBeInTheDocument();
   });
 });
 
@@ -204,13 +303,19 @@ describe('MonthCalendarSection', () => {
 
     const six = dialog.querySelector('[data-hour="06"]');
     expect(six).not.toBeNull();
-    expect(within(six as HTMLElement).getByText('1 Reformer, 1 Mat')).toBeInTheDocument();
+    expect(within(six as HTMLElement).getByText(/1 Reformer, 1 Mat · 1 cancelled/)).toBeInTheDocument();
 
     const boxes = within(six as HTMLElement).getAllByRole('button');
     expect(boxes[0]).toHaveTextContent('Maria Pap');
     expect(boxes[0]).toHaveTextContent('Reformer');
     expect(boxes[1]).toHaveTextContent('Elena Mat');
     expect(boxes[1]).toHaveTextContent('Mat');
+    expect(within(six as HTMLElement).getByRole('button', { name: /Cancelled, 1 cancelled/i })).toBeInTheDocument();
+
+    fireEvent.click(within(six as HTMLElement).getByRole('button', { name: /Cancelled, 1 cancelled/i }));
+    expect(await screen.findByRole('heading', { name: 'Cancelled bookings' })).toBeInTheDocument();
+    expect(screen.getByText('Alex Cancelled')).toBeInTheDocument();
+    expect(screen.getByText(/By Owner Staff/i)).toBeInTheDocument();
   });
 
   it('opens read-only client details from a booking box', async () => {

@@ -21,6 +21,7 @@ export type TypeCounts = {
 export type MonthCalendarBooking = {
   id: string;
   user_id: string;
+  session_id: string;
   client_name: string;
   session_type: string;
   kind: MonthCalendarKind;
@@ -29,6 +30,9 @@ export type MonthCalendarBooking = {
   hour: number;
   status: string;
   counts_as_active: boolean;
+  cancelled_at: string | null;
+  cancelled_by_name: string | null;
+  cancellation_actor_note: string | null;
 };
 
 export type MonthCalendarSlotBooking = {
@@ -42,6 +46,21 @@ export type MonthCalendarSlotBooking = {
   full_name: string;
 };
 
+export type MonthCalendarCancelledEntry = {
+  booking_id: string;
+  client_name: string;
+  cancelled_at: string | null;
+  cancelled_by_label: string;
+};
+
+export type MonthCalendarCancelledGroup = {
+  session_id: string;
+  session_type_label: string;
+  kind: MonthCalendarKind;
+  count: number;
+  cancellations: MonthCalendarCancelledEntry[];
+};
+
 export type MonthCalendarHourSlot = {
   hour: number;
   time_label: string;
@@ -49,6 +68,7 @@ export type MonthCalendarHourSlot = {
   reformer: MonthCalendarSlotBooking[];
   mat: MonthCalendarSlotBooking[];
   other: MonthCalendarSlotBooking[];
+  cancelled_groups: MonthCalendarCancelledGroup[];
 };
 
 export type MonthCalendarDay = {
@@ -73,13 +93,21 @@ export type MonthCalendarOverview = {
 type RawMonthCalendarRow = {
   id: string;
   user_id: string | null;
+  session_id: string | null;
   status: string;
+  cancelled_at?: string | null;
+  cancellation_actor_note?: string | null;
+  cancelled_by_user_id?: string | null;
+  cancelled_by?:
+    | { full_name: string | null }
+    | { full_name: string | null }[]
+    | null;
   profiles:
     | { full_name: string | null; email: string | null; phone: string | null }
     | { full_name: string | null; email: string | null; phone: string | null }[];
   sessions:
-    | { starts_at: string; session_type: string }
-    | { starts_at: string; session_type: string }[]
+    | { id?: string; starts_at: string; session_type: string }
+    | { id?: string; starts_at: string; session_type: string }[]
     | null;
 };
 
@@ -205,16 +233,32 @@ function increment_count(counts: TypeCounts, kind: MonthCalendarKind): void {
   counts[kind] += 1;
 }
 
+export function format_cancelled_by_label(options: {
+  cancelled_by_name: string | null | undefined;
+  cancellation_actor_note: string | null | undefined;
+}): string {
+  const name = options.cancelled_by_name?.trim();
+  if (name) return name;
+  const note = options.cancellation_actor_note?.trim();
+  if (note) return note;
+  return 'Not recorded';
+}
+
 export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalendarBooking | null {
-  if (row.status === 'cancelled') return null;
   const counts_as_active = is_active_booking_status(row.status);
-  const visible = counts_as_active || ['not_attended', 'no_show'].includes(row.status);
+  const is_cancelled = row.status === 'cancelled';
+  const visible =
+    counts_as_active || is_cancelled || ['not_attended', 'no_show'].includes(row.status);
   if (!row.user_id || !visible) return null;
 
   const session = related_row(row.sessions);
   if (!session) return null;
 
+  const session_id = row.session_id ?? session.id ?? null;
+  if (!session_id) return null;
+
   const profile = related_row(row.profiles);
+  const cancelled_by = related_row(row.cancelled_by);
   const time = studio_time_from_iso(session.starts_at);
   const [hour_text] = time.split(':');
   const hour = Number(hour_text);
@@ -222,6 +266,7 @@ export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalen
   return {
     id: row.id,
     user_id: row.user_id,
+    session_id,
     client_name: profile?.full_name?.trim() || 'Unnamed client',
     session_type: session.session_type,
     kind: classify_session_type(session.session_type),
@@ -230,6 +275,9 @@ export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalen
     hour: Number.isFinite(hour) ? hour : 0,
     status: row.status,
     counts_as_active,
+    cancelled_at: row.cancelled_at ?? null,
+    cancelled_by_name: cancelled_by?.full_name?.trim() || null,
+    cancellation_actor_note: row.cancellation_actor_note ?? null,
   };
 }
 
@@ -297,6 +345,48 @@ function to_slot_booking(item: MonthCalendarBooking): MonthCalendarSlotBooking {
   };
 }
 
+function to_cancelled_entry(item: MonthCalendarBooking): MonthCalendarCancelledEntry {
+  return {
+    booking_id: item.id,
+    client_name: item.client_name,
+    cancelled_at: item.cancelled_at,
+    cancelled_by_label: format_cancelled_by_label({
+      cancelled_by_name: item.cancelled_by_name,
+      cancellation_actor_note: item.cancellation_actor_note,
+    }),
+  };
+}
+
+export function build_cancelled_groups(
+  cancelled_bookings: MonthCalendarBooking[],
+): MonthCalendarCancelledGroup[] {
+  const by_session = new Map<string, MonthCalendarCancelledGroup>();
+
+  for (const item of cancelled_bookings) {
+    const existing = by_session.get(item.session_id);
+    const entry = to_cancelled_entry(item);
+    if (existing) {
+      existing.count += 1;
+      existing.cancellations.push(entry);
+      continue;
+    }
+
+    by_session.set(item.session_id, {
+      session_id: item.session_id,
+      session_type_label: format_session_type(item.session_type),
+      kind: item.kind,
+      count: 1,
+      cancellations: [entry],
+    });
+  }
+
+  return [...by_session.values()].sort((a, b) => {
+    if (a.kind === b.kind) return b.count - a.count;
+    const order: MonthCalendarKind[] = ['reformer', 'mat', 'private', 'intro', 'other'];
+    return order.indexOf(a.kind) - order.indexOf(b.kind);
+  });
+}
+
 export function build_day_hour_slots(options: {
   date_key: string;
   bookings: MonthCalendarBooking[];
@@ -311,8 +401,14 @@ export function build_day_hour_slots(options: {
     const private_bookings: MonthCalendarSlotBooking[] = [];
     const intro_bookings: MonthCalendarSlotBooking[] = [];
     const other_bookings: MonthCalendarSlotBooking[] = [];
+    const cancelled_rows: MonthCalendarBooking[] = [];
 
     for (const item of hour_bookings) {
+      if (item.status === 'cancelled') {
+        cancelled_rows.push(item);
+        continue;
+      }
+
       if (item.counts_as_active) increment_count(counts, item.kind);
       const slot_booking = to_slot_booking(item);
       if (item.kind === 'reformer') reformer.push(slot_booking);
@@ -329,6 +425,7 @@ export function build_day_hour_slots(options: {
       reformer,
       mat,
       other: [...private_bookings, ...intro_bookings, ...other_bookings],
+      cancelled_groups: build_cancelled_groups(cancelled_rows),
     };
   });
 }
@@ -344,4 +441,16 @@ export function current_studio_year_month(now = new Date()): { year: number; mon
   const key = studio_date_key(now);
   const [year, month] = key.split('-').map(Number);
   return { year: year ?? now.getFullYear(), month: month ?? now.getMonth() + 1 };
+}
+
+export function format_cancelled_at_label(iso: string | null): string {
+  if (!iso) return 'Time not recorded';
+  return new Date(iso).toLocaleString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 }
