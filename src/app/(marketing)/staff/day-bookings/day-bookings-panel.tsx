@@ -85,7 +85,7 @@ function AttendeeRow({
   const class_name = [
     'flex flex-col gap-1 rounded-md border px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between',
     variant === 'active' ? 'border-border bg-background' : 'border-border/70 bg-surface/60 opacity-80',
-    is_guest ? 'border-l-4 border-l-amber-700/70' : '',
+    is_guest ? 'border-orange-500 bg-orange-50 border-l-4 border-l-orange-500' : '',
     is_guest && on_open_guest ? 'cursor-pointer transition hover:bg-surface/80' : '',
   ].join(' ');
 

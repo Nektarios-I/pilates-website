@@ -207,6 +207,32 @@ describe('BookingBox', () => {
     expect(box).toHaveAttribute('data-status', 'not_attended');
     expect(box.className).toContain('bg-warning-surface');
   });
+
+  it('styles guest bookings in orange', () => {
+    render(
+      <BookingBox
+        booking={{
+          id: 'b-guest',
+          user_id: null,
+          compact_name: 'Maria',
+          session_type_label: 'Reformer',
+          kind: 'reformer',
+          status: 'booked',
+          counts_as_active: true,
+          full_name: 'Maria',
+          is_guest: true,
+          guest_note: 'First visit',
+        }}
+        on_select={vi.fn()}
+      />,
+    );
+
+    const box = screen.getByRole('button', { name: /Maria, Guest/i });
+    expect(box).toHaveAttribute('data-guest', 'true');
+    expect(box.className).toContain('bg-orange-50');
+    expect(box.className).toContain('border-orange-500');
+    expect(screen.getByText(/Guest · Reformer/i)).toBeInTheDocument();
+  });
 });
 
 describe('CancelledSessionCard', () => {

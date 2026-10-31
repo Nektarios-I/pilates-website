@@ -93,7 +93,8 @@ const BOOKING_KIND_CLASS: Record<MonthCalendarSlotBooking['kind'], string> = {
 const NOT_ATTENDED_CLASS = 'border-warning-border bg-warning-surface text-warning-foreground';
 const CANCELLED_CARD_CLASS =
   'border-destructive-border bg-destructive-surface text-destructive';
-const GUEST_ACCENT_CLASS = 'ring-1 ring-foreground/25';
+/** Distinct from warning/yellow (not attended) and class-type accents. */
+const GUEST_CARD_CLASS = 'border-orange-500 bg-orange-50 text-orange-950';
 
 type MonthCalendarSectionProps = {
   overview: MonthCalendarOverview;
@@ -104,6 +105,7 @@ type MonthCalendarSectionProps = {
 
 function booking_box_class(booking: MonthCalendarSlotBooking): string {
   if (booking.status === 'not_attended') return NOT_ATTENDED_CLASS;
+  if (booking.is_guest) return GUEST_CARD_CLASS;
   return BOOKING_KIND_CLASS[booking.kind];
 }
 
@@ -123,7 +125,6 @@ export function BookingBox({
         'min-h-11 min-w-[6.75rem] shrink-0 cursor-pointer rounded-md border px-3 py-2 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-w-[7.5rem]',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
         booking_box_class(booking),
-        booking.is_guest ? GUEST_ACCENT_CLASS : '',
       ].join(' ')}
       aria-label={`${booking.full_name}, ${booking.is_guest ? 'Guest, ' : ''}${booking.session_type_label}, ${status_label}`}
       data-guest={booking.is_guest ? 'true' : undefined}
