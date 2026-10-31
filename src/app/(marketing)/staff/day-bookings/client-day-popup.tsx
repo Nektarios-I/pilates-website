@@ -69,10 +69,13 @@ export function ClientDayPopup({
   on_close: () => void;
 }) {
   const title_id = useId();
+  const client_user_id = booking.user_id;
   const [dashboard, set_dashboard] = useState<ClientDashboardData | null>(null);
-  const [error, set_error] = useState<string | null>(null);
+  const [error, set_error] = useState<string | null>(
+    client_user_id ? null : 'Client account is missing for this booking.',
+  );
   const [notice, set_notice] = useState<string | null>(null);
-  const [loading, set_loading] = useState(true);
+  const [loading, set_loading] = useState(Boolean(client_user_id));
   const [tab, set_tab] = useState<PopupTab>('bookings');
   const [visible, set_visible] = useState(PAGE_SIZE);
   const [confirm, set_confirm] = useState<{ kind: 'cancel' | 'absent'; booking: ClientBookingRecord } | null>(null);
@@ -83,8 +86,9 @@ export function ClientDayPopup({
   const [package_id, set_package_id] = useState('');
 
   function reload() {
+    if (!client_user_id) return;
     set_loading(true);
-    void load_client_dashboard(booking.user_id)
+    void load_client_dashboard(client_user_id)
       .then((data) => {
         set_dashboard(data);
         set_loaded_at(new Date());
@@ -97,8 +101,9 @@ export function ClientDayPopup({
   }
 
   useEffect(() => {
+    if (!client_user_id) return;
     let cancelled = false;
-    void load_client_dashboard(booking.user_id)
+    void load_client_dashboard(client_user_id)
       .then((data) => {
         if (cancelled) return;
         set_dashboard(data);
@@ -113,7 +118,7 @@ export function ClientDayPopup({
     return () => {
       cancelled = true;
     };
-  }, [booking.user_id]);
+  }, [client_user_id]);
 
   const now = loaded_at;
   const bookings = dashboard?.bookings ?? [];
@@ -163,7 +168,8 @@ export function ClientDayPopup({
     start_transition(async () => {
       set_error(null);
       set_notice(null);
-      const result = await apply_membership(booking.user_id, package_id);
+      if (!client_user_id) return;
+      const result = await apply_membership(client_user_id, package_id);
       if (!result.success) {
         set_error(result.error);
         return;
@@ -304,7 +310,7 @@ export function ClientDayPopup({
             <div role="tabpanel">
               {session_cards ? (
                 <ManualBookingTab
-                  client_user_id={booking.user_id}
+                  client_user_id={client_user_id ?? ''}
                   packages={dashboard?.packages ?? []}
                   session_cards={session_cards}
                   on_success={() => {

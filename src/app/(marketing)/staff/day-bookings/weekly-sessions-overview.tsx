@@ -74,7 +74,7 @@ function SlotDisclosure({
 }) {
   const panel_id = useId();
   const [open, set_open] = useState(false);
-  const count_label = format_session_count_label(slot.session_count);
+  const count_label = format_session_count_label(slot.session_count, slot.guest_count);
 
   return (
     <div className="border-t border-border/60 first:border-t-0">
@@ -120,7 +120,7 @@ function SlotDisclosure({
                   {attendee.session_type_label}
                 </span>
                 <span className="truncate font-medium text-foreground">
-                  {attendee.client_name}
+                  {attendee.is_guest ? `Guest · ${attendee.client_name}` : attendee.client_name}
                 </span>
               </li>
             ))}
@@ -134,7 +134,7 @@ function SlotDisclosure({
 function DayCard({ day }: { day: WeekDayOverview }) {
   const panel_id = useId();
   const [open, set_open] = useState(false);
-  const count_label = format_session_count_label(day.session_count);
+  const count_label = format_session_count_label(day.session_count, day.guest_count);
 
   return (
     <div

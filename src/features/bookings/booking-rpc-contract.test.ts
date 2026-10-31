@@ -67,6 +67,15 @@ describe('booking RPC contract — staff manual path', () => {
     expect(result.friendly).toMatch(/full and cannot be booked/i);
   });
 
+  it('documents staff_guest source and guest error codes', () => {
+    expect(BOOKING_ERROR_CODES.guest_request_conflict).toBe('P0041');
+    expect(BOOKING_ERROR_CODES.guest_booking_disabled).toBe('P0042');
+    expect(BOOKING_ERROR_CODES.guest_not_attended_rejected).toBe('P0043');
+    const disabled = map_postgres_booking_error('ERROR: P0042 Guest booking is disabled');
+    expect(disabled.code).toBe('P0042');
+    expect(disabled.friendly).toMatch(/temporarily disabled/i);
+  });
+
   it('maps cancellation cutoff P0029', () => {
     const result = map_postgres_booking_error('ERROR: P0029 cutoff');
     expect(result.code).toBe(BOOKING_ERROR_CODES.cancellation_cutoff);

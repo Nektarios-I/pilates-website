@@ -6,12 +6,27 @@
  * (PGRST201). Always name the relationship when embedding the booked client.
  */
 
-/** Explicit embed for the booked client (bookings.user_id → profiles). */
-export const BOOKINGS_CLIENT_PROFILE_EMBED = `profiles!bookings_user_id_fkey!inner (
+/**
+ * Explicit embed for the booked client (bookings.user_id → profiles).
+ * Left join so staff guest rows (null user_id) are not dropped.
+ */
+export const BOOKINGS_CLIENT_PROFILE_EMBED = `profiles!bookings_user_id_fkey (
     full_name,
     email,
     phone
   )`;
+
+/** Guest identity columns required by staff calendars and history. */
+export const BOOKINGS_GUEST_FIELDS = `
+  attendee_kind,
+  guest_label,
+  guest_note,
+  guest_request_id,
+  guest_ordinal,
+  created_by_user_id,
+  booked_at,
+  booking_source
+`;
 
 /** Explicit embed for session instructor (sessions.instructor_id → profiles). */
 export const SESSIONS_INSTRUCTOR_PROFILE_EMBED = `instructor:profiles!sessions_instructor_id_fkey (
@@ -28,6 +43,7 @@ export const STAFF_BOOKING_HISTORY_SELECT = `
   cancelled_at,
   cancellation_reason,
   credits_used,
+  ${BOOKINGS_GUEST_FIELDS},
   ${BOOKINGS_CLIENT_PROFILE_EMBED},
   sessions!inner (
     title,
@@ -63,6 +79,7 @@ export const STAFF_MONTH_CALENDAR_SELECT = `
   cancelled_by:profiles!bookings_cancelled_by_user_id_fkey (
     full_name
   ),
+  ${BOOKINGS_GUEST_FIELDS},
   ${BOOKINGS_CLIENT_PROFILE_EMBED},
   sessions!inner (
     id,
@@ -81,6 +98,7 @@ export const STAFF_DAY_BOOKINGS_SELECT = `
   booked_at,
   cancelled_at,
   session_id,
+  ${BOOKINGS_GUEST_FIELDS},
   ${BOOKINGS_CLIENT_PROFILE_EMBED},
   sessions!inner (
     id,

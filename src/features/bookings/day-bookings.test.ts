@@ -55,6 +55,9 @@ describe('day booking helpers', () => {
       client_phone: null,
       booked_at: '2026-06-20T09:00:00.000Z',
       cancelled_at: null,
+      attendee_kind: 'client',
+      is_guest: false,
+      guest_note: null,
     });
   });
 
@@ -116,6 +119,7 @@ describe('day booking helpers', () => {
     expect(summarize_day_bookings(grouped)).toEqual({
       sessions: 1,
       active: 1,
+      guests: 0,
       cancelled: 1,
     });
   });

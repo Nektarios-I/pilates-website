@@ -46,6 +46,11 @@ import {
 } from '@/features/bookings/recurring-occurrence-cancellation';
 import { is_within_recurring_preview_window } from '@/features/bookings/skippable-recurring-occurrences';
 import { is_within_staff_manual_booking_window } from '@/features/bookings/staff-manual-booking-window';
+import {
+  normalize_guest_attendees,
+  type GuestAttendeeInput,
+  type GuestBookingResult,
+} from '@/features/bookings/guest-booking';
 import type { WeeklySlotPattern } from '@/features/bookings/weekly-slot-patterns';
 import { studio_date_key } from '@/lib/schedule/studio-hours';
 import {
@@ -431,6 +436,133 @@ export async function staff_manual_book_slot(
     reformer_package_id,
     mat_package_id,
   );
+}
+
+export async function staff_book_guests_action(input: {
+  request_id: string;
+  date_key: string;
+  slot_start: string;
+  slot_end: string;
+  session_card_id: string;
+  guests: GuestAttendeeInput[];
+}): Promise<ActionResult & { result?: GuestBookingResult }> {
+  const caller = await resolve_caller_staff();
+  if (!caller) return { success: false, error: 'You must be signed in as staff.' };
+
+  if (!is_within_staff_manual_booking_window(input.date_key)) {
+    return { success: false, error: 'Staff cannot manually book sessions in the past.' };
+  }
+
+  const normalized = normalize_guest_attendees(input.guests);
+  if (!normalized.ok) return { success: false, error: normalized.error };
+
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc('staff_book_guests', {
+    p_request_id: input.request_id,
+    p_schedule_date: input.date_key,
+    p_start_time: input.slot_start,
+    p_end_time: input.slot_end,
+    p_session_card_id: input.session_card_id,
+    p_guests: normalized.guests,
+  });
+
+  if (error) {
+    return { success: false, error: map_staff_rpc_error(error.message) };
+  }
+
+  revalidatePath(MANAGER_PATH);
+  revalidatePath('/staff/day-bookings');
+
+  const payload = data as GuestBookingResult;
+  return { success: true, result: payload };
+}
+
+export async function staff_update_guest_booking_action(input: {
+  booking_id: string;
+  label: string;
+  note?: string | null;
+}): Promise<ActionResult> {
+  const caller = await resolve_caller_staff();
+  if (!caller) return { success: false, error: 'You must be signed in as staff.' };
+
+  const normalized = normalize_guest_attendees([{ label: input.label, note: input.note }]);
+  if (!normalized.ok) return { success: false, error: normalized.error };
+
+  const guest = normalized.guests[0]!;
+  const supabase = await createClient();
+  const { error } = await supabase.rpc('staff_update_guest_booking', {
+    p_booking_id: input.booking_id,
+    p_label: guest.label,
+    p_note: guest.note,
+  });
+
+  if (error) {
+    return { success: false, error: map_staff_rpc_error(error.message) };
+  }
+
+  revalidatePath(MANAGER_PATH);
+  revalidatePath('/staff/day-bookings');
+  return { success: true };
+}
+
+export type GuestBookingDetail = {
+  id: string;
+  guest_label: string;
+  guest_note: string | null;
+  status: string;
+  booked_at: string;
+  session_type: string;
+  starts_at: string;
+  ends_at: string;
+  created_by_name: string | null;
+};
+
+export async function load_guest_booking_detail(
+  booking_id: string,
+): Promise<GuestBookingDetail | null> {
+  const caller = await resolve_caller_staff();
+  if (!caller) return null;
+
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(
+      `
+      id,
+      status,
+      booked_at,
+      attendee_kind,
+      guest_label,
+      guest_note,
+      created_by:profiles!bookings_created_by_user_id_fkey ( full_name ),
+      sessions!inner (
+        starts_at,
+        ends_at,
+        session_type
+      )
+    `,
+    )
+    .eq('id', booking_id)
+    .eq('attendee_kind', 'guest')
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  const session = Array.isArray(data.sessions) ? data.sessions[0] : data.sessions;
+  const created_by = Array.isArray(data.created_by) ? data.created_by[0] : data.created_by;
+  if (!session || !data.guest_label) return null;
+
+  return {
+    id: data.id,
+    guest_label: data.guest_label,
+    guest_note: data.guest_note,
+    status: data.status,
+    booked_at: data.booked_at,
+    session_type: session.session_type,
+    starts_at: session.starts_at,
+    ends_at: session.ends_at,
+    created_by_name: created_by?.full_name?.trim() || null,
+  };
 }
 
 export async function staff_mark_booking_not_attended(booking_id: string): Promise<ActionResult> {

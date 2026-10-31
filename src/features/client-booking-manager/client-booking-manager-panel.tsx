@@ -10,6 +10,7 @@ import { load_client_dashboard } from '@/features/client-booking-manager/actions
 import { AttentionTab } from '@/features/client-booking-manager/components/attention-tab';
 import { BookingsTab } from '@/features/client-booking-manager/components/bookings-tab';
 import { ClientSelector } from '@/features/client-booking-manager/components/client-selector';
+import { GuestBookingDialog } from '@/features/client-booking-manager/components/guest-booking-dialog';
 import { ManualBookingTab } from '@/features/client-booking-manager/components/manual-booking-tab';
 import { ManagerTabNav } from '@/features/client-booking-manager/components/manager-tab-nav';
 import { OverviewTab } from '@/features/client-booking-manager/components/overview-tab';
@@ -69,6 +70,8 @@ function ClientBookingManagerPanelInner({
     message: string;
   } | null>(null);
   const [overview_open, set_overview_open] = useState(false);
+  const [guest_booking_open, set_guest_booking_open] = useState(false);
+  const [guest_booking_instance, set_guest_booking_instance] = useState(0);
   const [, start_transition] = useTransition();
 
   const sync_url = useCallback(
@@ -145,11 +148,27 @@ function ClientBookingManagerPanelInner({
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <ClientSelector
-          clients={clients}
-          on_select={(client_id) => handle_client_select(client_id)}
-          selected_client_id={selected_client_id}
-        />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="min-w-0 flex-1">
+            <ClientSelector
+              clients={clients}
+              on_select={(client_id) => handle_client_select(client_id)}
+              selected_client_id={selected_client_id}
+            />
+          </div>
+          <Button
+            className="w-full shrink-0 sm:w-auto"
+            onClick={() => {
+              set_guest_booking_instance((value) => value + 1);
+              set_guest_booking_open(true);
+            }}
+            size="sm"
+            type="button"
+            variant="secondary"
+          >
+            Guest booking
+          </Button>
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button
             onClick={() => set_overview_open(true)}
@@ -164,6 +183,16 @@ function ClientBookingManagerPanelInner({
           </p>
         </div>
       </div>
+
+      <GuestBookingDialog
+        key={guest_booking_instance}
+        on_close={() => set_guest_booking_open(false)}
+        on_success={(message) =>
+          handle_operation_feedback({ type: 'success', message })
+        }
+        open={guest_booking_open}
+        session_cards={session_cards}
+      />
 
       <RecurringRulesOverviewDialog
         on_close={() => set_overview_open(false)}

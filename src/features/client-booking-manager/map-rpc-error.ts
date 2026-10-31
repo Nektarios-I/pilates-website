@@ -31,6 +31,11 @@ const STAFF_BOOKING_MSG_MAP: Record<string, string> = {
   P0038: 'Choose a valid first session date that matches the selected weekday and is today or later.',
   P0039:
     'This session is not available on the selected date. Choose another first occurrence date or session slot.',
+  P0041: 'This guest booking request was already used with different details.',
+  P0042: 'Guest booking is temporarily disabled.',
+  P0043: 'Guest bookings cannot receive a replacement credit.',
+  P0044: 'Guest booking details are invalid.',
+  P0045: 'Guest booking has unexpected credit charges.',
 };
 
 export function map_staff_rpc_error(message: string | undefined): string {

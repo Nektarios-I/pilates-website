@@ -129,7 +129,7 @@ describe('list_day_bookings', () => {
       client_name: 'MARIA ERAKLEOUS',
       status: 'booked',
     });
-    expect(result.summary).toEqual({ sessions: 1, active: 1, cancelled: 0 });
+    expect(result.summary).toEqual({ sessions: 1, active: 1, guests: 0, cancelled: 0 });
   });
 
   it('places cancelled bookings in the cancelled roster', async () => {

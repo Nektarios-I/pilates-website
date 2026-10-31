@@ -70,6 +70,9 @@ export type StaffBookingRecord = {
   client_name: string | null;
   client_email: string | null;
   client_phone: string | null;
+  attendee_kind: 'client' | 'guest';
+  is_guest: boolean;
+  guest_note: string | null;
   session_title: string;
   session_starts_at: string;
   session_ends_at: string;
@@ -91,6 +94,9 @@ type RawStaffBookingRow = {
   cancelled_at: string | null;
   cancellation_reason: string | null;
   credits_used: number;
+  attendee_kind?: string | null;
+  guest_label?: string | null;
+  guest_note?: string | null;
   profiles: RelatedRow<{ full_name: string | null; email: string | null; phone: string | null }>;
   sessions: RelatedRow<{
     title: string;
@@ -107,10 +113,13 @@ type RawStaffBookingRow = {
 
 export function map_staff_booking(row: RawStaffBookingRow): StaffBookingRecord | null {
   const session = related_booking_row(row.sessions);
-  const profile = related_booking_row(row.profiles);
-  if (!session || !profile) return null;
-
+  if (!session) return null;
   if (!BOOKING_STATUSES.includes(row.status as BookingStatus)) return null;
+
+  const is_guest = row.attendee_kind === 'guest';
+  const profile = related_booking_row(row.profiles);
+  if (!is_guest && !profile) return null;
+  if (is_guest && !row.guest_label?.trim()) return null;
 
   return {
     id: row.id,
@@ -119,9 +128,12 @@ export function map_staff_booking(row: RawStaffBookingRow): StaffBookingRecord |
     cancelled_at: row.cancelled_at,
     cancellation_reason: row.cancellation_reason,
     credits_used: row.credits_used,
-    client_name: profile.full_name,
-    client_email: profile.email,
-    client_phone: profile.phone,
+    client_name: is_guest ? row.guest_label!.trim() : profile?.full_name ?? null,
+    client_email: is_guest ? null : profile?.email ?? null,
+    client_phone: is_guest ? null : profile?.phone ?? null,
+    attendee_kind: is_guest ? 'guest' : 'client',
+    is_guest,
+    guest_note: is_guest ? row.guest_note ?? null : null,
     session_title: session.title,
     session_starts_at: session.starts_at,
     session_ends_at: session.ends_at,

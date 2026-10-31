@@ -68,7 +68,7 @@ export async function list_day_bookings(
 ): Promise<DayBookingsListResult> {
   const empty: DayBookingsListResult = {
     sessions: [],
-    summary: { sessions: 0, active: 0, cancelled: 0 },
+    summary: { sessions: 0, active: 0, guests: 0, cancelled: 0 },
     error: null,
   };
 

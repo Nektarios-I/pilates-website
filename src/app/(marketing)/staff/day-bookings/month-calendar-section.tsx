@@ -22,6 +22,8 @@ import {
   type MonthCalendarSlotBooking,
 } from '@/features/bookings/month-calendar';
 import { ClientDayPopup } from '@/app/(marketing)/staff/day-bookings/client-day-popup';
+import { GuestDetailPopup } from '@/features/bookings/components/guest-detail-popup';
+import { format_guest_subset_suffix } from '@/features/bookings/guest-booking';
 
 const MONTH_OPTIONS = [
   { value: 1, label: 'January' },
@@ -91,6 +93,7 @@ const BOOKING_KIND_CLASS: Record<MonthCalendarSlotBooking['kind'], string> = {
 const NOT_ATTENDED_CLASS = 'border-warning-border bg-warning-surface text-warning-foreground';
 const CANCELLED_CARD_CLASS =
   'border-destructive-border bg-destructive-surface text-destructive';
+const GUEST_ACCENT_CLASS = 'ring-1 ring-foreground/25';
 
 type MonthCalendarSectionProps = {
   overview: MonthCalendarOverview;
@@ -111,7 +114,8 @@ export function BookingBox({
   booking: MonthCalendarSlotBooking;
   on_select: (booking: MonthCalendarSlotBooking) => void;
 }) {
-  const is_not_attended = booking.status === 'not_attended';
+  const status_label = booking.status.replaceAll('_', ' ');
+  const show_status = booking.is_guest || !booking.counts_as_active || booking.status === 'not_attended';
 
   return (
     <button
@@ -119,8 +123,10 @@ export function BookingBox({
         'min-h-11 min-w-[6.75rem] shrink-0 cursor-pointer rounded-md border px-3 py-2 text-left transition-colors duration-200 motion-reduce:transition-none sm:min-w-[7.5rem]',
         'focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent',
         booking_box_class(booking),
+        booking.is_guest ? GUEST_ACCENT_CLASS : '',
       ].join(' ')}
-      aria-label={`${booking.compact_name}, ${booking.session_type_label}${is_not_attended ? ', not attended' : ''}`}
+      aria-label={`${booking.full_name}, ${booking.is_guest ? 'Guest, ' : ''}${booking.session_type_label}, ${status_label}`}
+      data-guest={booking.is_guest ? 'true' : undefined}
       data-kind={booking.kind}
       data-status={booking.status}
       type="button"
@@ -128,9 +134,11 @@ export function BookingBox({
     >
       <span className="block truncate text-sm font-medium text-foreground">{booking.compact_name}</span>
       <span className="mt-0.5 block text-[11px] uppercase tracking-wide text-foreground/70">
-        {booking.session_type_label}
-        {booking.counts_as_active ? '' : ` · ${booking.status.replaceAll('_', ' ')}`}
+        {booking.is_guest ? `Guest · ${booking.session_type_label}` : booking.session_type_label}
       </span>
+      {show_status ? (
+        <span className="mt-0.5 block text-[11px] capitalize text-foreground/65">{status_label}</span>
+      ) : null}
     </button>
   );
 }
@@ -297,6 +305,7 @@ function SlotRow({
       <div className="min-w-0 flex-1 py-2 pr-3">
         <p className="text-[11px] font-medium text-foreground/70">
           {format_slot_counts_label(slot.counts)}
+          {format_guest_subset_suffix(slot.guest_count)}
           {has_cancelled
             ? ` · ${slot.cancelled_groups.reduce((sum, group) => sum + group.count, 0)} cancelled`
             : ''}
@@ -369,6 +378,7 @@ export function DayDetailPopup({
   const title_id = useId();
   const dialog_ref = useRef<HTMLDivElement>(null);
   const [selected_booking, set_selected_booking] = useState<MonthCalendarSlotBooking | null>(null);
+  const [selected_guest_id, set_selected_guest_id] = useState<string | null>(null);
   const [selected_cancelled, set_selected_cancelled] =
     useState<MonthCalendarCancelledGroup | null>(null);
   const slots = useMemo(
@@ -376,7 +386,15 @@ export function DayDetailPopup({
     [date_key, overview.bookings],
   );
   const heading = format_day_heading(date_key);
-  const overlay_open = Boolean(selected_booking || selected_cancelled);
+  const overlay_open = Boolean(selected_booking || selected_guest_id || selected_cancelled);
+
+  function handle_select_booking(booking: MonthCalendarSlotBooking) {
+    if (booking.is_guest) {
+      set_selected_guest_id(booking.id);
+      return;
+    }
+    set_selected_booking(booking);
+  }
 
   useEffect(() => {
     const root = dialog_ref.current;
@@ -456,7 +474,7 @@ export function DayDetailPopup({
             <SlotRow
               key={slot.hour}
               slot={slot}
-              on_select_booking={set_selected_booking}
+              on_select_booking={handle_select_booking}
               on_select_cancelled={set_selected_cancelled}
             />
           ))}
@@ -467,6 +485,13 @@ export function DayDetailPopup({
           booking={selected_booking}
           key={selected_booking.id}
           on_close={() => set_selected_booking(null)}
+        />
+      ) : null}
+      {selected_guest_id ? (
+        <GuestDetailPopup
+          booking_id={selected_guest_id}
+          key={selected_guest_id}
+          on_close={() => set_selected_guest_id(null)}
         />
       ) : null}
       {selected_cancelled ? (
@@ -527,10 +552,10 @@ function DayCell({
         </span>
       </span>
       <span className="line-clamp-3 w-full min-w-0 overflow-hidden text-[8px] font-medium leading-[1.15] break-words text-foreground sm:hidden">
-        {format_compact_type_counts_label(day.counts)}
+        {format_compact_type_counts_label(day.counts, day.guest_count)}
       </span>
       <span className="hidden w-full min-w-0 overflow-hidden text-[11px] font-medium leading-tight text-foreground sm:line-clamp-2 sm:block">
-        {format_type_counts_label(day.counts)}
+        {format_type_counts_label(day.counts, day.guest_count)}
       </span>
       {day.is_today ? (
         <span className="hidden text-[9px] font-medium uppercase tracking-wide text-accent sm:inline">

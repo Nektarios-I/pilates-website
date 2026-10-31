@@ -51,6 +51,9 @@ describe('staff booking helpers', () => {
       session_type: 'reformer',
       session_location: 'Studio A',
       credit_charges: [{ class_type: 'reformer', credits_used: 1 }],
+      attendee_kind: 'client',
+      is_guest: false,
+      guest_note: null,
     });
   });
 

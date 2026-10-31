@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 
 import { Button } from '@/components/ui/button';
+import { GuestDetailPopup } from '@/features/bookings/components/guest-detail-popup';
 import {
   DAY_BOOKING_HOUR_OPTIONS,
   DEFAULT_DAY_BOOKINGS_FILTERS,
@@ -50,25 +51,23 @@ type DayBookingsPanelProps = {
 function AttendeeRow({
   booking,
   variant,
+  on_open_guest,
 }: {
   booking: DayBookingAttendee;
   variant: 'active' | 'cancelled';
+  on_open_guest?: (booking_id: string) => void;
 }) {
-  return (
-    <li
-      className={[
-        'flex flex-col gap-1 rounded-md border px-4 py-3 sm:flex-row sm:items-center sm:justify-between',
-        variant === 'active'
-          ? 'border-border bg-background'
-          : 'border-border/70 bg-surface/60 opacity-80',
-      ].join(' ')}
-    >
-      <div>
-        <p className="text-sm font-medium text-foreground">
-          {booking.client_name ?? 'Unnamed client'}
+  const is_guest = booking.is_guest;
+  const content = (
+    <>
+      <div className="min-w-0">
+        <p className="truncate text-sm font-medium text-foreground">
+          {is_guest ? `Guest · ${booking.client_name}` : (booking.client_name ?? 'Unnamed client')}
         </p>
-        <p className="mt-0.5 text-sm text-foreground/70">
-          {booking.client_email ? (
+        <p className="mt-0.5 truncate text-sm text-foreground/70">
+          {is_guest ? (
+            'Walk-in guest'
+          ) : booking.client_email ? (
             <a className="hover:text-foreground" href={`mailto:${booking.client_email}`}>
               {booking.client_email}
             </a>
@@ -80,11 +79,41 @@ function AttendeeRow({
       <p className="text-xs font-medium uppercase tracking-wide text-foreground/60">
         {format_booking_status(booking.status)}
       </p>
-    </li>
+    </>
   );
+
+  const class_name = [
+    'flex flex-col gap-1 rounded-md border px-4 py-3 text-left sm:flex-row sm:items-center sm:justify-between',
+    variant === 'active' ? 'border-border bg-background' : 'border-border/70 bg-surface/60 opacity-80',
+    is_guest ? 'border-l-4 border-l-amber-700/70' : '',
+    is_guest && on_open_guest ? 'cursor-pointer transition hover:bg-surface/80' : '',
+  ].join(' ');
+
+  if (is_guest && on_open_guest) {
+    return (
+      <li>
+        <button
+          aria-label={`Guest ${booking.client_name ?? 'attendee'}, ${format_booking_status(booking.status)}`}
+          className={`w-full ${class_name}`}
+          type="button"
+          onClick={() => on_open_guest(booking.id)}
+        >
+          {content}
+        </button>
+      </li>
+    );
+  }
+
+  return <li className={class_name}>{content}</li>;
 }
 
-function SessionCard({ session }: { session: DayBookingsSession }) {
+function SessionCard({
+  session,
+  on_open_guest,
+}: {
+  session: DayBookingsSession;
+  on_open_guest: (booking_id: string) => void;
+}) {
   const total = session.active_bookings.length + session.cancelled_bookings.length;
   const occupying = count_occupying_bookings(
     [
@@ -128,7 +157,12 @@ function SessionCard({ session }: { session: DayBookingsSession }) {
           ) : (
             <ul className="mt-3 space-y-2">
               {session.active_bookings.map((booking) => (
-                <AttendeeRow booking={booking} key={booking.id} variant="active" />
+                <AttendeeRow
+                  booking={booking}
+                  key={booking.id}
+                  variant="active"
+                  on_open_guest={on_open_guest}
+                />
               ))}
             </ul>
           )}
@@ -139,7 +173,12 @@ function SessionCard({ session }: { session: DayBookingsSession }) {
             <h3 className="text-sm font-semibold text-foreground/80">Cancelled / no-show</h3>
             <ul className="mt-3 space-y-2">
               {session.cancelled_bookings.map((booking) => (
-                <AttendeeRow booking={booking} key={booking.id} variant="cancelled" />
+                <AttendeeRow
+                  booking={booking}
+                  key={booking.id}
+                  variant="cancelled"
+                  on_open_guest={on_open_guest}
+                />
               ))}
             </ul>
           </section>
@@ -170,6 +209,7 @@ export function DayBookingsPanel({
   const [month_error, set_month_error] = useState<string | null>(initial_month_error);
   const [is_pending, start_transition] = useTransition();
   const [is_month_pending, start_month_transition] = useTransition();
+  const [selected_guest_id, set_selected_guest_id] = useState<string | null>(null);
 
   function load_for_filters(next_filters: DayBookingsFilters) {
     start_transition(async () => {
@@ -306,6 +346,11 @@ export function DayBookingsPanel({
           <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground/80 ring-1 ring-border">
             {summary.active} active
           </span>
+          {summary.guests > 0 ? (
+            <span className="rounded-full bg-background px-3 py-1 text-xs font-medium text-foreground/80 ring-1 ring-border">
+              {summary.guests} guest{summary.guests === 1 ? '' : 's'}
+            </span>
+          ) : null}
           <span className="rounded-full bg-surface px-3 py-1 text-xs font-medium text-foreground/70 ring-1 ring-border/70">
             {summary.cancelled} cancelled
           </span>
@@ -321,10 +366,23 @@ export function DayBookingsPanel({
       ) : (
         <div className="space-y-4">
           {sessions.map((session) => (
-            <SessionCard key={session.id} session={session} />
+            <SessionCard
+              key={session.id}
+              session={session}
+              on_open_guest={set_selected_guest_id}
+            />
           ))}
         </div>
       )}
+
+      {selected_guest_id ? (
+        <GuestDetailPopup
+          booking_id={selected_guest_id}
+          key={selected_guest_id}
+          on_changed={() => load_for_filters(filters)}
+          on_close={() => set_selected_guest_id(null)}
+        />
+      ) : null}
     </div>
   );
 }

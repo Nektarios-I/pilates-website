@@ -49,6 +49,9 @@ export type DayBookingAttendee = {
   client_phone: string | null;
   booked_at: string;
   cancelled_at: string | null;
+  attendee_kind: 'client' | 'guest';
+  is_guest: boolean;
+  guest_note: string | null;
 };
 
 export type DayBookingsSession = {
@@ -67,6 +70,7 @@ export type DayBookingsSession = {
 export type DayBookingsSummary = {
   sessions: number;
   active: number;
+  guests: number;
   cancelled: number;
 };
 
@@ -116,18 +120,40 @@ type RawDayBookingRow = {
   booked_at: string;
   cancelled_at: string | null;
   session_id: string;
+  attendee_kind?: string | null;
+  guest_label?: string | null;
+  guest_note?: string | null;
   profiles:
     | { full_name: string | null; email: string | null; phone: string | null }
-    | { full_name: string | null; email: string | null; phone: string | null }[];
+    | { full_name: string | null; email: string | null; phone: string | null }[]
+    | null;
 };
 
 export function map_day_booking_attendee(row: RawDayBookingRow): DayBookingAttendee | null {
+  const status = row.status as BookingStatus;
+  if (!is_active_booking_status(status) && !is_cancelled_booking_status(status)) return null;
+
+  const is_guest = row.attendee_kind === 'guest';
+  if (is_guest) {
+    const label = row.guest_label?.trim();
+    if (!label) return null;
+    return {
+      id: row.id,
+      status,
+      client_name: label,
+      client_email: null,
+      client_phone: null,
+      booked_at: row.booked_at,
+      cancelled_at: row.cancelled_at,
+      attendee_kind: 'guest',
+      is_guest: true,
+      guest_note: row.guest_note ?? null,
+    };
+  }
+
   const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
   if (!profile) return null;
   if (!profile.email && !profile.phone && !profile.full_name) return null;
-
-  const status = row.status as BookingStatus;
-  if (!is_active_booking_status(status) && !is_cancelled_booking_status(status)) return null;
 
   return {
     id: row.id,
@@ -137,6 +163,9 @@ export function map_day_booking_attendee(row: RawDayBookingRow): DayBookingAtten
     client_phone: profile.phone ?? null,
     booked_at: row.booked_at,
     cancelled_at: row.cancelled_at,
+    attendee_kind: 'client',
+    is_guest: false,
+    guest_note: null,
   };
 }
 
@@ -249,9 +278,11 @@ export function summarize_day_bookings(sessions: DayBookingsSession[]): DayBooki
     (summary, session) => ({
       sessions: summary.sessions + 1,
       active: summary.active + session.active_bookings.length,
+      guests:
+        summary.guests + session.active_bookings.filter((booking) => booking.is_guest).length,
       cancelled: summary.cancelled + session.cancelled_bookings.length,
     }),
-    { sessions: 0, active: 0, cancelled: 0 },
+    { sessions: 0, active: 0, guests: 0, cancelled: 0 },
   );
 }
 

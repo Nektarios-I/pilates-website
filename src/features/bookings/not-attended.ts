@@ -22,7 +22,11 @@ export function evaluate_not_attended_eligibility(input: {
   charge_count: number;
   credits_used: number | null;
   class_types: string[];
+  attendee_kind?: string | null;
 }): NotAttendedDecision {
+  if (input.attendee_kind === 'guest') {
+    return { ok: false, reason: 'Guest bookings cannot receive a replacement credit.' };
+  }
   const session_ends_at = new Date(input.session_ends_at);
   if (session_ends_at > input.now) {
     return { ok: false, reason: 'The session has not ended.' };

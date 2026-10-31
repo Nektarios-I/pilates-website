@@ -26,11 +26,16 @@ export const BOOKING_ERROR_CODES = {
   target_not_client: 'P0017',
   packages_not_authorised: 'P0020',
   cancellation_cutoff: 'P0029',
+  guest_request_conflict: 'P0041',
+  guest_booking_disabled: 'P0042',
+  guest_not_attended_rejected: 'P0043',
+  guest_validation: 'P0044',
+  guest_unexpected_charges: 'P0045',
 } as const;
 
 export const CLIENT_CANCELLATION_CUTOFF_HOURS = 2;
 
-export type BookingSource = 'client' | 'staff_manual' | 'recurring';
+export type BookingSource = 'client' | 'staff_manual' | 'recurring' | 'staff_guest';
 
 export type BookSessionCoreFlags = {
   allow_waitlist: boolean;
@@ -80,6 +85,11 @@ export function map_postgres_booking_error(raw_message: string): {
     P0032: 'This time is reserved until recurring prebookings are processed for this date.',
     P0017: 'Bookings can only be created for client accounts.',
     P0029: 'Online cancellation closes 4 hours before class. Your session credit is kept for this booking.',
+    P0041: 'This guest booking request was already used with different details.',
+    P0042: 'Guest booking is temporarily disabled.',
+    P0043: 'Guest bookings cannot receive a replacement credit.',
+    P0044: 'Guest booking details are invalid.',
+    P0045: 'Guest booking has unexpected credit charges.',
   };
 
   const matched_code = Object.keys(msg_map).find((code) => raw_message.includes(code));

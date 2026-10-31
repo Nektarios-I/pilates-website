@@ -6,6 +6,12 @@ import {
 } from '@/lib/schedule/studio-hours';
 
 import { is_active_booking_status, studio_time_from_iso } from './day-bookings';
+import {
+  format_compact_guest_subset_suffix,
+  format_guest_subset_suffix,
+  guest_display_name,
+  is_guest_attendee_kind,
+} from './guest-booking';
 import { format_session_type } from './staff-bookings';
 
 export type MonthCalendarKind = 'reformer' | 'mat' | 'private' | 'intro' | 'other';
@@ -20,9 +26,12 @@ export type TypeCounts = {
 
 export type MonthCalendarBooking = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   session_id: string;
   client_name: string;
+  attendee_kind: 'client' | 'guest';
+  is_guest: boolean;
+  guest_note: string | null;
   session_type: string;
   kind: MonthCalendarKind;
   starts_at: string;
@@ -37,18 +46,21 @@ export type MonthCalendarBooking = {
 
 export type MonthCalendarSlotBooking = {
   id: string;
-  user_id: string;
+  user_id: string | null;
   compact_name: string;
   session_type_label: string;
   kind: MonthCalendarKind;
   status: string;
   counts_as_active: boolean;
   full_name: string;
+  is_guest: boolean;
+  guest_note: string | null;
 };
 
 export type MonthCalendarCancelledEntry = {
   booking_id: string;
   client_name: string;
+  is_guest: boolean;
   cancelled_at: string | null;
   cancelled_by_label: string;
 };
@@ -65,6 +77,7 @@ export type MonthCalendarHourSlot = {
   hour: number;
   time_label: string;
   counts: TypeCounts;
+  guest_count: number;
   reformer: MonthCalendarSlotBooking[];
   mat: MonthCalendarSlotBooking[];
   other: MonthCalendarSlotBooking[];
@@ -79,6 +92,7 @@ export type MonthCalendarDay = {
   is_current_month: boolean;
   counts: TypeCounts;
   total_active: number;
+  guest_count: number;
   grade: 0 | 1 | 2 | 3 | 4;
 };
 
@@ -95,6 +109,9 @@ type RawMonthCalendarRow = {
   user_id: string | null;
   session_id: string | null;
   status: string;
+  attendee_kind?: string | null;
+  guest_label?: string | null;
+  guest_note?: string | null;
   cancelled_at?: string | null;
   cancellation_actor_note?: string | null;
   cancelled_by_user_id?: string | null;
@@ -155,15 +172,15 @@ export function format_compact_client_name(full_name: string | null | undefined)
   return `${first} ${last.slice(0, 3)}`;
 }
 
-export function format_type_counts_label(counts: TypeCounts): string {
+export function format_type_counts_label(counts: TypeCounts, guest_count = 0): string {
   const total = counts.reformer + counts.mat + counts.private + counts.intro + counts.other;
   if (total === 0) return 'No sessions';
 
-  return format_slot_counts_label(counts);
+  return `${format_slot_counts_label(counts)}${format_guest_subset_suffix(guest_count)}`;
 }
 
 /** Compact counts for narrow month cells. Screen-reader labels stay verbose. */
-export function format_compact_type_counts_label(counts: TypeCounts): string {
+export function format_compact_type_counts_label(counts: TypeCounts, guest_count = 0): string {
   const total = counts.reformer + counts.mat + counts.private + counts.intro + counts.other;
   if (total === 0) return 'None';
 
@@ -171,7 +188,7 @@ export function format_compact_type_counts_label(counts: TypeCounts): string {
   if (counts.private > 0) parts.push(`${counts.private}P`);
   if (counts.intro > 0) parts.push(`${counts.intro}I`);
   if (counts.other > 0) parts.push(`${counts.other}O`);
-  return parts.join(' ');
+  return `${parts.join(' ')}${format_compact_guest_subset_suffix(guest_count)}`;
 }
 
 export function format_hour_clock_label(hour: number): string {
@@ -249,7 +266,10 @@ export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalen
   const is_cancelled = row.status === 'cancelled';
   const visible =
     counts_as_active || is_cancelled || ['not_attended', 'no_show'].includes(row.status);
-  if (!row.user_id || !visible) return null;
+  if (!visible) return null;
+
+  const is_guest = is_guest_attendee_kind(row.attendee_kind);
+  if (!is_guest && !row.user_id) return null;
 
   const session = related_row(row.sessions);
   if (!session) return null;
@@ -262,12 +282,20 @@ export function map_month_calendar_booking(row: RawMonthCalendarRow): MonthCalen
   const time = studio_time_from_iso(session.starts_at);
   const [hour_text] = time.split(':');
   const hour = Number(hour_text);
+  const client_name = guest_display_name({
+    attendee_kind: is_guest ? 'guest' : 'client',
+    guest_label: row.guest_label,
+    client_name: profile?.full_name,
+  });
 
   return {
     id: row.id,
     user_id: row.user_id,
     session_id,
-    client_name: profile?.full_name?.trim() || 'Unnamed client',
+    client_name,
+    attendee_kind: is_guest ? 'guest' : 'client',
+    is_guest,
+    guest_note: is_guest ? row.guest_note ?? null : null,
     session_type: session.session_type,
     kind: classify_session_type(session.session_type),
     starts_at: session.starts_at,
@@ -290,12 +318,16 @@ export function build_month_calendar_days(options: {
   const today_key = options.today_key ?? studio_date_key();
   const grid = get_month_grid(new Date(options.year, options.month - 1, 1));
   const by_day = new Map<string, TypeCounts>();
+  const guests_by_day = new Map<string, number>();
 
   for (const item of options.bookings) {
     if (!item.counts_as_active) continue;
     const current = by_day.get(item.date_key) ?? empty_type_counts();
     increment_count(current, item.kind);
     by_day.set(item.date_key, current);
+    if (item.is_guest) {
+      guests_by_day.set(item.date_key, (guests_by_day.get(item.date_key) ?? 0) + 1);
+    }
   }
 
   return grid.map((date) => {
@@ -303,6 +335,7 @@ export function build_month_calendar_days(options: {
     const counts = by_day.get(date_key) ?? empty_type_counts();
     const total_active =
       counts.reformer + counts.mat + counts.private + counts.intro + counts.other;
+    const guest_count = guests_by_day.get(date_key) ?? 0;
 
     return {
       date_key,
@@ -312,6 +345,7 @@ export function build_month_calendar_days(options: {
       is_current_month: date.getMonth() === options.month - 1,
       counts,
       total_active,
+      guest_count,
       grade: grade_session_density(total_active),
     };
   });
@@ -342,13 +376,16 @@ function to_slot_booking(item: MonthCalendarBooking): MonthCalendarSlotBooking {
     status: item.status,
     counts_as_active: item.counts_as_active,
     full_name: item.client_name,
+    is_guest: item.is_guest,
+    guest_note: item.guest_note,
   };
 }
 
 function to_cancelled_entry(item: MonthCalendarBooking): MonthCalendarCancelledEntry {
   return {
     booking_id: item.id,
-    client_name: item.client_name,
+    client_name: item.is_guest ? `Guest · ${item.client_name}` : item.client_name,
+    is_guest: item.is_guest,
     cancelled_at: item.cancelled_at,
     cancelled_by_label: format_cancelled_by_label({
       cancelled_by_name: item.cancelled_by_name,
@@ -402,6 +439,7 @@ export function build_day_hour_slots(options: {
     const intro_bookings: MonthCalendarSlotBooking[] = [];
     const other_bookings: MonthCalendarSlotBooking[] = [];
     const cancelled_rows: MonthCalendarBooking[] = [];
+    let guest_count = 0;
 
     for (const item of hour_bookings) {
       if (item.status === 'cancelled') {
@@ -409,7 +447,10 @@ export function build_day_hour_slots(options: {
         continue;
       }
 
-      if (item.counts_as_active) increment_count(counts, item.kind);
+      if (item.counts_as_active) {
+        increment_count(counts, item.kind);
+        if (item.is_guest) guest_count += 1;
+      }
       const slot_booking = to_slot_booking(item);
       if (item.kind === 'reformer') reformer.push(slot_booking);
       else if (item.kind === 'mat') mat.push(slot_booking);
@@ -422,6 +463,7 @@ export function build_day_hour_slots(options: {
       hour,
       time_label: format_hour_clock_label(hour),
       counts,
+      guest_count,
       reformer,
       mat,
       other: [...private_bookings, ...intro_bookings, ...other_bookings],
@@ -434,7 +476,7 @@ export function accessible_day_label(day: MonthCalendarDay): string {
   const parsed = parse_date_key(day.date_key);
   const day_number = parsed.getDate();
   const month = parsed.toLocaleDateString('en-GB', { month: 'long' });
-  return `${day_number} ${month}, ${format_type_counts_label(day.counts)}`;
+  return `${day_number} ${month}, ${format_type_counts_label(day.counts, day.guest_count)}`;
 }
 
 export function current_studio_year_month(now = new Date()): { year: number; month: number } {

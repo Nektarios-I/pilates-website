@@ -16,8 +16,11 @@ import {
 
 describe('staff booking query contract (post-migration 18)', () => {
   it('requires explicit bookings_user_id_fkey for the booked client embed', () => {
-    expect(BOOKINGS_CLIENT_PROFILE_EMBED).toContain('profiles!bookings_user_id_fkey!inner');
+    expect(BOOKINGS_CLIENT_PROFILE_EMBED).toContain('profiles!bookings_user_id_fkey');
+    expect(BOOKINGS_CLIENT_PROFILE_EMBED).not.toContain('!inner');
     expect(BOOKINGS_CLIENT_PROFILE_EMBED).not.toMatch(/^profiles!inner/);
+    expect(STAFF_MONTH_CALENDAR_SELECT).toContain('attendee_kind');
+    expect(STAFF_MONTH_CALENDAR_SELECT).toContain('guest_label');
   });
 
   it('history, day, and month-calendar selects use the explicit client relationship', () => {

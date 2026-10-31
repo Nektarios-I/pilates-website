@@ -27,6 +27,7 @@ export type WeekSlotAttendee = {
   client_name: string;
   session_type: string;
   session_type_label: string;
+  is_guest: boolean;
 };
 
 export type WeekTimeSlot = {
@@ -36,6 +37,7 @@ export type WeekTimeSlot = {
   ends_at: string;
   /** Active booking count for this exact time range. */
   session_count: number;
+  guest_count: number;
   sessions: WeekSessionDetail[];
   /** Active clients across class sessions in this exact time range. */
   attendees: WeekSlotAttendee[];
@@ -47,6 +49,7 @@ export type WeekDayOverview = {
   day_number: number;
   is_today: boolean;
   session_count: number;
+  guest_count: number;
   slots: WeekTimeSlot[];
 };
 
@@ -98,10 +101,13 @@ export function shift_date_key_by_days(date_key: string, days: number): string {
   return to_date_key(add_days(parse_date_key(date_key), days));
 }
 
-export function format_session_count_label(count: number): string {
-  if (count === 0) return 'No sessions';
-  if (count === 1) return '1 session';
-  return `${count} sessions`;
+export function format_session_count_label(count: number, guest_count = 0): string {
+  let label = 'No sessions';
+  if (count === 1) label = '1 session';
+  else if (count > 1) label = `${count} sessions`;
+  if (guest_count <= 0) return label;
+  if (guest_count === 1) return `${label} · 1 guest`;
+  return `${label} · ${guest_count} guests`;
 }
 
 function format_day_month(date_key: string, include_year: boolean): string {
@@ -154,6 +160,7 @@ function attendees_from_session(session: DayBookingsSession): WeekSlotAttendee[]
     client_name: booking.client_name?.trim() || 'Unnamed client',
     session_type: session.session_type,
     session_type_label: type_label,
+    is_guest: booking.is_guest,
   }));
 }
 
@@ -178,6 +185,7 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
       existing.sessions.push(session_detail);
       existing.attendees.push(...session_attendees);
       existing.session_count = existing.attendees.length;
+      existing.guest_count = existing.attendees.filter((row) => row.is_guest).length;
       continue;
     }
 
@@ -187,6 +195,7 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
       starts_at: session.starts_at,
       ends_at: session.ends_at,
       session_count: session_attendees.length,
+      guest_count: session_attendees.filter((row) => row.is_guest).length,
       sessions: [session_detail],
       attendees: session_attendees,
     });
@@ -196,6 +205,7 @@ function group_day_slots(sessions: DayBookingsSession[]): WeekTimeSlot[] {
     .map((slot) => ({
       ...slot,
       session_count: slot.attendees.length,
+      guest_count: slot.attendees.filter((row) => row.is_guest).length,
       attendees: [...slot.attendees].sort((a, b) => {
         const type_cmp = a.session_type_label.localeCompare(b.session_type_label);
         if (type_cmp !== 0) return type_cmp;
@@ -235,6 +245,7 @@ export function build_week_sessions_overview(options: {
     const slots = group_day_slots(day_sessions);
     const parsed = parse_date_key(date_key);
     const session_count = slots.reduce((sum, slot) => sum + slot.session_count, 0);
+    const guest_count = slots.reduce((sum, slot) => sum + slot.guest_count, 0);
 
     return {
       date_key,
@@ -242,6 +253,7 @@ export function build_week_sessions_overview(options: {
       day_number: parsed.getDate(),
       is_today: date_key === today_key,
       session_count,
+      guest_count,
       slots,
     };
   });
